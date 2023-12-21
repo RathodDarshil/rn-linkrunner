@@ -159,5 +159,8 @@
         }
       ]
     ]
+  },
+  "directories": {
+    "example": "example"
   }
 }
