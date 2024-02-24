@@ -2,7 +2,7 @@ import DeviceInfo from 'react-native-device-info';
 
 let projet_token: string;
 
-const package_version = '0.2.0';
+const package_version = '0.2.1';
 const app_version = DeviceInfo.getVersion();
 
 const init = (token: string) => {
