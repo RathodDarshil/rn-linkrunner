@@ -1,9 +1,9 @@
 import DeviceInfo from 'react-native-device-info';
-
-let projet_token: string;
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 const package_version = '0.2.1';
 const app_version = DeviceInfo.getVersion();
+const EncryptedStorageTokenName = 'linkrunner-token';
 
 const init = (token: string) => {
   if (!token)
@@ -22,14 +22,14 @@ const init = (token: string) => {
     }),
   })
     .then((res) => res.json())
-    .then((result) => {
+    .then(async (result) => {
       if (!result) throw new Error('No response obtained!');
 
       if (result?.status !== 200 && result?.status !== 201) {
         throw new Error(result?.msg);
       }
 
-      projet_token = token;
+      await EncryptedStorage.setItem(EncryptedStorageTokenName, token);
       console.log('Linkrunner initialised successfully 🔥');
     })
     .catch((err) => {
@@ -37,13 +37,15 @@ const init = (token: string) => {
     });
 };
 
-const trigger = ({
+const trigger = async ({
   data,
   user_id,
 }: {
   user_id: string | number;
   data: any;
 }) => {
+  const token = await EncryptedStorage.getItem(EncryptedStorageTokenName);
+
   fetch('http://localhost:4000/api/client/trigger', {
     method: 'POST',
     headers: {
@@ -51,7 +53,7 @@ const trigger = ({
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      token: projet_token,
+      token,
       user_id,
       data,
     }),
