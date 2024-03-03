@@ -6,6 +6,7 @@ const app_version = DeviceInfo.getVersion();
 const EncryptedStorageTokenName = 'linkrunner-token';
 
 const init = (token: string) => {
+  // In error message add "Click here to get your project token"
   if (!token)
     return console.error('Linkrunner needs your project token to initialize!');
 
@@ -63,13 +64,15 @@ const trigger = async ({
       if (!result) throw new Error('No response obtained!');
 
       if (result?.status !== 200 && result?.status !== 201) {
-        throw new Error(result?.msg);
+        console.error('Linkrunner: Trigger failed');
+        console.error('Linkrunner: ', result?.msg);
       }
 
       console.log('Linkrunner: Trigger called 🔥');
     })
     .catch((err) => {
-      console.error('Error initializing linkrunner: ', err.message);
+      console.error('Linkrunner: Trigger failed');
+      console.error('Linkrunner: ', err?.msg);
     });
 };
 
