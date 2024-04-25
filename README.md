@@ -32,7 +32,7 @@ yarn add rn-linkrunner
 
 ### Initialisation
 
-You'll need your [project token](https://www.linkrunner.io) to initialisation the package
+You'll need your [project token](https://www.linkrunner.io/dashboard?m=documentation) to initialisation the package
 
 Place it in the `App.tsx` component, make sure the dependency array is empty for the `useEffect`
 
