@@ -5,7 +5,7 @@ import DeviceInfo, {
 } from 'react-native-device-info';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-const package_version = '0.2.2';
+const package_version = '0.3.0';
 const app_version = DeviceInfo.getVersion();
 const EncryptedStorageTokenName = 'linkrunner-token';
 
