@@ -1,16 +1,44 @@
-import DeviceInfo from 'react-native-device-info';
+import { Linking } from 'react-native';
+import DeviceInfo, {
+  getManufacturer,
+  getSystemVersion,
+} from 'react-native-device-info';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
 const package_version = '0.2.2';
 const app_version = DeviceInfo.getVersion();
 const EncryptedStorageTokenName = 'linkrunner-token';
 
+const device_data = {
+  android_id: DeviceInfo.getAndroidId(),
+  api_level: DeviceInfo.getApiLevel(),
+  application_name: DeviceInfo.getApplicationName(),
+  base_os: DeviceInfo.getBaseOs(),
+  build_id: DeviceInfo.getBuildId(),
+  brand: DeviceInfo.getBrand(),
+  build_number: DeviceInfo.getBuildNumber(),
+  bundle_id: DeviceInfo.getBundleId(),
+  carrier: DeviceInfo.getCarrier(),
+  device: DeviceInfo.getDevice(),
+  device_id: DeviceInfo.getDeviceId(),
+  device_type: DeviceInfo.getDeviceType(),
+  device_name: DeviceInfo.getDeviceName(),
+  device_token: DeviceInfo.getDeviceToken(),
+  device_ip: DeviceInfo.getIpAddress(),
+  install_ref: DeviceInfo.getInstallReferrer(),
+  manufacturer: getManufacturer(),
+  system_version: getSystemVersion(),
+  version: DeviceInfo.getVersion(),
+};
+
+const baseUrl = 'https://api.linkrunner.io';
+
 const init = (token: string) => {
   // In error message add "Click here to get your project token"
   if (!token)
     return console.error('Linkrunner needs your project token to initialize!');
 
-  fetch('http://localhost:4000/api/client/init', {
+  fetch(baseUrl + '/api/client/init', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -20,6 +48,7 @@ const init = (token: string) => {
       token,
       package_version,
       app_version,
+      device_data,
     }),
   })
     .then((res) => res.json())
@@ -47,7 +76,7 @@ const trigger = async ({
 }) => {
   const token = await EncryptedStorage.getItem(EncryptedStorageTokenName);
 
-  fetch('http://localhost:4000/api/client/trigger', {
+  fetch(baseUrl + '/api/client/trigger', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',
@@ -56,7 +85,10 @@ const trigger = async ({
     body: JSON.stringify({
       token,
       user_id,
-      data,
+      data: {
+        ...data,
+        device_data,
+      },
     }),
   })
     .then((res) => res.json())
@@ -66,6 +98,10 @@ const trigger = async ({
       if (result?.status !== 200 && result?.status !== 201) {
         console.error('Linkrunner: Trigger failed');
         console.error('Linkrunner: ', result?.msg);
+      }
+
+      if (!!result?.data?.deeplink) {
+        Linking.openURL(result?.data?.deeplink);
       }
 
       console.log('Linkrunner: Trigger called 🔥');
