@@ -54,8 +54,13 @@ import linkrunner from 'rn-linkrunner';
 
 const onTrigger = () => {
     linkrunner.trigger({
-        user_id: 'USER_ID',
-        data: {},
+        user_data: {
+            id: 1,
+            name: "Darshil Rathod", // optional
+            phone: "9583849238", // optional
+            email: "darshil@linkrunner.io", //optional
+        },
+        data: {}, // Any other data you might need
     });
 };
 ```
