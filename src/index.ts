@@ -67,11 +67,18 @@ const init = (token: string) => {
     });
 };
 
+type UserData = {
+  id: string;
+  name?: string;
+  phone?: string;
+  email?: string;
+};
+
 const trigger = async ({
   data,
-  user_id,
+  user_data,
 }: {
-  user_id: string | number;
+  user_data: UserData;
   data: any;
 }) => {
   const token = await EncryptedStorage.getItem(EncryptedStorageTokenName);
@@ -84,7 +91,7 @@ const trigger = async ({
     },
     body: JSON.stringify({
       token,
-      user_id,
+      user_data,
       data: {
         ...data,
         device_data,
