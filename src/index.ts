@@ -5,7 +5,7 @@ import DeviceInfo, {
 } from 'react-native-device-info';
 import EncryptedStorage from 'react-native-encrypted-storage';
 
-const package_version = '0.4.2';
+const package_version = '0.4.3';
 const app_version = DeviceInfo.getVersion();
 const EncryptedStorageTokenName = 'linkrunner-token';
 
@@ -49,6 +49,7 @@ const init = (token: string) => {
       package_version,
       app_version,
       device_data,
+      platform: 'REACT_NATIVE',
     }),
   })
     .then((res) => res.json())
@@ -92,6 +93,7 @@ const trigger = async ({
     body: JSON.stringify({
       token,
       user_data,
+      platform: 'REACT_NATIVE',
       data: {
         ...data,
         device_data,

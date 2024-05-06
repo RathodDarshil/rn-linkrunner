@@ -55,10 +55,10 @@ import linkrunner from 'rn-linkrunner';
 const onTrigger = () => {
     linkrunner.trigger({
         user_data: {
-            id: 1,
-            name: "Darshil Rathod", // optional
+            id: "1",
+            name: "John Doe", // optional
             phone: "9583849238", // optional
-            email: "darshil@linkrunner.io", //optional
+            email: "support@linkrunner.io", //optional
         },
         data: {}, // Any other data you might need
     });
@@ -66,6 +66,10 @@ const onTrigger = () => {
 ```
 
 Both the attributes in the `trigger` method are optional although recommened to have.
+
+### Facing issues during integration?
+
+Mail us on support@linkrunner.io
 
 <!-- ## Contributing
 
