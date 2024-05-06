@@ -3,11 +3,9 @@ import DeviceInfo, {
   getManufacturer,
   getSystemVersion,
 } from 'react-native-device-info';
-import EncryptedStorage from 'react-native-encrypted-storage';
 
-const package_version = '0.4.3';
-const app_version = DeviceInfo.getVersion();
-const EncryptedStorageTokenName = 'linkrunner-token';
+const package_version = '0.5.0';
+const app_version: string = DeviceInfo.getVersion();
 
 const device_data = {
   android_id: DeviceInfo.getAndroidId(),
@@ -33,97 +31,117 @@ const device_data = {
 
 const baseUrl = 'https://api.linkrunner.io';
 
-const init = (token: string) => {
-  // In error message add "Click here to get your project token"
-  if (!token)
-    return console.error('Linkrunner needs your project token to initialize!');
-
-  fetch(baseUrl + '/api/client/init', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token,
-      package_version,
-      app_version,
-      device_data,
-      platform: 'REACT_NATIVE',
-    }),
-  })
-    .then((res) => res.json())
-    .then(async (result) => {
-      if (!result) throw new Error('No response obtained!');
-
-      if (result?.status !== 200 && result?.status !== 201) {
-        throw new Error(result?.msg);
-      }
-
-      await EncryptedStorage.setItem(EncryptedStorageTokenName, token);
-      console.log('Linkrunner initialised successfully 🔥');
-    })
-    .catch((err) => {
-      console.error('Error initializing linkrunner: ', err.message);
-    });
-};
-
-type UserData = {
+interface UserData {
   id: string;
   name?: string;
   phone?: string;
   email?: string;
-};
+}
 
-const trigger = async ({
-  data,
-  user_data,
-}: {
-  user_data: UserData;
-  data: any;
-}) => {
-  const token = await EncryptedStorage.getItem(EncryptedStorageTokenName);
+interface TriggerConfig {
+  trigger_deeplink?: boolean;
+}
 
-  fetch(baseUrl + '/api/client/trigger', {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      token,
-      user_data,
-      platform: 'REACT_NATIVE',
-      data: {
-        ...data,
-        device_data,
+class Linkrunner {
+  private token: string | null;
+
+  constructor() {
+    this.token = null;
+  }
+
+  init(token: string): void {
+    if (!token) {
+      console.error('Linkrunner needs your project token to initialize!');
+      return;
+    }
+
+    this.token = token;
+    fetch(baseUrl + '/api/client/init', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
       },
-    }),
-  })
-    .then((res) => res.json())
-    .then((result) => {
-      if (!result) throw new Error('No response obtained!');
+      body: JSON.stringify({
+        token,
+        package_version,
+        app_version,
+        device_data,
+        platform: 'REACT_NATIVE',
+      }),
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (!result) throw new Error('No response obtained!');
+
+        if (result?.status !== 200 && result?.status !== 201) {
+          throw new Error(result?.msg);
+        }
+
+        if (__DEV__) {
+          console.log('Linkrunner initialised successfully 🔥');
+        }
+      })
+      .catch((err) => {
+        console.error('Error initializing linkrunner: ', err.message);
+      });
+  }
+
+  async trigger({
+    data,
+    user_data,
+    config,
+  }: {
+    config?: TriggerConfig;
+    data: any;
+    user_data: UserData;
+  }): Promise<void> {
+    if (!this.token) {
+      console.error('Linkrunner: Trigger failed, token not initialized');
+      return;
+    }
+
+    try {
+      const response = await fetch(baseUrl + '/api/client/trigger', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: this.token,
+          user_data,
+          platform: 'REACT_NATIVE',
+          data: {
+            ...data,
+            device_data,
+          },
+        }),
+      });
+      const result = await response.json();
 
       if (result?.status !== 200 && result?.status !== 201) {
         console.error('Linkrunner: Trigger failed');
         console.error('Linkrunner: ', result?.msg);
+        return;
       }
 
-      if (!!result?.data?.deeplink) {
+      if (result?.data?.deeplink && config?.trigger_deeplink !== false) {
         Linking.openURL(result?.data?.deeplink);
       }
 
-      console.log('Linkrunner: Trigger called 🔥');
-    })
-    .catch((err) => {
-      console.error('Linkrunner: Trigger failed');
-      console.error('Linkrunner: ', err?.msg);
-    });
-};
+      if (__DEV__) {
+        console.log('Linkrunner: Trigger called 🔥');
+      }
 
-const linkrunner = {
-  init,
-  trigger,
-};
+      return result.data;
+    } catch (err: any) {
+      console.error('Linkrunner: Trigger failed');
+      console.error('Linkrunner: ', err.message);
+    }
+  }
+}
+
+const linkrunner = new Linkrunner();
 
 export default linkrunner;
