@@ -42,6 +42,24 @@ interface TriggerConfig {
   trigger_deeplink?: boolean;
 }
 
+export type Response = {
+  ip_location_data: IPLocationData;
+  deeplink: string;
+  root_domain: boolean;
+};
+
+export interface IPLocationData {
+  ip: string;
+  city: string;
+  countryLong: string;
+  countryShort: string;
+  latitude: number;
+  longitude: number;
+  region: string;
+  timeZone: string;
+  zipCode: string;
+}
+
 class Linkrunner {
   private token: string | null;
 
@@ -49,42 +67,45 @@ class Linkrunner {
     this.token = null;
   }
 
-  init(token: string): void {
+  async init(token: string): Promise<void | Response> {
     if (!token) {
       console.error('Linkrunner needs your project token to initialize!');
       return;
     }
 
     this.token = token;
-    fetch(baseUrl + '/api/client/init', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token,
-        package_version,
-        app_version,
-        device_data,
-        platform: 'REACT_NATIVE',
-      }),
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        if (!result) throw new Error('No response obtained!');
-
-        if (result?.status !== 200 && result?.status !== 201) {
-          throw new Error(result?.msg);
-        }
-
-        if (__DEV__) {
-          console.log('Linkrunner initialised successfully 🔥');
-        }
-      })
-      .catch((err) => {
-        console.error('Error initializing linkrunner: ', err.message);
+    try {
+      const fetch_result = await fetch(baseUrl + '/api/client/init', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token,
+          package_version,
+          app_version,
+          device_data,
+          platform: 'REACT_NATIVE',
+        }),
       });
+
+      const result = await fetch_result.json();
+
+      //   if (!result) throw new Error('No response obtained!');
+
+      if (result?.status !== 200 && result?.status !== 201) {
+        throw new Error(result?.msg);
+      }
+
+      if (__DEV__) {
+        console.log('Linkrunner initialised successfully 🔥');
+      }
+
+      return result?.data;
+    } catch (error) {
+      console.error('Error initializing linkrunner');
+    }
   }
 
   async trigger({
@@ -95,7 +116,7 @@ class Linkrunner {
     config?: TriggerConfig;
     data: any;
     user_data: UserData;
-  }): Promise<void> {
+  }): Promise<void | Response> {
     if (!this.token) {
       console.error('Linkrunner: Trigger failed, token not initialized');
       return;
@@ -126,8 +147,29 @@ class Linkrunner {
         return;
       }
 
-      if (result?.data?.deeplink && config?.trigger_deeplink !== false) {
-        Linking.openURL(result?.data?.deeplink);
+      if (
+        result?.data?.deeplink &&
+        config?.trigger_deeplink !== false &&
+        result?.data?.trigger
+      ) {
+        if (__DEV__) {
+          console.log('Triggering deeplink > ', result?.data?.deeplink);
+        }
+
+        Linking.openURL(result?.data?.deeplink).then(() => {
+          fetch(baseUrl + '/api/client/deeplink-triggered', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              token: this.token,
+            }),
+          })
+            .then((res) => res.json())
+            .catch(() => {});
+        });
       }
 
       if (__DEV__) {
