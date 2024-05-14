@@ -4,7 +4,7 @@ import DeviceInfo, {
   getSystemVersion,
 } from 'react-native-device-info';
 
-const package_version = '0.5.1';
+const package_version = '0.5.2';
 const app_version: string = DeviceInfo.getVersion();
 
 const device_data = {

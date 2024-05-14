@@ -39,19 +39,43 @@ import linkrunner from 'rn-linkrunner';
 
 // Inside your react component
 useEffect(() => {
-  linkrunner.init('PROJECT_TOKEN');
+  init();
 }, []);
+
+const init = async () => {
+  const initData = await linkrunner.init('PROJECT_TOKEN');
+};
+```
+
+#### Response type for `linkrunner.init`
+
+```
+{
+  ip_location_data: {
+    ip: string;
+    city: string;
+    countryLong: string;
+    countryShort: string;
+    latitude: number;
+    longitude: number;
+    region: string;
+    timeZone: string;
+    zipCode: string;
+  };
+  deeplink: string;
+  root_domain: boolean;
+}
 ```
 
 ### Trigger
 
-Call this function once your onboarding is completed and the navigation stack can be accessed by a deep link:
+Call this function once your onboarding is completed and the navigation stack can be accessed by a deeplink:
 
 ```jsx
 import linkrunner from 'rn-linkrunner';
 
-const onTrigger = () => {
-  linkrunner.trigger({
+const onTrigger = async () => {
+  const trigger = await linkrunner.trigger({
     user_data: {
       id: '1',
       name: 'John Doe', // optional
@@ -63,7 +87,28 @@ const onTrigger = () => {
 };
 ```
 
-Both attributes in the `trigger` method are optional, although recommended.
+#### Response type for `linkrunner.trigger`
+
+```
+{
+  ip_location_data: {
+    ip: string;
+    city: string;
+    countryLong: string;
+    countryShort: string;
+    latitude: number;
+    longitude: number;
+    region: string;
+    timeZone: string;
+    zipCode: string;
+  };
+  deeplink: string;
+  root_domain: boolean;
+  trigger: boolean // Deeplink won't be triggered if false
+}
+```
+
+Note: Value of `trigger` will be only true for the first time the function is triggered by the user in order to prevent unnecessary redirects
 
 ### Facing issues during integration?
 
