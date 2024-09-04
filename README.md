@@ -6,14 +6,16 @@ React Native Package for [linkrunner.io](https://www.linkrunner.io)
 
 ### Step 1: Prerequisites
 
-rn-linkrunner also uses `react-native-device-info`. You can install this package with the following command:
+rn-linkrunner also uses `react-native-device-info`, `@react-native-community/netinfo` and `react-native-play-install-referrer`. You can install these packages with the following command:
 
 ```sh
-npm install react-native-device-info
+npm install react-native-device-info @react-native-community/netinfo react-native-play-install-referrer
+```
 
 or
 
-yarn add react-native-device-info
+```sh
+yarn add react-native-device-info @react-native-community/netinfo react-native-play-install-referrer
 ```
 
 Then run `cd ios && pod install` to install pods for the package.
@@ -22,9 +24,11 @@ Then run `cd ios && pod install` to install pods for the package.
 
 ```sh
 npm install rn-linkrunner
+```
 
 or
 
+```sh
 yarn add rn-linkrunner
 ```
 
@@ -104,15 +108,55 @@ const onTrigger = async () => {
   };
   deeplink: string;
   root_domain: boolean;
-  trigger: boolean // Deeplink won't be triggered if false
+  trigger: boolean; // Deeplink won't be triggered if false
 }
 ```
 
 Note: Value of `trigger` will be only true for the first time the function is triggered by the user in order to prevent unnecessary redirects
 
+### Capture Payment
+
+Use this method to capture payment information:
+
+```js
+const capturePayment = async () => {
+  await linkrunner.capturePayment({
+    amount: 100, // Payment amount
+    userId: 'user123', // User identifier
+    paymentId: 'payment456', // Optional: Unique payment identifier
+  });
+};
+```
+
+#### Parameters for `linkrunner.capturePayment`
+
+- `amount`: number (required) - The payment amount
+- `userId`: string (required) - Identifier for the user making the payment
+- `paymentId`: string (optional) - Unique identifier for the payment
+
+### Remove Payment
+
+Use this method to remove a captured payment:
+
+```js
+const removePayment = async () => {
+  await linkrunner.removePayment({
+    userId: 'user123', // User identifier
+    paymentId: 'payment456', // Optional: Unique payment identifier
+  });
+};
+```
+
+#### Parameters for `linkrunner.removePayment`
+
+- `userId`: string (required) - Identifier for the user whose payment is being removed
+- `paymentId`: string (optional) - Unique identifier for the payment to be removed
+
+Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If `userId` is provided, all payments for that user will be removed.
+
 ### Facing issues during integration?
 
-Mail us on support@linkrunner.io
+Mail us on darshil@linkrunner.io
 
 ## License
 

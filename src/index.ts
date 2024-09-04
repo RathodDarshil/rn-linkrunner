@@ -1,64 +1,53 @@
 import { Linking } from 'react-native';
-import DeviceInfo, {
-  getManufacturer,
-  getSystemVersion,
-} from 'react-native-device-info';
+import DeviceInfo from 'react-native-device-info';
+import { device_data } from './helper';
+import type { TriggerConfig, UserData } from './types';
 
-const package_version = '0.5.2';
+const package_version = '0.6.0';
 const app_version: string = DeviceInfo.getVersion();
-
-const device_data = {
-  android_id: DeviceInfo.getAndroidId(),
-  api_level: DeviceInfo.getApiLevel(),
-  application_name: DeviceInfo.getApplicationName(),
-  base_os: DeviceInfo.getBaseOs(),
-  build_id: DeviceInfo.getBuildId(),
-  brand: DeviceInfo.getBrand(),
-  build_number: DeviceInfo.getBuildNumber(),
-  bundle_id: DeviceInfo.getBundleId(),
-  carrier: DeviceInfo.getCarrier(),
-  device: DeviceInfo.getDevice(),
-  device_id: DeviceInfo.getDeviceId(),
-  device_type: DeviceInfo.getDeviceType(),
-  device_name: DeviceInfo.getDeviceName(),
-  device_token: DeviceInfo.getDeviceToken(),
-  device_ip: DeviceInfo.getIpAddress(),
-  install_ref: DeviceInfo.getInstallReferrer(),
-  manufacturer: getManufacturer(),
-  system_version: getSystemVersion(),
-  version: DeviceInfo.getVersion(),
-};
 
 const baseUrl = 'https://api.linkrunner.io';
 
-interface UserData {
-  id: string;
-  name?: string;
-  phone?: string;
-  email?: string;
-}
+const initApiCall = async (
+  token: string,
+  source: 'GENERAL' | 'ADS',
+  link?: string
+) => {
+  try {
+    const fetch_result = await fetch(baseUrl + '/api/client/init', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        package_version,
+        app_version,
+        device_data: await device_data(),
+        platform: 'REACT_NATIVE',
+        source,
+        link,
+      }),
+    });
 
-interface TriggerConfig {
-  trigger_deeplink?: boolean;
-}
+    const result = await fetch_result.json();
 
-export type Response = {
-  ip_location_data: IPLocationData;
-  deeplink: string;
-  root_domain: boolean;
+    if (result?.status !== 200 && result?.status !== 201) {
+      throw new Error(result?.msg);
+    }
+
+    if (__DEV__) {
+      console.log('Linkrunner initialised successfully 🔥');
+
+      console.log('init response > ', result);
+    }
+
+    return result?.data;
+  } catch (error) {
+    console.error('Error initializing linkrunner', error);
+  }
 };
-
-export interface IPLocationData {
-  ip: string;
-  city: string;
-  countryLong: string;
-  countryShort: string;
-  latitude: number;
-  longitude: number;
-  region: string;
-  timeZone: string;
-  zipCode: string;
-}
 
 class Linkrunner {
   private token: string | null;
@@ -67,45 +56,15 @@ class Linkrunner {
     this.token = null;
   }
 
-  async init(token: string): Promise<void | Response> {
+  async init(token: string): Promise<void | LRInitResponse> {
     if (!token) {
       console.error('Linkrunner needs your project token to initialize!');
       return;
     }
 
     this.token = token;
-    try {
-      const fetch_result = await fetch(baseUrl + '/api/client/init', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token,
-          package_version,
-          app_version,
-          device_data,
-          platform: 'REACT_NATIVE',
-        }),
-      });
 
-      const result = await fetch_result.json();
-
-      //   if (!result) throw new Error('No response obtained!');
-
-      if (result?.status !== 200 && result?.status !== 201) {
-        throw new Error(result?.msg);
-      }
-
-      if (__DEV__) {
-        console.log('Linkrunner initialised successfully 🔥');
-      }
-
-      return result?.data;
-    } catch (error) {
-      console.error('Error initializing linkrunner');
-    }
+    return await initApiCall(token, 'GENERAL');
   }
 
   async trigger({
@@ -114,9 +73,9 @@ class Linkrunner {
     config,
   }: {
     config?: TriggerConfig;
-    data: any;
+    data?: { [key: string]: any };
     user_data: UserData;
-  }): Promise<void | Response> {
+  }): Promise<void | LRTriggerResponse> {
     if (!this.token) {
       console.error('Linkrunner: Trigger failed, token not initialized');
       return;
@@ -135,7 +94,7 @@ class Linkrunner {
           platform: 'REACT_NATIVE',
           data: {
             ...data,
-            device_data,
+            device_data: await device_data(),
           },
         }),
       });
@@ -167,7 +126,14 @@ class Linkrunner {
               token: this.token,
             }),
           })
-            .then((res) => res.json())
+            .then(() => {
+              if (__DEV__) {
+                console.log(
+                  'Linkrunner: Deeplink triggered successfully',
+                  result?.data?.deeplink
+                );
+              }
+            })
             .catch(() => {});
         });
       }
@@ -182,8 +148,127 @@ class Linkrunner {
       console.error('Linkrunner: ', err.message);
     }
   }
+
+  async capturePayment({
+    amount,
+    userId,
+    paymentId,
+  }: {
+    paymentId?: string;
+    userId: string;
+    amount: number;
+  }) {
+    if (!this.token) {
+      console.error(
+        'Linkrunner: Capture payment failed, token not initialized'
+      );
+      return;
+    }
+
+    try {
+      const response = await fetch(baseUrl + '/api/client/capture-payment', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: this.token,
+          user_id: userId,
+          platform: 'REACT_NATIVE',
+          data: {
+            device_data: await device_data(),
+          },
+          amount,
+          payment_id: paymentId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result?.status !== 200 && result?.status !== 201) {
+        console.error('Linkrunner: Capture payment failed');
+        console.error('Linkrunner: ', result?.msg);
+        return;
+      }
+
+      if (__DEV__) {
+        console.log('Linkrunner: Payment captured successfully 💸', {
+          amount,
+          paymentId,
+          userId,
+        });
+      }
+    } catch (error) {
+      console.error('Linkrunner: Payment capturing failed!');
+      return;
+    }
+  }
+
+  async removePayment({
+    userId,
+    paymentId,
+  }: {
+    paymentId?: string;
+    userId: string;
+  }) {
+    if (!this.token) {
+      console.error('Linkrunner: Remove payment failed, token not initialized');
+      return;
+    }
+
+    if (!paymentId && !userId) {
+      return console.error(
+        'Linkrunner: Either paymentId or userId must be provided!'
+      );
+    }
+
+    try {
+      const response = await fetch(
+        baseUrl + '/api/client/remove-captured-payment',
+        {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            token: this.token,
+            user_id: userId,
+            platform: 'REACT_NATIVE',
+            data: {
+              device_data: await device_data(),
+            },
+            payment_id: paymentId,
+          }),
+        }
+      );
+
+      const result = await response.json();
+
+      if (result?.status !== 200 && result?.status !== 201) {
+        console.error('Linkrunner: Capture payment failed');
+        console.error('Linkrunner: ', result?.msg);
+        return;
+      }
+
+      if (__DEV__) {
+        console.log('Linkrunner: Payment entry removed successfully!', {
+          paymentId,
+          userId,
+        });
+      }
+    } catch (error) {
+      console.error('Linkrunner: Payment capturing failed!');
+      return;
+    }
+  }
 }
 
 const linkrunner = new Linkrunner();
+
+export type LRInitResponse = Response;
+
+export type LRTriggerResponse = Response;
 
 export default linkrunner;
