@@ -1,9 +1,9 @@
 import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import { device_data } from './helper';
+import { device_data, getLinkRunnerInstallInstanceId } from './helper';
 import type { TriggerConfig, UserData } from './types';
 
-const package_version = '0.6.0';
+const package_version = '0.6.1';
 const app_version: string = DeviceInfo.getVersion();
 
 const baseUrl = 'https://api.linkrunner.io';
@@ -28,6 +28,7 @@ const initApiCall = async (
         platform: 'REACT_NATIVE',
         source,
         link,
+        install_instance_id: await getLinkRunnerInstallInstanceId(),
       }),
     });
 
@@ -96,6 +97,7 @@ class Linkrunner {
             ...data,
             device_data: await device_data(),
           },
+          install_instance_id: await getLinkRunnerInstallInstanceId(),
         }),
       });
       const result = await response.json();
@@ -181,6 +183,7 @@ class Linkrunner {
           },
           amount,
           payment_id: paymentId,
+          install_instance_id: await getLinkRunnerInstallInstanceId(),
         }),
       });
 
@@ -240,6 +243,7 @@ class Linkrunner {
               device_data: await device_data(),
             },
             payment_id: paymentId,
+            install_instance_id: await getLinkRunnerInstallInstanceId(),
           }),
         }
       );
