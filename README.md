@@ -6,16 +6,16 @@ React Native Package for [linkrunner.io](https://www.linkrunner.io)
 
 ### Step 1: Prerequisites
 
-rn-linkrunner also uses `react-native-device-info`, `@react-native-community/netinfo` and `react-native-play-install-referrer`. You can install these packages with the following command:
+rn-linkrunner also uses `react-native-device-info`, `@react-native-community/netinfo`, `@react-native-async-storage/async-storage` and `react-native-play-install-referrer`. You can install these packages with the following command:
 
 ```sh
-npm install react-native-device-info @react-native-community/netinfo react-native-play-install-referrer
+npm install react-native-device-info @react-native-community/netinfo @react-native-async-storage/async-storage react-native-play-install-referrer
 ```
 
 or
 
 ```sh
-yarn add react-native-device-info @react-native-community/netinfo react-native-play-install-referrer
+yarn add react-native-device-info @react-native-community/netinfo @react-native-async-storage/async-storage react-native-play-install-referrer
 ```
 
 Then run `cd ios && pod install` to install pods for the package.

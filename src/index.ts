@@ -3,7 +3,7 @@ import DeviceInfo from 'react-native-device-info';
 import { device_data, getLinkRunnerInstallInstanceId } from './helper';
 import type { TriggerConfig, UserData } from './types';
 
-const package_version = '0.6.1';
+const package_version = '0.6.2';
 const app_version: string = DeviceInfo.getVersion();
 
 const baseUrl = 'https://api.linkrunner.io';
