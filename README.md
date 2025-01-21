@@ -68,12 +68,23 @@ const init = async () => {
   };
   deeplink: string;
   root_domain: boolean;
+  campaign_data: {
+    id: string;
+    name: string;
+    type: "ORGANIC" | "INORGANIC";
+    ad_network: "META" | "GOOGLE" | null;
+    group_name: string | null;
+    asset_group_name: string | null;
+    asset_name: string | null;
+  };
 }
 ```
 
 ### Trigger
 
 Call this function once your onboarding is completed and the navigation stack can be accessed by a deeplink:
+
+Note: Make sure this function is called every time the user opens the app after being logged in.
 
 ```jsx
 import linkrunner from 'rn-linkrunner';
@@ -87,9 +98,15 @@ const onTrigger = async () => {
       email: 'support@linkrunner.io', //optional
     },
     data: {}, // Any other data you might need
+    config: {
+      trigger_deeplink: true, // Default is true
   });
 };
 ```
+
+The config parameter allows you to control the behavior of the trigger function:
+
+- `trigger_deeplink`: boolean (optional) - When set to false, prevents automatic triggering of the deeplink even if one is returned
 
 #### Response type for `linkrunner.trigger`
 
@@ -112,7 +129,7 @@ const onTrigger = async () => {
 }
 ```
 
-Note: Value of `trigger` will be only true for the first time the function is triggered by the user in order to prevent unnecessary redirects
+Value of `trigger` will be only true for the first time the function is triggered by the user in order to prevent unnecessary redirects
 
 ### Capture Payment
 

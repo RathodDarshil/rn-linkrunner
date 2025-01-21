@@ -1,9 +1,14 @@
 import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 import { device_data, getLinkRunnerInstallInstanceId } from './helper';
-import type { TriggerConfig, UserData } from './types';
+import type {
+  CampaignData,
+  LRIPLocationData,
+  TriggerConfig,
+  UserData,
+} from './types';
 
-const package_version = '0.6.2';
+const package_version = '0.7.0';
 const app_version: string = DeviceInfo.getVersion();
 
 const baseUrl = 'https://api.linkrunner.io';
@@ -271,7 +276,12 @@ class Linkrunner {
 
 const linkrunner = new Linkrunner();
 
-export type LRInitResponse = Response;
+export type LRInitResponse = {
+  ip_location_data: LRIPLocationData;
+  deeplink: string;
+  root_domain: boolean;
+  campaign_data: CampaignData;
+};
 
 export type LRTriggerResponse = Response;
 

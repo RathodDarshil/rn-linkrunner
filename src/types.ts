@@ -21,9 +21,20 @@ export interface TriggerConfig {
   trigger_deeplink?: boolean;
 }
 
+export interface CampaignData {
+  id: string;
+  name: string;
+  type: 'ORGANIC' | 'INORGANIC';
+  ad_network: 'META' | 'GOOGLE' | null;
+  group_name: string | null;
+  asset_group_name: string | null;
+  asset_name: string | null;
+}
+
 export type Response = {
   ip_location_data: LRIPLocationData;
   deeplink: string;
   root_domain: boolean;
   trigger?: boolean;
+  campaign_data: CampaignData;
 };
