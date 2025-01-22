@@ -8,10 +8,16 @@ import {
   type PlayInstallReferrerInfo,
 } from 'react-native-play-install-referrer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 const device_data = async (): Promise<Record<string, any>> => {
   const getInstallReferrerInfo = (): Promise<PlayInstallReferrerInfo | {}> => {
     return new Promise((resolve) => {
+      if (Platform.OS === 'ios') {
+        resolve({});
+        return;
+      }
+
       PlayInstallReferrer.getInstallReferrerInfo(
         (installReferrerInfo, error) => {
           if (!error && !!installReferrerInfo) {
@@ -76,7 +82,7 @@ async function getLinkRunnerInstallInstanceId(): Promise<string> {
     return installInstanceId;
   } catch (error) {
     console.error('Error accessing AsyncStorage:', error);
-    throw error;
+    return 'ERROR_GENERAING_INSTALL_INSTANCE_ID';
   }
 }
 
