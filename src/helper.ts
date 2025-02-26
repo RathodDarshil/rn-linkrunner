@@ -9,6 +9,7 @@ import {
 } from 'react-native-play-install-referrer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import ReactNativeIdfaAaid from '@sparkfabrik/react-native-idfa-aaid';
 
 const device_data = async (): Promise<Record<string, any>> => {
   const getInstallReferrerInfo = (): Promise<PlayInstallReferrerInfo | {}> => {
@@ -29,6 +30,15 @@ const device_data = async (): Promise<Record<string, any>> => {
       );
     });
   };
+
+  const getAdvertisingIdentifier = async () => {
+    const identifier = await ReactNativeIdfaAaid.getAdvertisingInfo();
+    if (!identifier.isAdTrackingLimited && identifier.id) {
+        return identifier.id;
+    } else {
+        return null;
+    }
+  }
 
   const [installReferrerInfo, connectivity, manufacturer, systemVersion] =
     await Promise.all([
@@ -61,6 +71,9 @@ const device_data = async (): Promise<Record<string, any>> => {
     version: DeviceInfo.getVersion(),
     connectivity: connectivity.type,
     user_agent: DeviceInfo.getUserAgent(),
+    gaid: Platform.OS === "android" ? await getAdvertisingIdentifier() : null,
+    idfa: Platform.OS === "ios" ? await getAdvertisingIdentifier() : null,
+    idfv: Platform.OS === "ios" ? DeviceInfo.getUniqueId() : null,
     ...installReferrerInfo,
   };
 };
