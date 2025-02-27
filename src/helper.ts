@@ -19,26 +19,40 @@ const device_data = async (): Promise<Record<string, any>> => {
         return;
       }
 
-      PlayInstallReferrer.getInstallReferrerInfo(
-        (installReferrerInfo, error) => {
-          if (!error && !!installReferrerInfo) {
-            resolve(installReferrerInfo);
-          } else {
-            resolve({});
+      // Add a timeout to ensure the promise resolves even if the callback never fires
+      const timeoutId = setTimeout(() => {
+        resolve({});
+      }, 2000);
+
+      try {
+        PlayInstallReferrer.getInstallReferrerInfo(
+          (installReferrerInfo, error) => {
+            // Clear the timeout since callback fired
+            clearTimeout(timeoutId);
+
+            if (!error && !!installReferrerInfo) {
+              resolve(installReferrerInfo);
+            } else {
+              resolve({});
+            }
           }
-        }
-      );
+        );
+      } catch (e) {
+        // Clear the timeout since we caught an exception
+        clearTimeout(timeoutId);
+        resolve({});
+      }
     });
   };
 
   const getAdvertisingIdentifier = async () => {
     const identifier = await ReactNativeIdfaAaid.getAdvertisingInfo();
     if (!identifier.isAdTrackingLimited && identifier.id) {
-        return identifier.id;
+      return identifier.id;
     } else {
-        return null;
+      return null;
     }
-  }
+  };
 
   const [installReferrerInfo, connectivity, manufacturer, systemVersion] =
     await Promise.all([
@@ -49,31 +63,31 @@ const device_data = async (): Promise<Record<string, any>> => {
     ]);
 
   return {
-    android_id: DeviceInfo.getAndroidId(),
-    api_level: DeviceInfo.getApiLevel(),
+    android_id: await DeviceInfo.getAndroidId(),
+    api_level: await DeviceInfo.getApiLevel(),
     application_name: DeviceInfo.getApplicationName(),
-    base_os: DeviceInfo.getBaseOs(),
-    build_id: DeviceInfo.getBuildId(),
+    base_os: await DeviceInfo.getBaseOs(),
+    build_id: await DeviceInfo.getBuildId(),
     brand: DeviceInfo.getBrand(),
     build_number: DeviceInfo.getBuildNumber(),
     bundle_id: DeviceInfo.getBundleId(),
-    carrier: [DeviceInfo.getCarrier()],
-    device: DeviceInfo.getDevice(),
-    device_id: DeviceInfo.getDeviceId(),
-    device_display: DeviceInfo.getDisplay(),
-    device_type: DeviceInfo.getDeviceType(),
-    device_name: DeviceInfo.getDeviceName(),
-    device_token: DeviceInfo.getDeviceToken(),
-    device_ip: DeviceInfo.getIpAddress(),
+    carrier: [await DeviceInfo.getCarrier()],
+    device: await DeviceInfo.getDevice(),
+    device_id: await DeviceInfo.getDeviceId(),
+    device_display: await DeviceInfo.getDisplay(),
+    device_type: await DeviceInfo.getDeviceType(),
+    device_name: await DeviceInfo.getDeviceName(),
+    device_token: await DeviceInfo.getDeviceToken(),
+    device_ip: await DeviceInfo.getIpAddress(),
     install_ref: await DeviceInfo.getInstallReferrer(),
     manufacturer,
     system_version: systemVersion,
     version: DeviceInfo.getVersion(),
     connectivity: connectivity.type,
-    user_agent: DeviceInfo.getUserAgent(),
-    gaid: Platform.OS === "android" ? await getAdvertisingIdentifier() : null,
-    idfa: Platform.OS === "ios" ? await getAdvertisingIdentifier() : null,
-    idfv: Platform.OS === "ios" ? DeviceInfo.getUniqueId() : null,
+    user_agent: await DeviceInfo.getUserAgent(),
+    gaid: Platform.OS === 'android' ? await getAdvertisingIdentifier() : null,
+    idfa: Platform.OS === 'ios' ? await getAdvertisingIdentifier() : null,
+    idfv: Platform.OS === 'ios' ? await DeviceInfo.getUniqueId() : null,
     ...installReferrerInfo,
   };
 };
