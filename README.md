@@ -18,12 +18,13 @@ or
 yarn add react-native-device-info @react-native-community/netinfo @react-native-async-storage/async-storage react-native-play-install-referrer @sparkfabrik/react-native-idfa-aaid
 ```
 
-**IOS Configuration**:  
+**IOS Configuration**:
+
 - Run `cd ios && pod install` to install pods for the package.
 - Add the below code in `info.plist`:
   ```plist
     <key>NSUserTrackingUsageDescription</key>
-    <string>...</string>
+    <string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
   ```
 
 ### Step 2: Installing rn-linkrunner
