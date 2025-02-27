@@ -22,7 +22,7 @@ yarn add react-native-device-info @react-native-community/netinfo @react-native-
 
 - Run `cd ios && pod install` to install pods for the package.
 - Add the below code in `info.plist`:
-  ```plist
+  ```sh
     <key>NSUserTrackingUsageDescription</key>
     <string>This identifier will be used to deliver personalized ads and improve your app experience.</string>
   ```
