@@ -39,6 +39,10 @@ or
 yarn add rn-linkrunner
 ```
 
+## Expo
+
+If you are using Expo, you will need to use development builds since this package relies on native libraries. Follow the [Expo Development Builds Documentation](https://docs.expo.dev/develop/development-builds/introduction/) to get started.
+
 ## Usage
 
 ### Initialisation
