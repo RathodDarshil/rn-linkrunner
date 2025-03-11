@@ -189,10 +189,10 @@ Use this method to track custom events:
 
 ```js
 const trackEvent = async () => {
-  await linkrunner.trackEvent({
-    eventName: 'event_name', // Name of the event
-    eventData: { key: 'value' }, // Optional: Additional JSON data for the event
-  });
+  await linkrunner.trackEvent(
+    'event_name', // Name of the event
+    { key: 'value' } // Optional: Additional JSON data for the event
+  );
 };
 ```
 
