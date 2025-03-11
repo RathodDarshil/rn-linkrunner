@@ -7,8 +7,9 @@ import type {
   TriggerConfig,
   UserData,
 } from './types';
+import packageJson from '../package.json';
 
-const package_version = '0.7.0';
+const package_version = packageJson.version;
 const app_version: string = DeviceInfo.getVersion();
 
 const baseUrl = 'https://api.linkrunner.io';
