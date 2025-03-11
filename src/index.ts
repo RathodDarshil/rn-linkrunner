@@ -273,6 +273,25 @@ class Linkrunner {
       return;
     }
   }
+
+  async trackEvent({ 
+    eventName, 
+    eventData 
+  }: { 
+    eventName: string; 
+    eventData?: Record<string, any> 
+  }) {
+    if (!this.token) {
+      console.error('Linkrunner: Track event failed, token not initialized');
+      return;
+    }
+
+    if (!eventName) {
+      return console.error('Linkrunner: Event name is required');
+    }
+
+    console.log('Linkrunner: Tracking event', eventName, eventData);
+  }
 }
 
 const linkrunner = new Linkrunner();

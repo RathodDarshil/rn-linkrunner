@@ -175,12 +175,26 @@ const removePayment = async () => {
 };
 ```
 
+
 #### Parameters for `linkrunner.removePayment`
 
 - `userId`: string (required) - Identifier for the user whose payment is being removed
 - `paymentId`: string (optional) - Unique identifier for the payment to be removed
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If `userId` is provided, all payments for that user will be removed.
+
+### Track Event
+
+Use this method to track custom events:
+
+```js
+const trackEvent = async () => {
+  await linkrunner.trackEvent({
+    eventName: 'event_name', // Name of the event
+    eventData: { key: 'value' }, // Optional: Additional JSON data for the event
+  });
+};
+```
 
 ### Facing issues during integration?
 
