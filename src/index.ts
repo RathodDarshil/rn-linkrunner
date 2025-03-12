@@ -306,6 +306,54 @@ class Linkrunner {
       return;
     }
   }
+
+  async trackEvent(
+    eventName: string, 
+    eventData?: Record<string, any>
+  ) {
+    if (!this.token) {
+      console.error('Linkrunner: Track event failed, token not initialized');
+      return;
+    }
+
+    if (!eventName) {
+      return console.error('Linkrunner: Event name is required');
+    }
+
+    try {
+      const response = await fetch(baseUrl + '/api/client/capture-event', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: this.token,
+          event_name: eventName,
+          event_data: eventData,
+          device_data: await device_data(),
+          install_instance_id: await getLinkRunnerInstallInstanceId(),
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (result?.status !== 200 && result?.status !== 201) {
+        console.error('Linkrunner: Track event failed');
+        console.error('Linkrunner: ', result?.msg);
+        return;
+      }
+      
+      if (__DEV__) {
+        console.log('Linkrunner: Tracking event', eventName, eventData);
+      }
+
+      return result?.data;
+    } catch (error) {
+      console.error('Linkrunner: Track event failed');
+      console.error('Linkrunner: ', error);
+    } 
+  }
 }
 
 const linkrunner = new Linkrunner();

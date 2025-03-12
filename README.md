@@ -233,6 +233,19 @@ Below is a simple guide on where to place each function in your application:
 | `linkrunner.capturePayment`  | In your payment processing flow                                         | When a user makes a payment                              |
 | `linkrunner.removePayment`   | In your payment cancellation/refund flow                                | When a payment needs to be removed                       |
 
+### Track Event
+
+Use this method to track custom events:
+
+```js
+const trackEvent = async () => {
+  await linkrunner.trackEvent(
+    'event_name', // Name of the event
+    { key: 'value' } // Optional: Additional JSON data for the event
+  );
+};
+```
+
 ### Facing issues during integration?
 
 Mail us on darshil@linkrunner.io
