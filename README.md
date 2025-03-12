@@ -2,6 +2,23 @@
 
 React Native Package for [linkrunner.io](https://www.linkrunner.io)
 
+## Table of Contents
+
+- [Installation](#installation)
+  - [Step 1: Prerequisites](#step-1-prerequisites)
+  - [Step 2: Installing rn-linkrunner](#step-2-installing-rn-linkrunner)
+- [Expo](#expo)
+- [Usage](#usage)
+  - [Initialisation](#initialisation)
+  - [Signup](#signup)
+  - [Set User Data](#set-user-data)
+  - [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
+  - [Track Event](#track-event)
+  - [Capture Payment](#capture-payment)
+  - [Remove Payment](#remove-payment)
+- [Support](#facing-issues-during-integration)
+- [License](#license)
+
 ## Installation
 
 ### Step 1: Prerequisites
@@ -91,17 +108,15 @@ const init = async () => {
 }
 ```
 
-### Trigger
+### Signup
 
-Call this function once your onboarding is completed and the navigation stack can be accessed by a deeplink:
-
-Note: Make sure this function is called every time the user opens the app after being logged in.
+Call this function only once after the user has completed the onboarding process in your app. This should be triggered at the final step of your onboarding flow to register the user with Linkrunner.
 
 ```jsx
 import linkrunner from 'rn-linkrunner';
 
-const onTrigger = async () => {
-  const trigger = await linkrunner.trigger({
+const onSignup = async () => {
+  const signup = await linkrunner.signup({
     user_data: {
       id: '1',
       name: 'John Doe', // optional
@@ -109,17 +124,11 @@ const onTrigger = async () => {
       email: 'support@linkrunner.io', //optional
     },
     data: {}, // Any other data you might need
-    config: {
-      trigger_deeplink: true, // Default is true
   });
 };
 ```
 
-The config parameter allows you to control the behavior of the trigger function:
-
-- `trigger_deeplink`: boolean (optional) - When set to false, prevents automatic triggering of the deeplink even if one is returned
-
-#### Response type for `linkrunner.trigger`
+#### Response type for `linkrunner.signup`
 
 ```
 {
@@ -136,11 +145,54 @@ The config parameter allows you to control the behavior of the trigger function:
   };
   deeplink: string;
   root_domain: boolean;
-  trigger: boolean; // Deeplink won't be triggered if false
 }
 ```
 
-Value of `trigger` will be only true for the first time the function is triggered by the user in order to prevent unnecessary redirects
+### Set User Data
+
+Call this function everytime the app is opened and the user is logged in.
+
+```jsx
+import linkrunner from 'rn-linkrunner';
+
+const setUserData = async () => {
+  await linkrunner.setUserData({
+    user_data: {
+      id: '1',
+      name: 'John Doe', // optional
+      phone: '9583849238', // optional
+      email: 'support@linkrunner.io', //optional
+    },
+  });
+};
+```
+
+### Trigger Deeplink (For Deferred Deep Linking)
+
+This function triggers the original deeplink that led to the app installation. Call it only after your main navigation is initialized and all deeplink-accessible screens are ready to receive navigation events.
+
+Note: For this to work properly make sure you have added verification objects on the [Linkrunner Dashboard](https://www.linkrunner.io/settings?p_id=38&sort_by=activity-1&s=store-verification).
+
+```jsx
+import linkrunner from 'rn-linkrunner';
+
+const onTriggerDeeplink = async () => {
+  await linkrunner.triggerDeeplink();
+};
+```
+
+### Track Event
+
+Use this method to track custom events
+
+```js
+const trackEvent = async () => {
+  await linkrunner.trackEvent(
+    'event_name', // Name of the event
+    { key: 'value' } // Optional: Additional JSON data for the event
+  );
+};
+```
 
 ### Capture Payment
 
@@ -175,7 +227,6 @@ const removePayment = async () => {
 };
 ```
 
-
 #### Parameters for `linkrunner.removePayment`
 
 - `userId`: string (required) - Identifier for the user whose payment is being removed
@@ -183,18 +234,19 @@ const removePayment = async () => {
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If `userId` is provided, all payments for that user will be removed.
 
-### Track Event
+### Function Placement Guide
 
-Use this method to track custom events:
+Below is a simple guide on where to place each function in your application:
 
-```js
-const trackEvent = async () => {
-  await linkrunner.trackEvent(
-    'event_name', // Name of the event
-    { key: 'value' } // Optional: Additional JSON data for the event
-  );
-};
-```
+| Function                     | Where to Place                                                          | When to Call                                             |
+| ---------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- |
+| `linkrunner.init`            | In your `App.tsx` within a `useEffect` hook with empty dependency array | Once when the app starts                                 |
+| `linkrunner.signup`          | In your onboarding flow                                                 | Once after user completes the onboarding process         |
+| `linkrunner.setUserData`     | In your authentication logic                                            | Every time the app is opened and the user is logged in   |
+| `linkrunner.triggerDeeplink` | After navigation initialization                                         | Once after your navigation is ready to handle deep links |
+| `linkrunner.trackEvent`      | Throughout your app where events need to be tracked                     | When specific user actions or events occur               |
+| `linkrunner.capturePayment`  | In your payment processing flow                                         | When a user makes a payment                              |
+| `linkrunner.removePayment`   | In your payment cancellation/refund flow                                | When a payment needs to be removed                       |
 
 ### Facing issues during integration?
 
