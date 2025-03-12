@@ -171,7 +171,7 @@ const setUserData = async () => {
 
 This function triggers the original deeplink that led to the app installation. Call it only after your main navigation is initialized and all deeplink-accessible screens are ready to receive navigation events.
 
-Note: For this to work properly make sure you have added verification objects on the [Linkrunner Dashboard](https://www.linkrunner.io/settings?p_id=38&sort_by=activity-1&s=store-verification).
+Note: For this to work properly make sure you have added verification objects on the [Linkrunner Dashboard](https://www.linkrunner.io/settings?sort_by=activity-1&s=store-verification).
 
 ```jsx
 import linkrunner from 'rn-linkrunner';
