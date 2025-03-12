@@ -13,6 +13,7 @@ React Native Package for [linkrunner.io](https://www.linkrunner.io)
   - [Signup](#signup)
   - [Set User Data](#set-user-data)
   - [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
+  - [Track Event](#track-event)
   - [Capture Payment](#capture-payment)
   - [Remove Payment](#remove-payment)
 - [Support](#facing-issues-during-integration)
@@ -180,6 +181,19 @@ const onTriggerDeeplink = async () => {
 };
 ```
 
+### Track Event
+
+Use this method to track custom events
+
+```js
+const trackEvent = async () => {
+  await linkrunner.trackEvent(
+    'event_name', // Name of the event
+    { key: 'value' } // Optional: Additional JSON data for the event
+  );
+};
+```
+
 ### Capture Payment
 
 Use this method to capture payment information:
@@ -230,21 +244,9 @@ Below is a simple guide on where to place each function in your application:
 | `linkrunner.signup`          | In your onboarding flow                                                 | Once after user completes the onboarding process         |
 | `linkrunner.setUserData`     | In your authentication logic                                            | Every time the app is opened and the user is logged in   |
 | `linkrunner.triggerDeeplink` | After navigation initialization                                         | Once after your navigation is ready to handle deep links |
+| `linkrunner.trackEvent`      | Throughout your app where events need to be tracked                     | When specific user actions or events occur               |
 | `linkrunner.capturePayment`  | In your payment processing flow                                         | When a user makes a payment                              |
 | `linkrunner.removePayment`   | In your payment cancellation/refund flow                                | When a payment needs to be removed                       |
-
-### Track Event
-
-Use this method to track custom events:
-
-```js
-const trackEvent = async () => {
-  await linkrunner.trackEvent(
-    'event_name', // Name of the event
-    { key: 'value' } // Optional: Additional JSON data for the event
-  );
-};
-```
 
 ### Facing issues during integration?
 
