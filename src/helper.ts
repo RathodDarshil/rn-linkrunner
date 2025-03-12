@@ -122,4 +122,23 @@ function generateRandomString(length: number): string {
     .join('');
 }
 
-export { device_data, getLinkRunnerInstallInstanceId };
+const DEEPLINK_URL_STORAGE_KEY = 'linkrunner_deeplink_url';
+
+async function setDeeplinkURL(deeplink_url: string) {
+  try {
+    await AsyncStorage.setItem(DEEPLINK_URL_STORAGE_KEY, deeplink_url);
+  } catch (error) {
+    console.error('Error setting deeplink URL:', error);
+  }
+}
+
+async function getDeeplinkURL(): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(DEEPLINK_URL_STORAGE_KEY);
+  } catch (error) {
+    console.error('Error getting deeplink URL:', error);
+    return null;
+  }
+}
+
+export { device_data, getLinkRunnerInstallInstanceId, setDeeplinkURL, getDeeplinkURL };

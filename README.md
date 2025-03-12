@@ -91,17 +91,15 @@ const init = async () => {
 }
 ```
 
-### Trigger
+### Signup
 
-Call this function once your onboarding is completed and the navigation stack can be accessed by a deeplink:
-
-Note: Make sure this function is called every time the user opens the app after being logged in.
+Call this function once your onboarding is completed:
 
 ```jsx
 import linkrunner from 'rn-linkrunner';
 
-const onTrigger = async () => {
-  const trigger = await linkrunner.trigger({
+const onSignup = async () => {
+  const signup = await linkrunner.signup({
     user_data: {
       id: '1',
       name: 'John Doe', // optional
@@ -109,17 +107,11 @@ const onTrigger = async () => {
       email: 'support@linkrunner.io', //optional
     },
     data: {}, // Any other data you might need
-    config: {
-      trigger_deeplink: true, // Default is true
   });
 };
 ```
 
-The config parameter allows you to control the behavior of the trigger function:
-
-- `trigger_deeplink`: boolean (optional) - When set to false, prevents automatic triggering of the deeplink even if one is returned
-
-#### Response type for `linkrunner.trigger`
+#### Response type for `linkrunner.signup`
 
 ```
 {
@@ -136,17 +128,46 @@ The config parameter allows you to control the behavior of the trigger function:
   };
   deeplink: string;
   root_domain: boolean;
-  trigger: boolean; // Deeplink won't be triggered if false
 }
 ```
 
-Value of `trigger` will be only true for the first time the function is triggered by the user in order to prevent unnecessary redirects
+### Trigger Deeplink
+
+Call this function to trigger the deeplink:
+
+```jsx
+import linkrunner from 'rn-linkrunner';
+
+const onTriggerDeeplink = async () => {
+  await linkrunner.triggerDeeplink();
+};
+```
+
+### Set User Data
+
+Call this function to update user data:
+
+```jsx
+import linkrunner from 'rn-linkrunner';
+
+const setUserData = async () => {
+  await linkrunner.setUserData({
+    user_data: {
+      id: '1',
+      name: 'John Doe', // optional
+      phone: '9583849238', // optional
+      email: 'support@linkrunner.io', //optional
+    },
+  });
+};
+```
+
+Note: Make sure this function is called every time the user opens the app after being logged in.
 
 ### Capture Payment
 
 Use this method to capture payment information:
 
-```js
 const capturePayment = async () => {
   await linkrunner.capturePayment({
     amount: 100, // Payment amount

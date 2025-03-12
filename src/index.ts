@@ -1,10 +1,9 @@
 import { Linking } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import { device_data, getLinkRunnerInstallInstanceId } from './helper';
+import { device_data, getDeeplinkURL, getLinkRunnerInstallInstanceId, setDeeplinkURL } from './helper';
 import type {
   CampaignData,
   LRIPLocationData,
-  TriggerConfig,
   UserData,
 } from './types';
 import packageJson from '../package.json';
@@ -50,6 +49,8 @@ const initApiCall = async (
       console.log('init response > ', result);
     }
 
+    setDeeplinkURL(result?.data?.deeplink);
+
     return result?.data;
   } catch (error) {
     console.error('Error initializing linkrunner', error);
@@ -74,17 +75,15 @@ class Linkrunner {
     return await initApiCall(token, 'GENERAL');
   }
 
-  async trigger({
+  async signup({
     data,
     user_data,
-    config,
   }: {
-    config?: TriggerConfig;
     data?: { [key: string]: any };
     user_data: UserData;
   }): Promise<void | LRTriggerResponse> {
     if (!this.token) {
-      console.error('Linkrunner: Trigger failed, token not initialized');
+      console.error('Linkrunner: Signup failed, token not initialized');
       return;
     }
 
@@ -109,51 +108,85 @@ class Linkrunner {
       const result = await response.json();
 
       if (result?.status !== 200 && result?.status !== 201) {
-        console.error('Linkrunner: Trigger failed');
+        console.error('Linkrunner: Signup failed');
         console.error('Linkrunner: ', result?.msg);
         return;
       }
 
-      if (
-        result?.data?.deeplink &&
-        config?.trigger_deeplink !== false &&
-        result?.data?.trigger
-      ) {
-        if (__DEV__) {
-          console.log('Triggering deeplink > ', result?.data?.deeplink);
-        }
-
-        Linking.openURL(result?.data?.deeplink).then(() => {
-          fetch(baseUrl + '/api/client/deeplink-triggered', {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              token: this.token,
-            }),
-          })
-            .then(() => {
-              if (__DEV__) {
-                console.log(
-                  'Linkrunner: Deeplink triggered successfully',
-                  result?.data?.deeplink
-                );
-              }
-            })
-            .catch(() => {});
-        });
-      }
-
       if (__DEV__) {
-        console.log('Linkrunner: Trigger called 🔥');
+        console.log('Linkrunner: Signup called 🔥');
       }
 
       return result.data;
     } catch (err: any) {
-      console.error('Linkrunner: Trigger failed');
+      console.error('Linkrunner: Signup failed');
       console.error('Linkrunner: ', err.message);
+    }
+  }
+
+  async triggerDeeplink() {
+    const deeplink_url = await getDeeplinkURL();
+
+    if (!deeplink_url) {
+      console.error('Linkrunner: Deeplink URL not found');
+      return;
+    }
+
+    Linking.openURL(deeplink_url).then(() => {
+      fetch(baseUrl + '/api/client/deeplink-triggered', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: this.token,
+        }),
+      }).then(() => {
+        if (__DEV__) {
+          console.log('Linkrunner: Deeplink triggered successfully', deeplink_url);
+        }
+      }).catch(() => {
+        if (__DEV__) {
+          console.error('Linkrunner: Deeplink triggering failed', deeplink_url);
+        }
+      });
+    });
+  }
+
+  async setUserData(user_data: UserData) {
+    if (!this.token) {
+      console.error('Linkrunner: Set user data failed, token not initialized');
+      return;
+    }
+
+    try {
+      const response = await fetch(baseUrl + '/api/client/set-user-data', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: this.token,
+          user_data,
+          device_data: await device_data(),
+          install_instance_id: await getLinkRunnerInstallInstanceId(),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result?.status !== 200 && result?.status !== 201) {
+        console.error('Linkrunner: Set user data failed');
+        console.error('Linkrunner: ', result?.msg);
+        return;
+      }
+
+      return result.data;
+    } catch (err: any) {
+        console.error('Linkrunner: Set user data failed');
+        console.error('Linkrunner: ', err?.message);
     }
   }
 
