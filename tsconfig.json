@@ -1,10 +1,13 @@
 {
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "compilerOptions": {
-    // "rootDir": ".",
-    // "paths": {
-    //   "rn-linkrunner": ["./src/index"]
-    // },
+    "rootDir": "src",
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "lib/typescript",
+    "paths": {
+      "rn-linkrunner": ["./src/index"]
+    },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "esModuleInterop": true,
@@ -26,5 +29,5 @@
     "target": "esnext",
     "verbatimModuleSyntax": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "lib"]
 }
