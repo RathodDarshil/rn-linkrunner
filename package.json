@@ -1,6 +1,6 @@
 {
   "name": "rn-linkrunner",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "React Native Package for linkrunner",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
