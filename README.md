@@ -238,15 +238,15 @@ Note: Either `paymentId` or `userId` must be provided when calling `removePaymen
 
 Below is a simple guide on where to place each function in your application:
 
-| Function                     | Where to Place                                                          | When to Call                                             |
-| ---------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- |
-| `linkrunner.init`            | In your `App.tsx` within a `useEffect` hook with empty dependency array | Once when the app starts                                 |
-| `linkrunner.signup`          | In your onboarding flow                                                 | Once after user completes the onboarding process         |
-| `linkrunner.setUserData`     | In your authentication logic                                            | Every time the app is opened and the user is logged in   |
-| `linkrunner.triggerDeeplink` | After navigation initialization                                         | Once after your navigation is ready to handle deep links |
-| `linkrunner.trackEvent`      | Throughout your app where events need to be tracked                     | When specific user actions or events occur               |
-| `linkrunner.capturePayment`  | In your payment processing flow                                         | When a user makes a payment                              |
-| `linkrunner.removePayment`   | In your payment cancellation/refund flow                                | When a payment needs to be removed                       |
+| Function                                                                    | Where to Place                                                          | When to Call                                             |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- |
+| [`linkrunner.init`](#initialisation)                                        | In your `App.tsx` within a `useEffect` hook with empty dependency array | Once when the app starts                                 |
+| [`linkrunner.signup`](#signup)                                              | In your onboarding flow                                                 | Once after user completes the onboarding process         |
+| [`linkrunner.setUserData`](#set-user-data)                                  | In your authentication logic                                            | Every time the app is opened and the user is logged in   |
+| [`linkrunner.triggerDeeplink`](#trigger-deeplink-for-deferred-deep-linking) | After navigation initialization                                         | Once after your navigation is ready to handle deep links |
+| [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                     | When specific user actions or events occur               |
+| [`linkrunner.capturePayment`](#capture-payment)                             | In your payment processing flow                                         | When a user makes a payment                              |
+| [`linkrunner.removePayment`](#remove-payment)                               | In your payment cancellation/refund flow                                | When a payment needs to be removed                       |
 
 ### Facing issues during integration?
 
