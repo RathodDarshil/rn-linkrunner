@@ -233,6 +233,8 @@ const capturePayment = async () => {
     amount: 100, // Payment amount
     userId: 'user123', // User identifier
     paymentId: 'payment456', // Optional: Unique payment identifier
+    type: 'FIRST_PAYMENT', // Optional: Payment type
+    status: 'PAYMENT_COMPLETED', // Optional: Payment status
   });
 };
 ```
@@ -242,6 +244,20 @@ const capturePayment = async () => {
 - `amount`: number (required) - The payment amount
 - `userId`: string (required) - Identifier for the user making the payment
 - `paymentId`: string (optional) - Unique identifier for the payment
+- `type`: string (optional) - Type of payment. Available options:
+  - `FIRST_PAYMENT` - First payment made by the user
+  - `WALLET_TOPUP` - Adding funds to a wallet
+  - `FUNDS_WITHDRAWAL` - Withdrawing funds
+  - `SUBSCRIPTION_CREATED` - New subscription created
+  - `SUBSCRIPTION_RENEWED` - Subscription renewal
+  - `ONE_TIME` - One-time payment
+  - `RECURRING` - Recurring payment
+  - `DEFAULT` - Default type (used if not specified)
+- `status`: string (optional) - Status of the payment. Available options:
+  - `PAYMENT_INITIATED` - Payment has been initiated
+  - `PAYMENT_COMPLETED` - Payment completed successfully (default if not specified)
+  - `PAYMENT_FAILED` - Payment attempt failed
+  - `PAYMENT_CANCELLED` - Payment was cancelled
 
 ### Remove Payment
 

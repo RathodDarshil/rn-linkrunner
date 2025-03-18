@@ -205,10 +205,26 @@ class Linkrunner {
     amount,
     userId,
     paymentId,
+    type,
+    status,
   }: {
     paymentId?: string;
     userId: string;
     amount: number;
+    type?:
+      | 'FIRST_PAYMENT'
+      | 'WALLET_TOPUP'
+      | 'FUNDS_WITHDRAWAL'
+      | 'SUBSCRIPTION_CREATED'
+      | 'SUBSCRIPTION_RENEWED'
+      | 'DEFAULT'
+      | 'ONE_TIME'
+      | 'RECURRING';
+    status?:
+      | 'PAYMENT_INITIATED'
+      | 'PAYMENT_COMPLETED'
+      | 'PAYMENT_FAILED'
+      | 'PAYMENT_CANCELLED';
   }) {
     if (!this.token) {
       console.error(
@@ -233,6 +249,8 @@ class Linkrunner {
           },
           amount,
           payment_id: paymentId,
+          type,
+          status,
           install_instance_id: await getLinkRunnerInstallInstanceId(),
         }),
       });
@@ -250,6 +268,8 @@ class Linkrunner {
           amount,
           paymentId,
           userId,
+          type,
+          status,
         });
       }
     } catch (error) {
