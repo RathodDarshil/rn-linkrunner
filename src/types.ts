@@ -15,6 +15,9 @@ export interface UserData {
   name?: string;
   phone?: string;
   email?: string;
+  mixpanel_distinct_id?: string;
+  amplitude_user_id?: string;
+  posthog_distinct_id?: string;
 }
 
 export interface TriggerConfig {
