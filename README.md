@@ -14,7 +14,6 @@ React Native Package for [linkrunner.io](https://www.linkrunner.io)
   - [Set User Data](#set-user-data)
   - [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
   - [Track Event](#track-event)
-  - [Process Google Analytics](#process-google-analytics)
   - [Capture Payment](#capture-payment)
   - [Remove Payment](#remove-payment)
 - [Support](#facing-issues-during-integration)
@@ -69,8 +68,6 @@ You'll need your [project token](https://www.linkrunner.io/dashboard?m=documenta
 
 ```js
 import linkrunner from 'rn-linkrunner';
-import analytics from '@react-native-firebase/analytics';
-import { Platform } from 'react-native';
 
 // Inside your react component
 useEffect(() => {
@@ -79,11 +76,6 @@ useEffect(() => {
 
 const init = async () => {
   const initData = await linkrunner.init('PROJECT_TOKEN');
-
-  // Call processGoogleAnalytics right after init
-  if (Platform.OS === 'android') {
-    await linkrunner.processGoogleAnalytics(analytics);
-  }
 };
 ```
 
@@ -202,27 +194,6 @@ const trackEvent = async () => {
 };
 ```
 
-### Process Google Analytics
-
-Use this method to track GCLID from install referrer in Google Analytics. This is especially useful for tracking the effectiveness of Google Ads campaigns. For best results, call this method immediately after initializing linkrunner.
-
-```js
-import analytics from '@react-native-firebase/analytics';
-import linkrunner from 'rn-linkrunner';
-
-// Recommended implementation
-const init = async () => {
-  const initData = await linkrunner.init('PROJECT_TOKEN');
-
-  // Call processGoogleAnalytics right after init
-  linkrunner.processGoogleAnalytics(analytics);
-};
-```
-
-#### Prerequisites for `linkrunner.processGoogleAnalytics`
-
-You must have `@react-native-firebase/analytics` installed in your project and have properly configured Firebase in your app according to the [Firebase for React Native documentation](https://rnfirebase.io/analytics/usage).
-
 ### Capture Payment
 
 Use this method to capture payment information:
@@ -286,7 +257,6 @@ Below is a simple guide on where to place each function in your application:
 | Function                                                                    | Where to Place                                                          | When to Call                                             |
 | --------------------------------------------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- |
 | [`linkrunner.init`](#initialisation)                                        | In your `App.tsx` within a `useEffect` hook with empty dependency array | Once when the app starts                                 |
-| [`linkrunner.processGoogleAnalytics`](#process-google-analytics)            | Just below the `linkrunner.init` function call in your `App.tsx`        | Once after initializing linkrunner                       |
 | [`linkrunner.signup`](#signup)                                              | In your onboarding flow                                                 | Once after user completes the onboarding process         |
 | [`linkrunner.setUserData`](#set-user-data)                                  | In your authentication logic                                            | Every time the app is opened and the user is logged in   |
 | [`linkrunner.triggerDeeplink`](#trigger-deeplink-for-deferred-deep-linking) | After navigation initialization                                         | Once after your navigation is ready to handle deep links |
