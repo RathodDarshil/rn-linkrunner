@@ -52,7 +52,7 @@ const initApiCall = async (
       console.log('init response > ', result);
     }
 
-    setDeeplinkURL(result?.data?.deeplink);
+    if (!!result?.data?.deeplink) setDeeplinkURL(result?.data?.deeplink);
 
     return result?.data;
   } catch (error) {
