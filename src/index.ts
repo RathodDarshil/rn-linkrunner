@@ -8,8 +8,6 @@ import {
 } from './helper';
 import type { CampaignData, LRIPLocationData, UserData } from './types';
 import packageJson from '../package.json';
-import { Platform } from 'react-native';
-import { PlayInstallReferrer } from 'react-native-play-install-referrer';
 
 const package_version = packageJson.version;
 const app_version: string = DeviceInfo.getVersion();
@@ -381,91 +379,6 @@ class Linkrunner {
       console.error('Linkrunner: Track event failed');
       console.error('Linkrunner: ', error);
     }
-  }
-
-  /**
-   * Processes Google Analytics with GCLID from install referrer
-   * @param analytics - Instance of Firebase Analytics
-   */
-  async processGoogleAnalytics(analytics: any): Promise<void> {
-    if (Platform.OS !== 'android') {
-      return;
-    }
-
-    try {
-      const gclid = await this.extractGCLID();
-
-      if (!gclid) {
-        return;
-      }
-
-      // Log event with GCLID
-      await analytics().logEvent('install_with_gclid', {
-        gclid: gclid,
-      });
-
-      // Set user property with GCLID
-      await analytics().setUserProperty('gclid', gclid);
-    } catch (error) {
-      console.error('Linkrunner: Error processing Google Analytics:', error);
-    }
-  }
-
-  /**
-   * Extracts GCLID from install referrer
-   * @returns Promise with GCLID string or null if not found
-   */
-  private extractGCLID(): Promise<string | null> {
-    return new Promise((resolve) => {
-      // Set a timeout to ensure the promise resolves even if there's an issue
-      const timeoutId = setTimeout(() => {
-        resolve(null);
-      }, 5000);
-
-      try {
-        PlayInstallReferrer.getInstallReferrerInfo(
-          (installReferrerInfo, error) => {
-            // Clear the timeout since callback fired
-            clearTimeout(timeoutId);
-
-            if (error) {
-              resolve(null);
-              return;
-            }
-
-            if (!installReferrerInfo || !installReferrerInfo.installReferrer) {
-              resolve(null);
-              return;
-            }
-
-            // Parse the referrer URL to extract GCLID
-            try {
-              const referrer = installReferrerInfo.installReferrer;
-              const urlParams = new URLSearchParams(referrer);
-              let gclid = urlParams.get('gclid');
-
-              if (!gclid) {
-                const match = referrer.match(/gclid=([^&]*)/);
-                gclid = !!match?.[1] ? match[1] : null;
-              }
-
-              resolve(gclid);
-            } catch (parseError) {
-              console.error(
-                'Linkrunner: Error parsing referrer URL:',
-                parseError
-              );
-              resolve(null);
-            }
-          }
-        );
-      } catch (e) {
-        // Clear the timeout since we caught an exception
-        clearTimeout(timeoutId);
-        console.error('Linkrunner: Exception in extractGCLID:', e);
-        resolve(null);
-      }
-    });
   }
 }
 
