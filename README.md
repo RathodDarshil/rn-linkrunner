@@ -130,6 +130,9 @@ const onSignup = async () => {
       name: 'John Doe', // optional
       phone: '9583849238', // optional
       email: 'support@linkrunner.io', //optional
+      mixpanel_distinct_id: 'mixpanel_distinct_id', //optional
+      amplitude_user_id: 'amplitude_user_id', //optional
+      posthog_distinct_id: 'posthog_distinct_id', //optional
     },
     data: {}, // Any other data you might need
   });
@@ -169,7 +172,10 @@ const setUserData = async () => {
       id: '1',
       name: 'John Doe', // optional
       phone: '9583849238', // optional
-      email: 'support@linkrunner.io', //optional
+      email: 'support@linkrunner.io', //optional,
+      mixpanel_distinct_id: 'mixpanel_distinct_id', //optional
+      amplitude_user_id: 'amplitude_user_id', //optional
+      posthog_distinct_id: 'posthog_distinct_id', //optional
     },
   });
 };
