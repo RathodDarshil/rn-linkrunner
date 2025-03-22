@@ -11,85 +11,109 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import ReactNativeIdfaAaid from '@sparkfabrik/react-native-idfa-aaid';
 
-const device_data = async (): Promise<Record<string, any>> => {
-  const getInstallReferrerInfo = (): Promise<PlayInstallReferrerInfo | {}> => {
-    return new Promise((resolve) => {
-      if (Platform.OS === 'ios') {
-        resolve({});
-        return;
-      }
+const getInstallReferrerInfo = (): Promise<PlayInstallReferrerInfo | {}> => {
+  return new Promise((resolve) => {
+    if (Platform.OS === 'ios') {
+      resolve({});
+      return;
+    }
 
-      // Add a timeout to ensure the promise resolves even if the callback never fires
-      const timeoutId = setTimeout(() => {
-        resolve({});
-      }, 2000);
+    // Add a timeout to ensure the promise resolves even if the callback never fires
+    const timeoutId = setTimeout(() => {
+      resolve({});
+    }, 2000);
 
-      try {
-        PlayInstallReferrer.getInstallReferrerInfo(
-          (installReferrerInfo, error) => {
-            // Clear the timeout since callback fired
-            clearTimeout(timeoutId);
+    try {
+      PlayInstallReferrer.getInstallReferrerInfo(
+        (installReferrerInfo, error) => {
+          // Clear the timeout since callback fired
+          clearTimeout(timeoutId);
 
-            if (!error && !!installReferrerInfo) {
-              resolve(installReferrerInfo);
-            } else {
-              resolve({});
-            }
+          if (!error && !!installReferrerInfo) {
+            resolve(installReferrerInfo);
+          } else {
+            resolve({});
           }
-        );
-      } catch (e) {
-        // Clear the timeout since we caught an exception
-        clearTimeout(timeoutId);
-        resolve({});
-      }
-    });
-  };
+        }
+      );
+    } catch (e) {
+      // Clear the timeout since we caught an exception
+      clearTimeout(timeoutId);
+      resolve({});
+    }
+  });
+};
 
-  const getAdvertisingIdentifier = async () => {
+const getAdvertisingIdentifier = async (): Promise<string | null> => {
+  try {
     const identifier = await ReactNativeIdfaAaid.getAdvertisingInfo();
     if (!identifier.isAdTrackingLimited && identifier.id) {
       return identifier.id;
     } else {
       return null;
     }
-  };
+  } catch (error) {
+    console.error('Error getting advertising identifier:', error);
+    return null;
+  }
+};
 
-  const [installReferrerInfo, connectivity, manufacturer, systemVersion] =
-    await Promise.all([
-      getInstallReferrerInfo(),
-      netinfoFetch(),
-      getManufacturer(),
-      getSystemVersion(),
-    ]);
+const device_data = async (): Promise<Record<string, any>> => {
+  try {
+    const [installReferrerInfo, connectivity, manufacturer, systemVersion] =
+      await Promise.all([
+        getInstallReferrerInfo(),
+        netinfoFetch(),
+        getManufacturer(),
+        getSystemVersion(),
+      ]);
 
-  return {
-    android_id: await DeviceInfo.getAndroidId(),
-    api_level: await DeviceInfo.getApiLevel(),
-    application_name: DeviceInfo.getApplicationName(),
-    base_os: await DeviceInfo.getBaseOs(),
-    build_id: await DeviceInfo.getBuildId(),
-    brand: DeviceInfo.getBrand(),
-    build_number: DeviceInfo.getBuildNumber(),
-    bundle_id: DeviceInfo.getBundleId(),
-    carrier: [await DeviceInfo.getCarrier()],
-    device: await DeviceInfo.getDevice(),
-    device_id: await DeviceInfo.getDeviceId(),
-    device_display: await DeviceInfo.getDisplay(),
-    device_type: await DeviceInfo.getDeviceType(),
-    device_name: await DeviceInfo.getDeviceName(),
-    device_token: await DeviceInfo.getDeviceToken(),
-    device_ip: await DeviceInfo.getIpAddress(),
-    install_ref: await DeviceInfo.getInstallReferrer(),
-    manufacturer,
-    system_version: systemVersion,
-    version: DeviceInfo.getVersion(),
-    connectivity: connectivity.type,
-    user_agent: await DeviceInfo.getUserAgent(),
-    gaid: Platform.OS === 'android' ? await getAdvertisingIdentifier() : null,
-    idfa: Platform.OS === 'ios' ? await getAdvertisingIdentifier() : null,
-    idfv: Platform.OS === 'ios' ? await DeviceInfo.getUniqueId() : null,
-    ...installReferrerInfo,
-  };
+    // Helper function to safely get device info with fallback
+    const safeGet = async <T>(
+      getter: () => Promise<T> | T,
+      fallback: T = null as unknown as T
+    ): Promise<T> => {
+      try {
+        return await getter();
+      } catch (error) {
+        console.warn(`DeviceInfo error: ${error}`);
+        return fallback;
+      }
+    };
+
+    return {
+      android_id: await safeGet(DeviceInfo.getAndroidId),
+      api_level: await safeGet(DeviceInfo.getApiLevel),
+      application_name: await safeGet(DeviceInfo.getApplicationName),
+      base_os: await safeGet(DeviceInfo.getBaseOs),
+      build_id: await safeGet(DeviceInfo.getBuildId),
+      brand: await safeGet(DeviceInfo.getBrand),
+      build_number: await safeGet(DeviceInfo.getBuildNumber),
+      bundle_id: await safeGet(DeviceInfo.getBundleId),
+      carrier: [await safeGet(DeviceInfo.getCarrier)],
+      device: await safeGet(DeviceInfo.getDevice),
+      device_id: await safeGet(DeviceInfo.getDeviceId),
+      device_display: await safeGet(DeviceInfo.getDisplay),
+      device_type: await safeGet(DeviceInfo.getDeviceType),
+      device_name: await safeGet(DeviceInfo.getDeviceName),
+      device_token: await safeGet(DeviceInfo.getDeviceToken),
+      device_ip: await safeGet(DeviceInfo.getIpAddress),
+      install_ref: await safeGet(DeviceInfo.getInstallReferrer),
+      manufacturer,
+      system_version: systemVersion,
+      version: await safeGet(DeviceInfo.getVersion),
+      connectivity: connectivity.type,
+      user_agent: await safeGet(DeviceInfo.getUserAgent),
+      gaid: Platform.OS === 'android' ? await getAdvertisingIdentifier() : null,
+      idfa: Platform.OS === 'ios' ? await getAdvertisingIdentifier() : null,
+      idfv:
+        Platform.OS === 'ios' ? await safeGet(DeviceInfo.getUniqueId) : null,
+      ...installReferrerInfo,
+    };
+  } catch (error) {
+    console.error('Error collecting device data:', error);
+    return { error: 'Failed to collect device data' };
+  }
 };
 
 const STORAGE_KEY = 'linkrunner_install_instance_id';
@@ -141,4 +165,9 @@ async function getDeeplinkURL(): Promise<string | null> {
   }
 }
 
-export { device_data, getLinkRunnerInstallInstanceId, setDeeplinkURL, getDeeplinkURL };
+export {
+  device_data,
+  getLinkRunnerInstallInstanceId,
+  setDeeplinkURL,
+  getDeeplinkURL,
+};
