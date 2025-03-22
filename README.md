@@ -113,6 +113,7 @@ const init = async () => {
     asset_group_name: string | null;
     asset_name: string | null;
   };
+  attribution_source: "ORGANIC" | "META" | "GOOGLE";
 }
 ```
 
