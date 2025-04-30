@@ -38,3 +38,26 @@ export type Response = {
   trigger?: boolean;
   campaign_data: CampaignData;
 };
+
+export enum TokenType {
+  FCM = 'FCM',
+  APN = 'APN',
+}
+
+export interface PushTokenInfo {
+  token: string;
+  token_type: TokenType; // 'FCM' | 'APN'
+}
+
+export interface InitializationRequest {
+  token: string;
+  package_version: string;
+  app_version: string;
+  device_data: any; // You might want to create a more specific type for device_data
+  platform: 'REACT_NATIVE';
+  source: 'GENERAL' | 'ADS';
+  link?: string;
+  install_instance_id: string;
+  push_token?: string;
+  push_token_type?: TokenType;
+}

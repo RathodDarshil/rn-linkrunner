@@ -4,9 +4,10 @@ import {
   device_data,
   getDeeplinkURL,
   getLinkRunnerInstallInstanceId,
+  getPushToken,
   setDeeplinkURL,
 } from './helper';
-import type { CampaignData, LRIPLocationData, UserData } from './types';
+import type { CampaignData, LRIPLocationData, UserData, InitializationRequest } from './types';
 import packageJson from '../package.json';
 import { Platform } from 'react-native';
 import { PlayInstallReferrer } from 'react-native-play-install-referrer';
@@ -22,22 +23,31 @@ const initApiCall = async (
   link?: string
 ) => {
   try {
+    const init_info = await Promise.all([
+      device_data(),
+      getPushToken(),
+    ]);
+
+    const requestBody: InitializationRequest = {
+      token,
+      package_version,
+      app_version,
+      device_data: init_info[0],
+      platform: 'REACT_NATIVE',
+      source,
+      link,
+      install_instance_id: await getLinkRunnerInstallInstanceId(),
+      push_token: init_info[1]?.token,
+      push_token_type: init_info[1]?.token_type,
+    };
+
     const fetch_result = await fetch(baseUrl + '/api/client/init', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        token,
-        package_version,
-        app_version,
-        device_data: await device_data(),
-        platform: 'REACT_NATIVE',
-        source,
-        link,
-        install_instance_id: await getLinkRunnerInstallInstanceId(),
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     const result = await fetch_result.json();
@@ -48,7 +58,6 @@ const initApiCall = async (
 
     if (__DEV__) {
       console.log('Linkrunner initialised successfully 🔥');
-
       console.log('init response > ', result);
     }
 
@@ -81,9 +90,13 @@ class Linkrunner {
   async signup({
     data,
     user_data,
+    customer_created_at,
+    is_first_time_customer,
   }: {
     data?: { [key: string]: any };
     user_data: UserData;
+    customer_created_at?: Date;
+    is_first_time_customer?: boolean;
   }): Promise<void | LRTriggerResponse> {
     if (!this.token) {
       console.error('Linkrunner: Signup failed, token not initialized');
@@ -106,6 +119,8 @@ class Linkrunner {
             device_data: await device_data(),
           },
           install_instance_id: await getLinkRunnerInstallInstanceId(),
+          customer_created_at,
+          is_first_time_customer,
         }),
       });
       const result = await response.json();

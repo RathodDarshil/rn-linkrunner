@@ -10,6 +10,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import ReactNativeIdfaAaid from '@sparkfabrik/react-native-idfa-aaid';
+import messaging from '@react-native-firebase/messaging';
+import { TokenType, type PushTokenInfo } from './types';
 
 const getInstallReferrerInfo = (): Promise<PlayInstallReferrerInfo | {}> => {
   return new Promise((resolve) => {
@@ -164,6 +166,29 @@ async function getDeeplinkURL(): Promise<string | null> {
     return null;
   }
 }
+
+export async function getPushToken(): Promise<PushTokenInfo | null> {
+  try {
+    // iOS: request permission *before* token fetch
+    if (Platform.OS === 'ios') {
+      const status = await messaging().requestPermission();
+      if (status === messaging.AuthorizationStatus.DENIED) return null;
+      await messaging().registerDeviceForRemoteMessages();
+    }
+
+    const token = await messaging().getToken();
+    if (!token) return null;
+
+    return {
+      token,
+      token_type: Platform.OS === 'android' ? TokenType.FCM : TokenType.APN,
+    };
+  } catch (e) {
+    console.warn('Push‑token fetch failed', e);
+    return null;
+  }
+}
+
 
 export {
   device_data,
