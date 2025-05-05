@@ -37,8 +37,9 @@ const initApiCall = async (
       source,
       link,
       install_instance_id: await getLinkRunnerInstallInstanceId(),
-      push_token: init_info[1]?.token,
-      push_token_type: init_info[1]?.token_type,
+      fcm_push_token: init_info[1]?.fcm_token,
+      apns_push_token: init_info[1]?.apns_token,
+      platform_os: init_info[1]?.platform,
     };
 
     const fetch_result = await fetch(baseUrl + '/api/client/init', {

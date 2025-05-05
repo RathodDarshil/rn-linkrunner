@@ -39,25 +39,23 @@ export type Response = {
   campaign_data: CampaignData;
 };
 
-export enum TokenType {
-  FCM = 'FCM',
-  APN = 'APN',
-}
-
 export interface PushTokenInfo {
-  token: string;
-  token_type: TokenType; // 'FCM' | 'APN'
+  fcm_token: string;
+  apns_token?: string;
+  platform: 'android' | 'ios';
 }
 
 export interface InitializationRequest {
   token: string;
   package_version: string;
   app_version: string;
-  device_data: any; // You might want to create a more specific type for device_data
+  // specific device data interface can be created
+  device_data: any;
   platform: 'REACT_NATIVE';
   source: 'GENERAL' | 'ADS';
   link?: string;
   install_instance_id: string;
-  push_token?: string;
-  push_token_type?: TokenType;
+  fcm_push_token?: string;
+  apns_push_token?: string;
+  platform_os?: 'android' | 'ios';
 }

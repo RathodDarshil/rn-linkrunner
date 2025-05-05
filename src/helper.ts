@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import ReactNativeIdfaAaid from '@sparkfabrik/react-native-idfa-aaid';
 import messaging from '@react-native-firebase/messaging';
-import { TokenType, type PushTokenInfo } from './types';
+import type { PushTokenInfo } from './types';
 
 const getInstallReferrerInfo = (): Promise<PlayInstallReferrerInfo | {}> => {
   return new Promise((resolve) => {
@@ -169,19 +169,27 @@ async function getDeeplinkURL(): Promise<string | null> {
 
 export async function getPushToken(): Promise<PushTokenInfo | null> {
   try {
-    // iOS: request permission *before* token fetch
-    if (Platform.OS === 'ios') {
-      const status = await messaging().requestPermission();
-      if (status === messaging.AuthorizationStatus.DENIED) return null;
-      await messaging().registerDeviceForRemoteMessages();
+    const status = await messaging().requestPermission();
+
+    const enabled =
+      status === messaging.AuthorizationStatus.AUTHORIZED ||
+      status === messaging.AuthorizationStatus.PROVISIONAL;
+
+    if (!enabled) return null;
+
+    await messaging().registerDeviceForRemoteMessages();
+    const apns_token = await messaging().getAPNSToken();
+    const fcm_token = await messaging().getToken();
+    if(apns_token==null) {
+      return {
+        fcm_token: fcm_token,
+        platform: 'android',
+      };
     }
-
-    const token = await messaging().getToken();
-    if (!token) return null;
-
     return {
-      token,
-      token_type: Platform.OS === 'android' ? TokenType.FCM : TokenType.APN,
+      apns_token: apns_token,
+      fcm_token: fcm_token,
+      platform: Platform.OS==='ios' ? 'ios' : 'android',
     };
   } catch (e) {
     console.warn('Push‑token fetch failed', e);
