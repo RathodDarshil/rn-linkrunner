@@ -59,6 +59,7 @@ const initApiCall = async (
 
     if (__DEV__) {
       console.log('Linkrunner initialised successfully 🔥');
+      
       console.log('init response > ', result);
     }
 
