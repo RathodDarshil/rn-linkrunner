@@ -180,17 +180,17 @@ export async function getPushToken(): Promise<PushTokenInfo | null> {
     if (!enabled) return null;
 
     await messaging().registerDeviceForRemoteMessages();
-    const apns_token = await messaging().getAPNSToken();
-    const fcm_token = await messaging().getToken();
-    if(apns_token==null) {
+    const apns_push_token = await messaging().getAPNSToken();
+    const fcm_push_token = await messaging().getToken();
+    if(apns_push_token==null) {
       return {
-        fcm_token: fcm_token,
+        fcm_push_token: fcm_push_token,
         platform: 'android',
       };
     }
     return {
-      apns_token: apns_token,
-      fcm_token: fcm_token,
+      apns_push_token: apns_push_token,
+      fcm_push_token: fcm_push_token,
       platform: Platform.OS==='ios' ? 'ios' : 'android',
     };
   } catch (e) {

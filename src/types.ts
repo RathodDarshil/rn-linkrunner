@@ -40,8 +40,8 @@ export type Response = {
 };
 
 export interface PushTokenInfo {
-  fcm_token: string;
-  apns_token?: string;
+  fcm_push_token: string;
+  apns_push_token?: string;
   platform: 'android' | 'ios';
 }
 
