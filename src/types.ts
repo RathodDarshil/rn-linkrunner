@@ -42,7 +42,7 @@ export type Response = {
 export interface PushTokenInfo {
   fcm_push_token: string;
   apns_push_token?: string;
-  platform: 'android' | 'ios';
+  platform_os: 'android' | 'ios';
 }
 
 export interface InitializationRequest {

@@ -185,13 +185,13 @@ export async function getPushToken(): Promise<PushTokenInfo | null> {
     if(apns_push_token==null) {
       return {
         fcm_push_token: fcm_push_token,
-        platform: 'android',
+        platform_os: 'android',
       };
     }
     return {
       apns_push_token: apns_push_token,
       fcm_push_token: fcm_push_token,
-      platform: Platform.OS==='ios' ? 'ios' : 'android',
+      platform_os: Platform.OS==='ios' ? 'ios' : 'android',
     };
   } catch (e) {
     console.warn('Push‑token fetch failed', e);
