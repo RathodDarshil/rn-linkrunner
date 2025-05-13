@@ -62,12 +62,13 @@ const getAdvertisingIdentifier = async (): Promise<string | null> => {
 
 const device_data = async (): Promise<Record<string, any>> => {
   try {
-    const [installReferrerInfo, connectivity, manufacturer, systemVersion] =
+    const [installReferrerInfo, connectivity, manufacturer, systemVersion, pushTokenInfo] =
       await Promise.all([
         getInstallReferrerInfo(),
         netinfoFetch(),
         getManufacturer(),
         getSystemVersion(),
+        getPushToken(),
       ]);
 
     // Helper function to safely get device info with fallback
@@ -111,6 +112,7 @@ const device_data = async (): Promise<Record<string, any>> => {
       idfv:
         Platform.OS === 'ios' ? await safeGet(DeviceInfo.getUniqueId) : null,
       ...installReferrerInfo,
+      ...(pushTokenInfo ? pushTokenInfo : {}),
     };
   } catch (error) {
     console.error('Error collecting device data:', error);

@@ -4,7 +4,6 @@ import {
   device_data,
   getDeeplinkURL,
   getLinkRunnerInstallInstanceId,
-  getPushToken,
   setDeeplinkURL,
 } from './helper';
 import type { CampaignData, LRIPLocationData, UserData, InitializationRequest } from './types';
@@ -23,23 +22,15 @@ const initApiCall = async (
   link?: string
 ) => {
   try {
-    const init_info = await Promise.all([
-      device_data(),
-      getPushToken(),
-    ]);
-
     const requestBody: InitializationRequest = {
       token,
       package_version,
       app_version,
-      device_data: init_info[0],
+      device_data: await device_data(),
       platform: 'REACT_NATIVE',
       source,
       link,
       install_instance_id: await getLinkRunnerInstallInstanceId(),
-      fcm_push_token: init_info[1]?.fcm_token,
-      apns_push_token: init_info[1]?.apns_token,
-      platform_os: init_info[1]?.platform,
     };
 
     const fetch_result = await fetch(baseUrl + '/api/client/init', {
