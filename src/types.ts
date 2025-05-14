@@ -15,6 +15,8 @@ export interface UserData {
   name?: string;
   phone?: string;
   email?: string;
+  user_created_at?: Date;
+  is_first_time_user?: boolean;
 }
 
 export interface TriggerConfig {

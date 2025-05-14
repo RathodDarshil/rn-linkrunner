@@ -83,13 +83,9 @@ class Linkrunner {
   async signup({
     data,
     user_data,
-    user_created_at,
-    is_first_time_user,
   }: {
     data?: { [key: string]: any };
     user_data: UserData;
-    user_created_at?: Date;
-    is_first_time_user?: boolean;
   }): Promise<void | LRTriggerResponse> {
     if (!this.token) {
       console.error('Linkrunner: Signup failed, token not initialized');
@@ -112,8 +108,6 @@ class Linkrunner {
             device_data: await device_data(),
           },
           install_instance_id: await getLinkRunnerInstallInstanceId(),
-          customer_created_at: user_created_at,
-          is_first_time_customer: is_first_time_user,
         }),
       });
       const result = await response.json();
