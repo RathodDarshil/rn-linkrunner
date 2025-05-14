@@ -15,6 +15,8 @@ export interface UserData {
   name?: string;
   phone?: string;
   email?: string;
+  user_created_at?: Date;
+  is_first_time_user?: boolean;
 }
 
 export interface TriggerConfig {
@@ -38,3 +40,24 @@ export type Response = {
   trigger?: boolean;
   campaign_data: CampaignData;
 };
+
+export interface PushTokenInfo {
+  fcm_push_token: string;
+  apns_push_token?: string;
+  platform_os: 'android' | 'ios';
+}
+
+export interface InitializationRequest {
+  token: string;
+  package_version: string;
+  app_version: string;
+  // specific device data interface can be created
+  device_data: any;
+  platform: 'REACT_NATIVE';
+  source: 'GENERAL' | 'ADS';
+  link?: string;
+  install_instance_id: string;
+  fcm_push_token?: string;
+  apns_push_token?: string;
+  platform_os?: 'android' | 'ios';
+}
