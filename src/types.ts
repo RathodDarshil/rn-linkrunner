@@ -40,15 +40,3 @@ export type Response = {
   trigger?: boolean;
   campaign_data: CampaignData;
 };
-
-export interface InitializationRequest {
-  token: string;
-  package_version: string;
-  app_version: string;
-  // specific device data interface can be created
-  device_data: any;
-  platform: 'REACT_NATIVE';
-  source: 'GENERAL' | 'ADS';
-  link?: string;
-  install_instance_id: string;
-}
