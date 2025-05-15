@@ -16,7 +16,7 @@ export interface UserData {
   phone?: string;
   email?: string;
   mixpanel_distinct_id?: string;
-  amplitude_user_id?: string;
+  amplitude_device_id?: string;
   posthog_distinct_id?: string;
 }
 
