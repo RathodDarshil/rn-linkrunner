@@ -15,7 +15,7 @@ export interface UserData {
   name?: string;
   phone?: string;
   email?: string;
-  user_created_at?: Date;
+  user_created_at?: string;
   is_first_time_user?: boolean;
 }
 
