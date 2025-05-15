@@ -120,6 +120,18 @@ const init = async () => {
 
 Call this function only once after the user has completed the onboarding process in your app. This should be triggered at the final step of your onboarding flow to register the user with Linkrunner.
 
+It is strongly recommended to use the platform’s identify function to set a persistent user_id once it becomes available (typically after signup or login).
+
+- [Mixpanel - ID Management & User Identification](https://docs.mixpanel.com/docs/tracking-methods/id-management/identifying-users-simplified)
+- [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
+- [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
+
+If a user_id is not being set using the platform’s identify method, you must pass a user identifier for mixpanel, posthog and amplitude integration:
+
+- mixpanel_distinct_id for Mixpanel
+- posthog_distinct_id for PostHog
+- amplitude_device_id for Amplitude
+
 ```jsx
 import linkrunner from 'rn-linkrunner';
 
@@ -131,7 +143,7 @@ const onSignup = async () => {
       phone: '9583849238', // optional
       email: 'support@linkrunner.io', //optional
       mixpanel_distinct_id: 'mixpanel_distinct_id', //optional
-      amplitude_user_id: 'amplitude_user_id', //optional
+      amplitude_device_id: 'amplitude_device_id', //optional
       posthog_distinct_id: 'posthog_distinct_id', //optional
     },
     data: {}, // Any other data you might need
