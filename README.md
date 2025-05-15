@@ -126,7 +126,7 @@ It is strongly recommended to use the platform’s identify function to set a pe
 - [PostHog - How User Identification Works](https://posthog.com/docs/product-analytics/identify#how-identify-works)
 - [Amplitude - Identify Users Documentation](https://amplitude.com/docs/get-started/identify-users)
 
-If a user_id is not being set using the platform’s identify method, you must pass a user identifier for mixpanel, posthog and amplitude integration:
+If the platform's identifier function is not called, you must provide a user identifier for Mixpanel, PostHog, and Amplitude integration.
 
 - mixpanel_distinct_id for Mixpanel
 - posthog_distinct_id for PostHog
