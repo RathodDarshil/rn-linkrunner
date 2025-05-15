@@ -41,12 +41,6 @@ export type Response = {
   campaign_data: CampaignData;
 };
 
-export interface PushTokenInfo {
-  fcm_push_token: string;
-  apns_push_token?: string;
-  platform_os: 'android' | 'ios';
-}
-
 export interface InitializationRequest {
   token: string;
   package_version: string;
@@ -57,7 +51,4 @@ export interface InitializationRequest {
   source: 'GENERAL' | 'ADS';
   link?: string;
   install_instance_id: string;
-  fcm_push_token?: string;
-  apns_push_token?: string;
-  platform_os?: 'android' | 'ios';
 }

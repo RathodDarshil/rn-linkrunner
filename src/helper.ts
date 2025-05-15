@@ -10,8 +10,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import ReactNativeIdfaAaid from '@sparkfabrik/react-native-idfa-aaid';
-import messaging from '@react-native-firebase/messaging';
-import type { PushTokenInfo } from './types';
 
 const getInstallReferrerInfo = (): Promise<PlayInstallReferrerInfo | {}> => {
   return new Promise((resolve) => {
@@ -62,13 +60,12 @@ const getAdvertisingIdentifier = async (): Promise<string | null> => {
 
 const device_data = async (): Promise<Record<string, any>> => {
   try {
-    const [installReferrerInfo, connectivity, manufacturer, systemVersion, pushTokenInfo] =
+    const [installReferrerInfo, connectivity, manufacturer, systemVersion] =
       await Promise.all([
         getInstallReferrerInfo(),
         netinfoFetch(),
         getManufacturer(),
         getSystemVersion(),
-        getPushToken(),
       ]);
 
     // Helper function to safely get device info with fallback
@@ -112,7 +109,6 @@ const device_data = async (): Promise<Record<string, any>> => {
       idfv:
         Platform.OS === 'ios' ? await safeGet(DeviceInfo.getUniqueId) : null,
       ...installReferrerInfo,
-      ...(pushTokenInfo ? pushTokenInfo : {}),
     };
   } catch (error) {
     console.error('Error collecting device data:', error);
@@ -168,37 +164,6 @@ async function getDeeplinkURL(): Promise<string | null> {
     return null;
   }
 }
-
-export async function getPushToken(): Promise<PushTokenInfo | null> {
-  try {
-    const status = await messaging().requestPermission();
-
-    const enabled =
-      status === messaging.AuthorizationStatus.AUTHORIZED ||
-      status === messaging.AuthorizationStatus.PROVISIONAL;
-
-    if (!enabled) return null;
-
-    await messaging().registerDeviceForRemoteMessages();
-    const apns_push_token = await messaging().getAPNSToken();
-    const fcm_push_token = await messaging().getToken();
-    if(apns_push_token==null) {
-      return {
-        fcm_push_token: fcm_push_token,
-        platform_os: 'android',
-      };
-    }
-    return {
-      apns_push_token: apns_push_token,
-      fcm_push_token: fcm_push_token,
-      platform_os: Platform.OS==='ios' ? 'ios' : 'android',
-    };
-  } catch (e) {
-    console.warn('Push‑token fetch failed', e);
-    return null;
-  }
-}
-
 
 export {
   device_data,
