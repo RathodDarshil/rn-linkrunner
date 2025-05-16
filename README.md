@@ -131,6 +131,9 @@ const onSignup = async () => {
       name: 'John Doe', // optional
       phone: '9583849238', // optional
       email: 'support@linkrunner.io', //optional
+      // These properties are used to track reinstalls
+      user_created_at: '2025-05-16T04:48:53.000Z', // optional
+      is_first_time_user: true, // optional
     },
     data: {}, // Any other data you might need
   });
