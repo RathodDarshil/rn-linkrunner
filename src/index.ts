@@ -467,6 +467,58 @@ class Linkrunner {
       }
     });
   }
+
+  /**
+   * Sets Clevertap ID for the current installation
+   * @param clevertapId - Clevertap ID to associate with this installation
+   * @returns Promise with API response data or void if failed
+   */
+  async setClevertapId(clevertapId: string): Promise<void | any> {
+    if (!this.token) {
+      console.error('Linkrunner: Setting CleverTap ID failed, token not initialized');
+      return;
+    }
+
+    if (!clevertapId) {
+      console.error('Linkrunner: CleverTap ID is required');
+      return;
+    }
+
+    try {
+      const response = await fetch(baseUrl + '/api/client/integrations', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: this.token,
+          install_instance_id: await getLinkRunnerInstallInstanceId(),
+          integration_info: {
+            clevertap_id: clevertapId
+          },
+          platform: Platform.OS
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result?.status !== 200 && result?.status !== 201) {
+        console.error('Linkrunner: Setting CleverTap ID failed');
+        console.error('Linkrunner: ', result?.msg);
+        return;
+      }
+
+      if (__DEV__) {
+        console.log('Linkrunner: CleverTap ID set successfully', clevertapId);
+      }
+
+      return result?.data;
+    } catch (error) {
+      console.error('Linkrunner: Setting CleverTap ID failed');
+      console.error('Linkrunner: ', error);
+    }
+  }
 }
 
 const linkrunner = new Linkrunner();
