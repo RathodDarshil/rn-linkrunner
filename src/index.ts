@@ -485,10 +485,8 @@ class Linkrunner {
     }
 
     try {
-      // Convert IntegrationData to integration_info object
       const integration_info: Record<string, any> = {};
       
-      // Map the properties from IntegrationData to the expected API format
       if (integrationData.clevertapId) {
         integration_info.clevertap_id = integrationData.clevertapId;
       }

@@ -42,9 +42,6 @@ export type Response = {
   campaign_data: CampaignData;
 };
 
-/**
- * Interface for integration data that can be sent to the server
- */
 export interface IntegrationData {
   clevertapId?: string;
 }

@@ -333,7 +333,7 @@ Below is a simple guide on where to place each function in your application:
 | [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                     | When specific user actions or events occur               |
 | [`linkrunner.capturePayment`](#capture-payment)                             | In your payment processing flow                                         | When a user makes a payment                              |
 | [`linkrunner.removePayment`](#remove-payment)                               | In your payment cancellation/refund flow                                | When a payment needs to be removed                       |
-| [`linkrunner.setAdditionalData`](#set-additional-data)                     | After initializing third-party analytics                                | When third-party analytics identifiers are available     |
+| [`linkrunner.setAdditionalData`](#set-additional-data)                     | Inside your app's initialization flow                                   | When third-party analytics identifiers are available     |
 
 ### Facing issues during integration?
 
