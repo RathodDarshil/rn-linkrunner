@@ -17,6 +17,7 @@ React Native Package for [linkrunner.io](https://www.linkrunner.io)
   - [Process Google Analytics](#process-google-analytics)
   - [Capture Payment](#capture-payment)
   - [Remove Payment](#remove-payment)
+  - [Set Additional Data](#set-additional-data)
 - [Support](#facing-issues-during-integration)
 - [License](#license)
 
@@ -280,21 +281,25 @@ const removePayment = async () => {
 
 Note: Either `paymentId` or `userId` must be provided when calling `removePayment`. If `userId` is provided, all payments for that user will be removed.
 
-### Set CleverTap ID
+### Set Additional Data
 
-Use this method to associate a CleverTap ID with the current installation:
+Linkrunner allows you to connect with other analytics platforms by sending integration identifiers. There are two ways to set integration data:
+
+#### Using `setAdditionalData`
+
+For more flexibility, you can use the `setAdditionalData` method with the `IntegrationData` object:
 
 ```js
-import linkrunner from 'rn-linkrunner';
-
-const setCleverTapIdentifier = async () => {
-  await linkrunner.setClevertapId('your_clevertap_user_id');
+const setIntegrationData = async () => {
+  await linkrunner.setAdditionalData({
+    clevertapId: 'your-clevertap-id',
+  });
 };
 ```
 
-#### Parameters for `linkrunner.setClevertapId`
+#### Parameters for `linkrunner.setAdditionalData`
 
-- `clevertapId`: string (required) - The CleverTap ID to associate with this installation
+- `clevertapId`: string (optional) - Your Clevertap identifier for this installation
 
 ### Function Placement Guide
 
@@ -306,11 +311,11 @@ Below is a simple guide on where to place each function in your application:
 | [`linkrunner.processGoogleAnalytics`](#process-google-analytics)            | Just below the `linkrunner.init` function call in your `App.tsx`        | Once after initializing linkrunner                       |
 | [`linkrunner.signup`](#signup)                                              | In your onboarding flow                                                 | Once after user completes the onboarding process         |
 | [`linkrunner.setUserData`](#set-user-data)                                  | In your authentication logic                                            | Every time the app is opened and the user is logged in   |
-| [`linkrunner.setClevertapId`](#set-clevertap-id)                           | After initializing CleverTap SDK                                        | When you want to associate a CleverTap ID with the user  |
 | [`linkrunner.triggerDeeplink`](#trigger-deeplink-for-deferred-deep-linking) | After navigation initialization                                         | Once after your navigation is ready to handle deep links |
 | [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                     | When specific user actions or events occur               |
 | [`linkrunner.capturePayment`](#capture-payment)                             | In your payment processing flow                                         | When a user makes a payment                              |
 | [`linkrunner.removePayment`](#remove-payment)                               | In your payment cancellation/refund flow                                | When a payment needs to be removed                       |
+| [`linkrunner.setAdditionalData`](#set-additional-data)                     | After initializing third-party analytics                                | When third-party analytics identifiers are available     |
 
 ### Facing issues during integration?
 
