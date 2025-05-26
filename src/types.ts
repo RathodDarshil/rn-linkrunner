@@ -15,6 +15,9 @@ export interface UserData {
   name?: string;
   phone?: string;
   email?: string;
+  mixpanel_distinct_id?: string;
+  amplitude_device_id?: string;
+  posthog_distinct_id?: string;
 }
 
 export interface TriggerConfig {
@@ -38,3 +41,7 @@ export type Response = {
   trigger?: boolean;
   campaign_data: CampaignData;
 };
+
+export interface IntegrationData {
+  clevertapId?: string;
+}
