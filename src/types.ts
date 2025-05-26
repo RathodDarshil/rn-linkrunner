@@ -38,3 +38,10 @@ export type Response = {
   trigger?: boolean;
   campaign_data: CampaignData;
 };
+
+/**
+ * Interface for integration data that can be sent to the server
+ */
+export interface IntegrationData {
+  clevertapId?: string;
+}
