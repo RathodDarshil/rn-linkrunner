@@ -10,6 +10,7 @@ React Native Package for [linkrunner.io](https://www.linkrunner.io)
 - [Expo](#expo)
 - [Usage](#usage)
   - [Initialisation](#initialisation)
+  - [Get Attribution Data](#get-attribution-data)
   - [Signup](#signup)
   - [Set User Data](#set-user-data)
   - [Trigger Deeplink](#trigger-deeplink-for-deferred-deep-linking)
@@ -78,8 +79,8 @@ useEffect(() => {
 }, []);
 
 const init = async () => {
-  const initData = await linkrunner.init('PROJECT_TOKEN');
-
+  await linkrunner.init('PROJECT_TOKEN');
+  
   // Call processGoogleAnalytics right after init
   if (Platform.OS === 'android') {
     await linkrunner.processGoogleAnalytics(analytics);
@@ -87,33 +88,45 @@ const init = async () => {
 };
 ```
 
-#### Response type for `linkrunner.init`
+The `init` function does not return attribution data and deeplink for the current installation. To get attribution data and deeplink for the current installation use `linkrunner.getAttributionData`.
 
+### Get Attribution Data
+
+Use this function to retrieve attribution information and deeplink for the current installation.
+
+```jsx
+import linkrunner from 'rn-linkrunner';
+
+// Get attribution data
+const getAttribution = async () => {
+  try {
+    const data = await linkrunner.getAttributionData();
+    console.log('Attribution data:', data);
+  } catch (error) {
+    console.error('Error getting attribution data:', error);
+  }
+};
 ```
+
+#### Response Format
+
+```typescript
 {
-  ip_location_data: {
-    ip: string;
-    city: string;
-    countryLong: string;
-    countryShort: string;
-    latitude: number;
-    longitude: number;
-    region: string;
-    timeZone: string;
-    zipCode: string;
+  data: {
+    deeplink: string;  // The deep link that opened the app, if any
+    campaign_data: {
+      id: string;               // Campaign ID
+      name: string;             // Campaign name
+      ad_network: string | null; // Source ad network (e.g., 'facebook', 'google')
+      group_name: string | null; // Ad group name
+      asset_group_name: string | null; // Asset group name
+      asset_name: string | null; // Asset name
+      type: string;            // Campaign type (e.g., 'ORGANIC', 'PAID')
+      installed_at: string;    // ISO timestamp of installation
+      store_click_at: string;  // ISO timestamp of store click
+    };
+    attribution_source: string; // Source of attribution (e.g., 'ORGANIC', 'FACEBOOK')
   };
-  deeplink: string;
-  root_domain: boolean;
-  campaign_data: {
-    id: string;
-    name: string;
-    type: "ORGANIC" | "INORGANIC";
-    ad_network: "META" | "GOOGLE" | null;
-    group_name: string | null;
-    asset_group_name: string | null;
-    asset_name: string | null;
-  };
-  attribution_source: "ORGANIC" | "META" | "GOOGLE";
 }
 ```
 
@@ -137,25 +150,6 @@ const onSignup = async () => {
 };
 ```
 
-#### Response type for `linkrunner.signup`
-
-```
-{
-  ip_location_data: {
-    ip: string;
-    city: string;
-    countryLong: string;
-    countryShort: string;
-    latitude: number;
-    longitude: number;
-    region: string;
-    timeZone: string;
-    zipCode: string;
-  };
-  deeplink: string;
-  root_domain: boolean;
-}
-```
 
 ### Set User Data
 
@@ -294,7 +288,7 @@ Below is a simple guide on where to place each function in your application:
 | [`linkrunner.trackEvent`](#track-event)                                     | Throughout your app where events need to be tracked                     | When specific user actions or events occur               |
 | [`linkrunner.capturePayment`](#capture-payment)                             | In your payment processing flow                                         | When a user makes a payment                              |
 | [`linkrunner.removePayment`](#remove-payment)                               | In your payment cancellation/refund flow                                | When a payment needs to be removed                       |
-
+| [`linkrunner.getAttributionData`](#get-attribution-data)                    |                                               | Every time the app is opened and the user is logged in   |
 ### Facing issues during integration?
 
 Mail us on darshil@linkrunner.io

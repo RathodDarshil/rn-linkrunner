@@ -4,7 +4,6 @@ import {
   device_data,
   getDeeplinkURL,
   getLinkRunnerInstallInstanceId,
-  setDeeplinkURL,
 } from './helper';
 import type { CampaignData, LRIPLocationData, UserData } from './types';
 import packageJson from '../package.json';
@@ -20,7 +19,7 @@ const initApiCall = async (
   token: string,
   source: 'GENERAL' | 'ADS',
   link?: string
-) => {
+): Promise<void> => {
   try {
     const fetch_result = await fetch(baseUrl + '/api/client/init', {
       method: 'POST',
@@ -52,9 +51,7 @@ const initApiCall = async (
       console.log('init response > ', result);
     }
 
-    if (!!result?.data?.deeplink) setDeeplinkURL(result?.data?.deeplink);
-
-    return result?.data;
+    return;
   } catch (error) {
     console.error('Error initializing linkrunner', error);
   }
@@ -67,7 +64,7 @@ class Linkrunner {
     this.token = null;
   }
 
-  async init(token: string): Promise<void | LRInitResponse> {
+  async init(token: string) {
     if (!token) {
       console.error('Linkrunner needs your project token to initialize!');
       return;
@@ -84,7 +81,7 @@ class Linkrunner {
   }: {
     data?: { [key: string]: any };
     user_data: UserData;
-  }): Promise<void | LRTriggerResponse> {
+  }) {
     if (!this.token) {
       console.error('Linkrunner: Signup failed, token not initialized');
       return;
@@ -120,7 +117,7 @@ class Linkrunner {
         console.log('Linkrunner: Signup called 🔥');
       }
 
-      return result.data;
+      return;
     } catch (err: any) {
       console.error('Linkrunner: Signup failed');
       console.error('Linkrunner: ', err.message);
@@ -165,7 +162,60 @@ class Linkrunner {
     });
   }
 
-  async setUserData(user_data: UserData) {
+  async getAttributionData(): Promise<{
+    msg: string;
+    status: number;
+    data: {
+      deeplink: string;
+      campaign_data: {
+        id: string;
+        name: string;
+        ad_network: string | null;
+        group_name: string | null;
+        asset_group_name: string | null;
+        asset_name: string | null;
+        type: string;
+        installed_at: string;
+        store_click_at: string;
+      };
+      attribution_source: string;
+    };
+  } | void> {
+    if (!this.token) {
+      console.error('Linkrunner: Get attribution data failed, token not initialized');
+      return;
+    }
+
+    try {
+      const response = await fetch(baseUrl + '/api/client/attribution-data', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          token: this.token,
+          device_data: await device_data(),
+          install_instance_id: await getLinkRunnerInstallInstanceId(),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result?.status !== 200 && result?.status !== 201) {
+        console.error('Linkrunner: Get attribution data failed');
+        console.error('Linkrunner: ', result?.msg);
+        return;
+      }
+
+      return result.data;
+    } catch (error) {
+      console.error('Linkrunner: Get attribution data failed');
+      console.error('Linkrunner: ', error);
+    }
+  }
+
+  async setUserData(user_data: UserData): Promise<void> {
     if (!this.token) {
       console.error('Linkrunner: Set user data failed, token not initialized');
       return;
