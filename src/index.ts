@@ -19,7 +19,7 @@ const initApiCall = async (
   token: string,
   source: 'GENERAL' | 'ADS',
   link?: string
-): Promise<void> => {
+) => {
   try {
     const fetch_result = await fetch(baseUrl + '/api/client/init', {
       method: 'POST',
