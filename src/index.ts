@@ -1,64 +1,26 @@
-import { Linking } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
+import { NativeModules, Platform } from 'react-native';
+// import DeviceInfo from 'react-native-device-info';
 import {
-  device_data,
-  getDeeplinkURL,
-  getLinkRunnerInstallInstanceId,
   setDeeplinkURL,
 } from './helper';
 import type { CampaignData, LRIPLocationData, UserData } from './types';
-import packageJson from '../package.json';
-import { Platform } from 'react-native';
+// import packageJson from '../package.json';
 import { PlayInstallReferrer } from 'react-native-play-install-referrer';
 
-const package_version = packageJson.version;
-const app_version: string = DeviceInfo.getVersion();
+const LINKING_ERROR =
+  `The package 'rn-linkrunner' doesn't seem to be linked. Make sure: \n\n` +
+  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
+  '- You rebuilt the app after installing the package\n' +
+  '- You are not using Expo Go\n';
 
-const baseUrl = 'https://api.linkrunner.io';
+const LinkrunnerSDKModule = NativeModules.LinkrunnerSDK;
 
-const initApiCall = async (
-  token: string,
-  source: 'GENERAL' | 'ADS',
-  link?: string
-) => {
-  try {
-    const fetch_result = await fetch(baseUrl + '/api/client/init', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        token,
-        package_version,
-        app_version,
-        device_data: await device_data(),
-        platform: 'REACT_NATIVE',
-        source,
-        link,
-        install_instance_id: await getLinkRunnerInstallInstanceId(),
-      }),
-    });
+if (!LinkrunnerSDKModule) {
+  throw new Error(LINKING_ERROR);
+}
 
-    const result = await fetch_result.json();
-
-    if (result?.status !== 200 && result?.status !== 201) {
-      throw new Error(result?.msg);
-    }
-
-    if (__DEV__) {
-      console.log('Linkrunner initialised successfully 🔥');
-
-      console.log('init response > ', result);
-    }
-
-    if (!!result?.data?.deeplink) setDeeplinkURL(result?.data?.deeplink);
-
-    return result?.data;
-  } catch (error) {
-    console.error('Error initializing linkrunner', error);
-  }
-};
+// const package_version = packageJson.version;
+// const app_version: string = '2.2.0';
 
 class Linkrunner {
   private token: string | null;
@@ -75,7 +37,25 @@ class Linkrunner {
 
     this.token = token;
 
-    return await initApiCall(token, 'GENERAL');
+    try {
+      const result = await LinkrunnerSDKModule.init(token, { link: "", source: "GENERAL" });
+      
+      if (__DEV__) {
+        console.log("Init successful");
+        console.log('Linkrunner initialised successfully ');
+        console.log('init response > ', result);
+      }
+
+      // Handle deeplink from native response
+      if (result?.deeplink) {
+        setDeeplinkURL(result.deeplink);
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error initializing linkrunner via native module', error);
+      throw error;
+    }
   }
 
   async signup({
@@ -91,78 +71,39 @@ class Linkrunner {
     }
 
     try {
-      const response = await fetch(baseUrl + '/api/client/trigger', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: this.token,
-          user_data,
-          platform: 'REACT_NATIVE',
-          data: {
-            ...data,
-            device_data: await device_data(),
-          },
-          install_instance_id: await getLinkRunnerInstallInstanceId(),
-        }),
-      });
-      const result = await response.json();
-
-      if (result?.status !== 200 && result?.status !== 201) {
-        console.error('Linkrunner: Signup failed');
-        console.error('Linkrunner: ', result?.msg);
-        return;
-      }
-
+      const result = await LinkrunnerSDKModule.signup(user_data, data || {});
+      
       if (__DEV__) {
-        console.log('Linkrunner: Signup called 🔥');
+        console.log('Linkrunner signup successful');
+        console.log('signup response > ', result);
       }
 
-      return result.data;
-    } catch (err: any) {
-      console.error('Linkrunner: Signup failed');
-      console.error('Linkrunner: ', err.message);
+      return result;
+    } catch (error) {
+      console.error('Error during signup via native module', error);
+      throw error;
     }
   }
 
-  async triggerDeeplink() {
-    const deeplink_url = await getDeeplinkURL();
-
-    if (!deeplink_url) {
-      console.error('Linkrunner: Deeplink URL not found');
+  async triggerDeeplink(): Promise<void | LRTriggerResponse> {
+    if (!this.token) {
+      console.error('Linkrunner: Trigger Deeplink failed, token not initialized');
       return;
     }
 
-    Linking.openURL(deeplink_url).then(() => {
-      fetch(baseUrl + '/api/client/deeplink-triggered', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: this.token,
-        }),
-      })
-        .then(() => {
-          if (__DEV__) {
-            console.log(
-              'Linkrunner: Deeplink triggered successfully',
-              deeplink_url
-            );
-          }
-        })
-        .catch(() => {
-          if (__DEV__) {
-            console.error(
-              'Linkrunner: Deeplink triggering failed',
-              deeplink_url
-            );
-          }
-        });
-    });
+    try {
+      const result = await LinkrunnerSDKModule.triggerDeeplink();
+      
+      if (__DEV__) {
+        console.log('Linkrunner deeplink triggered successfully');
+        console.log('trigger deeplink response > ', result);
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error triggering deeplink via native module', error);
+      throw error;
+    }
   }
 
   async setUserData(user_data: UserData) {
@@ -172,32 +113,17 @@ class Linkrunner {
     }
 
     try {
-      const response = await fetch(baseUrl + '/api/client/set-user-data', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: this.token,
-          user_data,
-          device_data: await device_data(),
-          install_instance_id: await getLinkRunnerInstallInstanceId(),
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result?.status !== 200 && result?.status !== 201) {
-        console.error('Linkrunner: Set user data failed');
-        console.error('Linkrunner: ', result?.msg);
-        return;
+      const result = await LinkrunnerSDKModule.setUserData(user_data);
+      
+      if (__DEV__) {
+        console.log('Linkrunner user data set successfully');
+        console.log('set user data response > ', result);
       }
 
-      return result.data;
-    } catch (err: any) {
-      console.error('Linkrunner: Set user data failed');
-      console.error('Linkrunner: ', err?.message);
+      return result;
+    } catch (error) {
+      console.error('Error setting user data via native module', error);
+      throw error;
     }
   }
 
@@ -227,54 +153,29 @@ class Linkrunner {
       | 'PAYMENT_CANCELLED';
   }) {
     if (!this.token) {
-      console.error(
-        'Linkrunner: Capture payment failed, token not initialized'
-      );
+      console.error('Linkrunner: Payment capture failed, token not initialized');
       return;
     }
 
     try {
-      const response = await fetch(baseUrl + '/api/client/capture-payment', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: this.token,
-          user_id: userId,
-          platform: 'REACT_NATIVE',
-          data: {
-            device_data: await device_data(),
-          },
-          amount,
-          payment_id: paymentId,
-          type,
-          status,
-          install_instance_id: await getLinkRunnerInstallInstanceId(),
-        }),
-      });
+      const paymentData = {
+        paymentId: paymentId || '',
+        userId,
+        amount,
+        type: type || 'DEFAULT',
+        status: status || 'PAYMENT_COMPLETED',
+      };
 
-      const result = await response.json();
-
-      if (result?.status !== 200 && result?.status !== 201) {
-        console.error('Linkrunner: Capture payment failed');
-        console.error('Linkrunner: ', result?.msg);
-        return;
-      }
-
+      const result = await LinkrunnerSDKModule.capturePayment(paymentData);
+      
       if (__DEV__) {
-        console.log('Linkrunner: Payment captured successfully 💸', {
-          amount,
-          paymentId,
-          userId,
-          type,
-          status,
-        });
+        console.log('Linkrunner payment captured successfully');
+        console.log('capture payment response > ', result);
       }
+
     } catch (error) {
-      console.error('Linkrunner: Payment capturing failed!');
-      return;
+      console.error('Error capturing payment via native module', error);
+      throw error;
     }
   }
 
@@ -286,55 +187,25 @@ class Linkrunner {
     userId: string;
   }) {
     if (!this.token) {
-      console.error('Linkrunner: Remove payment failed, token not initialized');
+      console.error('Linkrunner: Payment removal failed, token not initialized');
       return;
-    }
-
-    if (!paymentId && !userId) {
-      return console.error(
-        'Linkrunner: Either paymentId or userId must be provided!'
-      );
     }
 
     try {
-      const response = await fetch(
-        baseUrl + '/api/client/remove-captured-payment',
-        {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            token: this.token,
-            user_id: userId,
-            platform: 'REACT_NATIVE',
-            data: {
-              device_data: await device_data(),
-            },
-            payment_id: paymentId,
-            install_instance_id: await getLinkRunnerInstallInstanceId(),
-          }),
-        }
-      );
+      const paymentData = {
+        paymentId: paymentId || '',
+        userId,
+      };
 
-      const result = await response.json();
-
-      if (result?.status !== 200 && result?.status !== 201) {
-        console.error('Linkrunner: Capture payment failed');
-        console.error('Linkrunner: ', result?.msg);
-        return;
-      }
-
+      const result = await LinkrunnerSDKModule.removePayment(paymentData);
+      
       if (__DEV__) {
-        console.log('Linkrunner: Payment entry removed successfully!', {
-          paymentId,
-          userId,
-        });
+        console.log('Linkrunner payment removed successfully');
+        console.log('remove payment response > ', result);
       }
     } catch (error) {
-      console.error('Linkrunner: Payment capturing failed!');
-      return;
+      console.error('Error removing payment via native module', error);
+      throw error;
     }
   }
 
@@ -349,37 +220,17 @@ class Linkrunner {
     }
 
     try {
-      const response = await fetch(baseUrl + '/api/client/capture-event', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: this.token,
-          event_name: eventName,
-          event_data: eventData,
-          device_data: await device_data(),
-          install_instance_id: await getLinkRunnerInstallInstanceId(),
-        }),
-      });
-
-      const result = await response.json();
-
-      if (result?.status !== 200 && result?.status !== 201) {
-        console.error('Linkrunner: Track event failed');
-        console.error('Linkrunner: ', result?.msg);
-        return;
-      }
-
+      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {});
+      
       if (__DEV__) {
-        console.log('Linkrunner: Tracking event', eventName, eventData);
+        console.log('Linkrunner event tracked successfully:', eventName);
+        console.log('track event response > ', result);
       }
 
       return result?.data;
     } catch (error) {
-      console.error('Linkrunner: Track event failed');
-      console.error('Linkrunner: ', error);
+      console.error('Error tracking event via native module', error);
+      throw error;
     }
   }
 
@@ -478,6 +329,10 @@ export type LRInitResponse = {
   campaign_data: CampaignData;
 };
 
-export type LRTriggerResponse = Response;
+export type LRTriggerResponse = {
+  status: string;
+  message: string;
+  [key: string]: any;
+};
 
 export default linkrunner;
