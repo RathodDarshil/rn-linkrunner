@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   dependencies: {
     'rn-linkrunner': {
@@ -6,7 +8,9 @@ module.exports = {
           sourceDir: 'android',
           packageImportPath: 'io.linkrunner.LinkrunnerPackage',
         },
-        // iOS configuration will be added when iOS module is created
+        ios: {
+          podspecPath: path.join(__dirname, 'LinkrunnerSDK.podspec'),
+        },
       },
     },
   },

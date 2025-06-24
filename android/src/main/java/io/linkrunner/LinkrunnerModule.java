@@ -16,8 +16,8 @@ import io.linkrunner.models.CapturePaymentRequest;
 import io.linkrunner.models.RemovePaymentRequest;
 import io.linkrunner.models.UserDataRequest;
 import io.linkrunner.sdk.LinkRunner;
-import io.linkrunner.sdk.models.response.InitResponse;
-import io.linkrunner.sdk.models.response.TriggerResponse;
+import io.linkrunner.sdk.models.response.AttributionData;
+import io.linkrunner.sdk.models.IntegrationData;
 import io.linkrunner.utils.MapUtils;
 import io.linkrunner.utils.ModelConverter;
 
@@ -36,7 +36,7 @@ public class LinkrunnerModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
     private final LinkRunner linkrunnerSDK;
 
-  public LinkrunnerModule(ReactApplicationContext reactContext) {
+    public LinkrunnerModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.reactContext = reactContext;
         // Initialize the native SDK instance
@@ -76,7 +76,14 @@ public class LinkrunnerModule extends ReactContextBaseJavaModule {
                 }
             }
 
+            if (token == null || token.isEmpty()) {
+                promise.reject("INIT_ERROR", "Token is required");
+                return;
+            }
+
             try {
+                Log.i(TAG, "init: Initializing LinkRunner SDK");
+                
                 linkrunnerSDK.initFromJava(
                         reactContext,
                         token,
@@ -84,27 +91,26 @@ public class LinkrunnerModule extends ReactContextBaseJavaModule {
                         source,
                         secretKey,
                         keyId,
-                        initResponse -> {
+                        baseResponse -> {
                             try {
-                                WritableMap response = io.linkrunner.utils.ModelConverter.fromInitResponse(initResponse);
-                                if (response == null) {
-                                    response = Arguments.createMap();
-                                }
-
+                                // Create a response map for React Native
+                                WritableMap response = Arguments.createMap();
+                                
+                                // Add status and message
                                 response.putString("status", "success");
                                 response.putString("message", "Linkrunner SDK initialized successfully");
                                 promise.resolve(response);
-
+                                Log.i(TAG, "init: SDK initialized successfully");
+                                
                                 return Unit.INSTANCE;
                             } catch (Exception e) {
-                              promise.reject("CALLBACK_ERROR", "Error in success callback: " + e.getMessage(), e);
-                              return Unit.INSTANCE;
+                                Log.e(TAG, "init: Error in success callback: " + e.getMessage(), e);
+                                promise.reject("CALLBACK_ERROR", "Error in success callback: " + e.getMessage(), e);
+                                return Unit.INSTANCE;
                             }
                         },
                         exception -> {
-                          promise.reject("INIT_ERROR", "Failed to initialize Linkrunner: " +
-                              exception.getMessage(), exception);
-
+                            promise.reject("INIT_ERROR", "Failed to initialize Linkrunner: " + exception.getMessage(), exception);
                             return Unit.INSTANCE;
                         }
                 );
@@ -126,7 +132,7 @@ public class LinkrunnerModule extends ReactContextBaseJavaModule {
 
             // Convert ReadableMap to native Map for additionalData
             Map<String, Object> additionalData = null;
-            if (data != null) {
+            if (data != null && !data.toHashMap().isEmpty()) {
                 additionalData = MapUtils.readableMapToMap(data);
             }
 
@@ -134,25 +140,24 @@ public class LinkrunnerModule extends ReactContextBaseJavaModule {
             linkrunnerSDK.signupFromJava(
                 userDataRequest.toKotlinModel(),
                 additionalData,
-                triggerResponse -> {
+                baseResponse -> {
                     Log.i(TAG, "signup: Success callback received");
                     try {
-                        // Convert the Kotlin TriggerResponse to a JavaScript-friendly WritableMap
-                        WritableMap response = io.linkrunner.utils.ModelConverter.fromTriggerResponse(triggerResponse);
-
-                        // Add status and message for better client-side handling
-                        if (response == null) {
-                            response = Arguments.createMap();
-                        }
+                        // Create response map
+                        WritableMap response = Arguments.createMap();
+                        
                         response.putString("status", "success");
                         response.putString("message", "User signed up successfully");
+                        
+                        if (baseResponse != null) {
+                            if (baseResponse.getMessage() != null) {
+                                response.putString("message", baseResponse.getMessage());
+                            }
+                        }
 
-                        // Resolve the promise with the properly converted response
                         promise.resolve(response);
-                        Log.i(TAG, "signup: Promise resolved successfully");
                         return Unit.INSTANCE;
                     } catch (Exception e) {
-                        Log.e(TAG, "signup: Exception in success callback: " + e.getMessage(), e);
                         promise.reject("CALLBACK_ERROR", "Error in signup success callback: " + e.getMessage(), e);
                         return Unit.INSTANCE;
                     }
@@ -194,32 +199,6 @@ public class LinkrunnerModule extends ReactContextBaseJavaModule {
             );
         } catch (Exception e) {
             promise.reject("SET_USER_DATA_ERROR", "Failed to set user data: " + e.getMessage(), e);
-        }
-    }
-
-    @ReactMethod
-    public void triggerDeeplink(Promise promise) {
-        try {
-            // Call native SDK triggerDeeplink method with proper callback
-            linkrunnerSDK.triggerDeeplinkFromJava(
-              () -> {
-                    // Convert the Kotlin TriggerResponse to a JavaScript-friendly WritableMap
-
-                    WritableMap response = Arguments.createMap();
-                    response.putString("status", "success");
-                    response.putString("message", "Deeplink triggered successfully");
-
-                    // Resolve the promise with the properly converted response
-                    promise.resolve(response);
-                    return Unit.INSTANCE;
-                },
-                exception -> {
-                    promise.reject("TRIGGER_DEEPLINK_ERROR", "Failed to trigger deeplink: " + exception.getMessage(), exception);
-                    return Unit.INSTANCE;
-                }
-            );
-        } catch (Exception e) {
-            promise.reject("TRIGGER_DEEPLINK_ERROR", "Failed to trigger deeplink: " + e.getMessage(), e);
         }
     }
 
@@ -315,38 +294,103 @@ public class LinkrunnerModule extends ReactContextBaseJavaModule {
             promise.reject("REMOVE_PAYMENT_ERROR", "Failed to remove payment: " + e.getMessage(), e);
         }
     }
-
+    
     @ReactMethod
-    public void processGoogleAnalytics(Promise promise) {
+    public void getAttributionData(Promise promise) {
         try {
-            // Note: This method might not be available in the SDK
-            // Provide a meaningful response or error based on availability
-            WritableMap response = Arguments.createMap();
-            response.putString("status", "not_implemented");
-            response.putString("message", "This functionality is not currently available in the SDK");
-
-            promise.resolve(response);
+            // Call native SDK getAttributionDataFromJava method with proper callback
+            linkrunnerSDK.getAttributionDataFromJava(
+                attributionData -> {
+                    try {
+                        // Convert the attribution data to a WritableMap
+                        WritableMap response = Arguments.createMap();
+                        
+                        if (attributionData != null) {
+                            // Add the deeplink if it exists
+                            if (attributionData.getDeeplink() != null) {
+                                response.putString("deeplink", attributionData.getDeeplink());
+                            }
+                            
+                            // Convert campaign data to a WritableMap
+                            if (attributionData.getCampaignData() != null) {
+                                WritableMap campaignDataMap = Arguments.createMap();
+                                campaignDataMap.putString("id", attributionData.getCampaignData().getId());
+                                campaignDataMap.putString("name", attributionData.getCampaignData().getName());
+                                
+                                if (attributionData.getCampaignData().getAdNetwork() != null) {
+                                    campaignDataMap.putString("adNetwork", attributionData.getCampaignData().getAdNetwork());
+                                }
+                                
+                                campaignDataMap.putString("type", attributionData.getCampaignData().getType());
+                                campaignDataMap.putString("installedAt", attributionData.getCampaignData().getInstalledAt());
+                                
+                                if (attributionData.getCampaignData().getStoreClickAt() != null) {
+                                    campaignDataMap.putString("storeClickAt", attributionData.getCampaignData().getStoreClickAt());
+                                }
+                                
+                                campaignDataMap.putString("groupName", attributionData.getCampaignData().getGroupName());
+                                campaignDataMap.putString("assetName", attributionData.getCampaignData().getAssetName());
+                                campaignDataMap.putString("assetGroupName", attributionData.getCampaignData().getAssetGroupName());
+                                
+                                response.putMap("campaignData", campaignDataMap);
+                                
+                            }
+                        }
+                        
+                        response.putString("status", "success");
+                        response.putString("message", "Attribution data retrieved successfully");
+                        
+                        promise.resolve(response);
+                    } catch (Exception e) {
+                        promise.reject("ATTRIBUTION_DATA_ERROR", "Error processing attribution data: " + e.getMessage(), e);
+                    }
+                    return Unit.INSTANCE;
+                },
+                exception -> {
+                    promise.reject("ATTRIBUTION_DATA_ERROR", "Failed to get attribution data: " + exception.getMessage(), exception);
+                    return Unit.INSTANCE;
+                }
+            );
         } catch (Exception e) {
-            promise.reject("PROCESS_GA_ERROR", "Failed to process Google Analytics: " + e.getMessage(), e);
+            promise.reject("ATTRIBUTION_DATA_ERROR", "Failed to get attribution data: " + e.getMessage(), e);
         }
     }
-
+    
     @ReactMethod
-    public void getDeviceData(Promise promise) {
+    public void setAdditionalData(ReadableMap integrationDataMap, Promise promise) {
         try {
-            // Note: This method might not be directly available in the SDK
-            // Create a response with basic device information from the context
-            WritableMap deviceData = Arguments.createMap();
-
-            // Add device information available from context
-            deviceData.putString("platform", "android");
-            deviceData.putString("osVersion", android.os.Build.VERSION.RELEASE);
-            deviceData.putString("deviceModel", android.os.Build.MODEL);
-            deviceData.putString("manufacturer", android.os.Build.MANUFACTURER);
-
-            promise.resolve(deviceData);
+            if (integrationDataMap == null || integrationDataMap.toHashMap().isEmpty()) {
+                promise.reject("ADDITIONAL_DATA_ERROR", "Integration data is required");
+                return;
+            }
+            
+            // Create IntegrationData instance
+            IntegrationData integrationData = new IntegrationData();
+            
+            // Extract clevertapId if present
+            if (integrationDataMap.hasKey("clevertapId")) {
+                integrationData.setClevertapId(integrationDataMap.getString("clevertapId"));
+            }
+            
+            // Add other integration data fields here as they are added to the SDK
+            
+            // Call native SDK setAdditionalDataFromJava method
+            linkrunnerSDK.setAdditionalDataFromJava(
+                integrationData,
+                () -> {
+                    WritableMap response = Arguments.createMap();
+                    response.putString("status", "success");
+                    response.putString("message", "Additional data set successfully");
+                    promise.resolve(response);
+                    return Unit.INSTANCE;
+                },
+                exception -> {
+                    promise.reject("ADDITIONAL_DATA_ERROR", "Failed to set additional data: " + exception.getMessage(), exception);
+                    return Unit.INSTANCE;
+                }
+            );
         } catch (Exception e) {
-            promise.reject("GET_DEVICE_DATA_ERROR", "Failed to get device data: " + e.getMessage(), e);
+            promise.reject("ADDITIONAL_DATA_ERROR", "Failed to set additional data: " + e.getMessage(), e);
         }
     }
 }

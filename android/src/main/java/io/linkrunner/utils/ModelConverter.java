@@ -14,48 +14,11 @@ import io.linkrunner.models.UserDataRequest;
 import io.linkrunner.sdk.models.response.ClientCampaignData;
 import io.linkrunner.sdk.models.response.GeneralResponse;
 import io.linkrunner.sdk.models.response.IPLocationData;
-import io.linkrunner.sdk.models.response.InitResponse;
-import io.linkrunner.sdk.models.response.TriggerResponse;
 
 /**
  * Utility class to convert React Native ReadableMap objects to Java model objects
  */
 public class ModelConverter {    
-    /**
-     * Convert InitResponse to WritableMap
-     */
-    public static WritableMap fromInitResponse(InitResponse response) {
-        if (response == null) {
-            return null;
-        }
-        
-        WritableMap map = fromGeneralResponse(response);
-        
-        // Add campaign data if available
-        if (response.getCampaignData() != null) {
-            map.putMap("campaign_data", fromClientCampaignData(response.getCampaignData()));
-        }
-        
-        return map;
-    }
-    
-    /**
-     * Convert TriggerResponse to WritableMap
-     */
-    public static WritableMap fromTriggerResponse(TriggerResponse response) {
-        if (response == null) {
-            return null;
-        }
-        
-        WritableMap map = fromGeneralResponse(response);
-        
-        // Add trigger info
-        if (response.getTrigger() != null) {
-            map.putBoolean("trigger", response.getTrigger());
-        }
-        
-        return map;
-    }
     
     /**
      * Convert GeneralResponse to WritableMap
