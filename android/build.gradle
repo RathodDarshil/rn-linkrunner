@@ -32,6 +32,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 def getExtOrDefault(name) {
     return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNative_' + name]
@@ -106,8 +107,8 @@ dependencies {
     // React Native - use compileOnly to avoid version conflicts
     implementation 'com.facebook.react:react-android:0.80.0'
 
-    // Linkrunner SDK - using local project
-    implementation project(':linkrunner')
+    // Linkrunner SDK 
+    implementation "io.linkrunner:android-sdk:2.1.3"
 
     // Kotlin standard libraries
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"

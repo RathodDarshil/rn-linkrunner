@@ -1,5 +1,6 @@
-rootProject.name = "rn-linkrunner"
+rootProject.name = 'rn-linkrunner'
 
-// Include the linkrunner-android project directly
-include ':linkrunner'
-project(':linkrunner').projectDir = new File(rootProject.projectDir, '../../linkrunner-android/linkrunner')
+apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); 
+applyNativeModulesSettingsGradle(settings)
+
+include ':app'
