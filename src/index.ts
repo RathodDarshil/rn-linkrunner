@@ -32,7 +32,7 @@ class Linkrunner {
     return package_version;
   }
 
-  async init(token: string, options?: { link?: string, source?: string, secretKey?: string, keyId?: string }) {
+  async init(token: string, secretKey?: string, keyId?: string) {
     if (!token) {
       console.error('Linkrunner needs your project token to initialize!');
       return;
@@ -41,20 +41,13 @@ class Linkrunner {
     this.token = token;
 
     try {
-      // Prepare options object with defaults
-      const initOptions = {
-        link: options?.link || "",
-        source: options?.source || "GENERAL",
-        secretKey: options?.secretKey,
-        keyId: options?.keyId
-      };
 
       let result;
       if (Platform.OS === 'android') {
-        result = await LinkrunnerSDKModule.init(token, initOptions);
+        result = await LinkrunnerSDKModule.init(token, {secretKey, keyId});
       } else {
         // iOS init maintains backwards compatibility
-        result = await LinkrunnerSDKModule.initializeSDK({token: token});
+        result = await LinkrunnerSDKModule.initializeSDK({token: token, secretKey, keyId});
       }
       
       if (__DEV__) {
@@ -280,6 +273,19 @@ class Linkrunner {
       console.error('Linkrunner: Getting attribution data failed');
       console.error('Linkrunner: ', error);
       throw error;
+    }
+  }
+
+  enablePIIHashing(enabled: boolean = true): void {
+    try {
+      LinkrunnerSDKModule.enablePIIHashing(enabled);
+      
+      if (__DEV__) {
+        console.log(`Linkrunner: PII hashing ${enabled ? 'enabled' : 'disabled'}`);
+      }
+    } catch (error) {
+      console.error(`Linkrunner: Failed to ${enabled ? 'enable' : 'disable'} PII hashing`);
+      console.error('Linkrunner: ', error);
     }
   }
 
