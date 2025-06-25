@@ -32,6 +32,41 @@ class LinkrunnerSDK: NSObject {
             }
         }
     }
+
+    @objc func signup(_ userData: NSDictionary, data: NSDictionary? = nil) -> Void {
+        guard let id = userData["id"] as? String else {
+            print("Linkrunner: User ID is required")
+            return
+        }
+        
+        let userDataObj = UserData(
+            id: id,
+            name: userData["name"] as? String,
+            phone: userData["phone"] as? String,
+            email: userData["email"] as? String,
+            isFirstTimeUser: userData["isFirstTimeUser"] as? Bool,
+            userCreatedAt: userData["userCreatedAt"] as? String,
+            mixPanelDistinctId: userData["mixPanelDistinctId"] as? String,
+            amplitudeDeviceId: userData["amplitudeDeviceId"] as? String,
+            posthogDistinctId: userData["posthogDistinctId"] as? String
+        )
+        
+        Task {
+            do {
+                if #available(iOS 15.0, *) {
+                    try await linkrunnerSDK.signup(
+                        userData: userDataObj,
+                        additionalData: data as? [String: Any]
+                    )
+                    return
+                } else {
+                    print("UNSUPPORTED_VERSION: iOS 15.0 or later is required")
+                }
+            } catch {
+                print("SIGNUP_ERROR", "Failed to complete signup: \(error.localizedDescription)", error)
+            }
+        }
+    }
     
     @objc func setUserData(_ userData: NSDictionary) -> Void {
         guard let id = userData["id"] as? String else {
@@ -138,48 +173,42 @@ class LinkrunnerSDK: NSObject {
         Task {
             do {
                 let attributionData = try await linkrunnerSDK.getAttributionData()
-                // resolve(attributionData.toDictionary())
-                resolve(["status":"success"])
+                resolve(attributionData.toDictionary())
             } catch {
                 reject("ATTRIBUTION_ERROR", "Failed to get attribution data: \(error.localizedDescription)", error)
             }
         }
     }
     
-    @objc func signup(_ userData: NSDictionary, data: NSDictionary? = nil) -> Void {
-        guard let id = userData["id"] as? String else {
-            print("Linkrunner: User ID is required")
+    @objc func setAdditionalData(_ integrationDataDict: NSDictionary, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+        if integrationDataDict.count == 0 {
+            reject("ADDITIONAL_DATA_ERROR", "Integration data is required", NSError(domain: "LinkrunnerSDK", code: 1, userInfo: nil))
             return
         }
         
-        let userDataObj = UserData(
-            id: id,
-            name: userData["name"] as? String,
-            phone: userData["phone"] as? String,
-            email: userData["email"] as? String,
-            isFirstTimeUser: userData["isFirstTimeUser"] as? Bool,
-            userCreatedAt: userData["userCreatedAt"] as? String,
-            mixPanelDistinctId: userData["mixPanelDistinctId"] as? String,
-            amplitudeDeviceId: userData["amplitudeDeviceId"] as? String,
-            posthogDistinctId: userData["posthogDistinctId"] as? String
-        )
+        let clevertapId = integrationDataDict["clevertapId"] as? String
+        
+        let integrationData = IntegrationData(clevertapId: clevertapId)
         
         Task {
             do {
                 if #available(iOS 15.0, *) {
-                    try await linkrunnerSDK.signup(
-                        userData: userDataObj,
-                        additionalData: data as? [String: Any]
-                    )
-                    return
+                    try await linkrunnerSDK.setAdditionalData(integrationData)
+                    
+                    let response: [String: Any] = [
+                        "status": "success",
+                        "message": "Additional data set successfully"
+                    ]
+                    resolve(response)
                 } else {
-                    print("UNSUPPORTED_VERSION", "iOS 15.0 or later is required", nil)
+                    reject("UNSUPPORTED_VERSION", "iOS 15.0 or later is required", NSError(domain: "LinkrunnerSDK", code: 2, userInfo: nil))
                 }
             } catch {
-                print("SIGNUP_ERROR", "Failed to complete signup: \(error.localizedDescription)", error)
+                reject("ADDITIONAL_DATA_ERROR", "Failed to set additional data: \(error.localizedDescription)", error)
             }
         }
     }
+
 }
 
 // Type definition needed for RCTPromiseResolveBlock
