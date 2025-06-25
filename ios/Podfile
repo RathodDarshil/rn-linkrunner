@@ -11,8 +11,8 @@ abstract_target 'LinkrunnerSDK' do
 
   # Pods for LinkrunnerSDK
   
-  # Add the linkrunner-ios dependency
-  pod 'Linkrunner', :git => 'https://github.com/linkrunner-labs/linkrunner-ios.git', :tag => '2.1.0'
+  # Add the linkrunner-ios-sdk dependency
+    pod 'LinkrunnerKit', '3.0.0'
 
   
   # Add any other dependencies your SDK needs here

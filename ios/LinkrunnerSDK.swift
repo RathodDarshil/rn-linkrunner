@@ -1,14 +1,14 @@
 import Foundation
-import Linkrunner
+import LinkrunnerKit;
 import React
 
 @objc(LinkrunnerSDK)
 class LinkrunnerSDK: NSObject {
     
-    private var linkrunnerSDK: Linkrunner.LinkrunnerSDK!
+    private var linkrunnerSDK: LinkrunnerKit.LinkrunnerSDK!
     
     override init() {
-        linkrunnerSDK = Linkrunner.LinkrunnerSDK.shared
+        linkrunnerSDK = LinkrunnerKit.LinkrunnerSDK.shared
     }
     
     
@@ -19,9 +19,10 @@ class LinkrunnerSDK: NSObject {
             print("Linkrunner: token is required")
             return
         }
-        
+
         let secretKey = dict["secretKey"] as? String
         let keyId = dict["keyId"] as? String
+    
         
         Task {
             do {
