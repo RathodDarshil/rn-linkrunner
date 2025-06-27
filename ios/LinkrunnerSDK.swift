@@ -22,11 +22,12 @@ class LinkrunnerSDK: NSObject {
 
         let secretKey = dict["secretKey"] as? String
         let keyId = dict["keyId"] as? String
+        let debug = dict["debug"] as? Bool ?? false
     
         
         Task {
             do {
-                try await linkrunnerSDK.initialize(token: token, secretKey: secretKey, keyId: keyId)
+                try await linkrunnerSDK.initialize(token: token, secretKey: secretKey, keyId: keyId, debug: debug)
                 print("Linkrunner: SDK initialized successfully")
             } catch {
                 print("Linkrunner: Failed to initialize SDK: \(error)")
