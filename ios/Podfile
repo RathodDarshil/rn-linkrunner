@@ -1,0 +1,19 @@
+# Define the global platform for your project
+platform :ios, '15.0'
+
+# Specify that this is a library, not an application
+install! 'cocoapods', :deterministic_uuids => false
+
+# This is needed since there's no Xcode project yet
+abstract_target 'LinkrunnerSDK' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for LinkrunnerSDK
+  
+  # Add the linkrunner-ios-sdk dependency
+    pod 'LinkrunnerKit', '3.0.1'
+
+  
+  # Add any other dependencies your SDK needs here
+end

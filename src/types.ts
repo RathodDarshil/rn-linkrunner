@@ -15,26 +15,29 @@ export interface UserData {
   name?: string;
   phone?: string;
   email?: string;
+  mixpanel_distinct_id?: string;
+  amplitude_device_id?: string;
+  posthog_distinct_id?: string;
 }
 
-export interface TriggerConfig {
-  trigger_deeplink?: boolean;
+export interface IntegrationData {
+  clevertapId?: string;
 }
 
 export interface CampaignData {
   id: string;
   name: string;
-  type: 'ORGANIC' | 'INORGANIC';
-  ad_network: 'META' | 'GOOGLE' | null;
-  group_name: string | null;
-  asset_group_name: string | null;
-  asset_name: string | null;
+  type: string;
+  adNetwork?: string | null;
+  installedAt: string;
+  storeClickAt?: string | null;
+  groupName?: string;
+  assetName?: string;
+  assetGroupName?: string;
 }
 
-export type Response = {
-  ip_location_data: LRIPLocationData;
-  deeplink: string;
-  root_domain: boolean;
-  trigger?: boolean;
-  campaign_data: CampaignData;
-};
+export interface AttributionData {
+  // Direct fields
+  deeplink?: string;
+  campaignData?: CampaignData;
+}
