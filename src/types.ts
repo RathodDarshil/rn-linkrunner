@@ -15,6 +15,8 @@ export interface UserData {
   name?: string;
   phone?: string;
   email?: string;
+  user_created_at?: string;
+  is_first_time_user?: boolean;
   mixpanel_distinct_id?: string;
   amplitude_device_id?: string;
   posthog_distinct_id?: string;
