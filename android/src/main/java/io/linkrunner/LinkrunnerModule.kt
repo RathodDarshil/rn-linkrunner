@@ -36,6 +36,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             // Extract optional parameters
             val secretKey = options?.getString("secretKey")
             val keyId = options?.getString("keyId")
+            val debug = options?.getBoolean("debug") ?: false
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -48,7 +49,8 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                         context = reactContext,
                         token = token,
                         secretKey = secretKey,
-                        keyId = keyId
+                        keyId = keyId,
+                        debug = debug
                     )
                     
                     withContext(Dispatchers.Main) {

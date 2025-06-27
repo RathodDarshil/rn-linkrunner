@@ -22,11 +22,12 @@ class LinkrunnerSDK: NSObject {
 
         let secretKey = dict["secretKey"] as? String
         let keyId = dict["keyId"] as? String
+        let debug = dict["debug"] as? Bool ?? false
     
         
         Task {
             do {
-                try await linkrunnerSDK.initialize(token: token, secretKey: secretKey, keyId: keyId)
+                try await linkrunnerSDK.initialize(token: token, secretKey: secretKey, keyId: keyId, debug: debug)
                 print("Linkrunner: SDK initialized successfully")
             } catch {
                 print("Linkrunner: Failed to initialize SDK: \(error)")
@@ -45,11 +46,11 @@ class LinkrunnerSDK: NSObject {
             name: userData["name"] as? String,
             phone: userData["phone"] as? String,
             email: userData["email"] as? String,
-            isFirstTimeUser: userData["isFirstTimeUser"] as? Bool,
-            userCreatedAt: userData["userCreatedAt"] as? String,
-            mixPanelDistinctId: userData["mixPanelDistinctId"] as? String,
-            amplitudeDeviceId: userData["amplitudeDeviceId"] as? String,
-            posthogDistinctId: userData["posthogDistinctId"] as? String
+            isFirstTimeUser: userData["is_first_time_user"] as? Bool,
+            userCreatedAt: userData["user_created_at"] as? String,
+            mixPanelDistinctId: userData["mixpanel_distinct_id"] as? String,
+            amplitudeDeviceId: userData["amplitude_device_id"] as? String,
+            posthogDistinctId: userData["posthog_distinct_id"] as? String
         )
         
         Task {
@@ -80,11 +81,11 @@ class LinkrunnerSDK: NSObject {
             name: userData["name"] as? String,
             phone: userData["phone"] as? String,
             email: userData["email"] as? String,
-            isFirstTimeUser: userData["isFirstTimeUser"] as? Bool,
-            userCreatedAt: userData["userCreatedAt"] as? String,
-            mixPanelDistinctId: userData["mixPanelDistinctId"] as? String,
-            amplitudeDeviceId: userData["amplitudeDeviceId"] as? String,
-            posthogDistinctId: userData["posthogDistinctId"] as? String
+            isFirstTimeUser: userData["is_first_time_user"] as? Bool,
+            userCreatedAt: userData["user_created_at"] as? String,
+            mixPanelDistinctId: userData["mixpanel_distinct_id"] as? String,
+            amplitudeDeviceId: userData["amplitude_device_id"] as? String,
+            posthogDistinctId: userData["posthog_distinct_id"] as? String
         )
         
         Task {

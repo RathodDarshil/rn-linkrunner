@@ -7,6 +7,7 @@ module.exports = {
         android: {
           sourceDir: 'android',
           packageImportPath: 'io.linkrunner.LinkrunnerPackage',
+          packageInstance: 'new LinkrunnerPackage()',
         },
         ios: {
           podspecPath: path.join(__dirname, 'LinkrunnerSDK.podspec'),

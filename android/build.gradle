@@ -58,7 +58,7 @@ def supportsNamespace() {
 
 android {
     if (supportsNamespace()) {
-        namespace "io.linkrunner.rnlinkrunner"
+        namespace "io.linkrunner"
 
         sourceSets {
             main {
@@ -87,12 +87,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11  // Keep Java 11 for RN compatibility
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17 
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '11'  // Match Java version
+        jvmTarget = '17'  // Match Java version
     }
 }
 
@@ -117,7 +117,7 @@ dependencies {
     implementation 'com.facebook.react:react-android:0.80.0'
 
     // Linkrunner SDK 
-    implementation "io.linkrunner:android-sdk:2.1.3"
+    implementation "io.linkrunner:android-sdk:2.1.4"
 
     // Kotlin standard libraries - use stable versions
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
