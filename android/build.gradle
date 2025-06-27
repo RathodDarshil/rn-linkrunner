@@ -58,7 +58,7 @@ def supportsNamespace() {
 
 android {
     if (supportsNamespace()) {
-        namespace "io.linkrunner.rnlinkrunner"
+        namespace "io.linkrunner"
 
         sourceSets {
             main {
@@ -87,12 +87,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11  // Keep Java 11 for RN compatibility
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17 
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '11'  // Match Java version
+        jvmTarget = '17'  // Match Java version
     }
 }
 
