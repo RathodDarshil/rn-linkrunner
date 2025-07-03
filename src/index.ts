@@ -33,7 +33,7 @@ class Linkrunner {
     return package_version;
   }
 
-  async init(token: string, secretKey?: string, keyId?: string, debug?: boolean) {
+  async init(token: string, secretKey?: string, keyId?: string, debug: boolean=false) {
     if (!token) {
       console.error('Linkrunner needs your project token to initialize!');
       return;
