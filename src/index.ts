@@ -33,7 +33,7 @@ class Linkrunner {
     return package_version;
   }
 
-  async init(token: string, secretKey?: string, keyId?: string, debug: boolean=false) {
+  async init(token: string, secretKey?: string, keyId?: string, disableIdfa?: boolean, debug: boolean=false) {
     if (!token) {
       console.error('Linkrunner needs your project token to initialize!');
       return;
@@ -48,7 +48,7 @@ class Linkrunner {
         result = await LinkrunnerSDKModule.init(token, {secretKey, keyId, debug});
       } else {
         // iOS init maintains backwards compatibility
-        result = await LinkrunnerSDKModule.initializeSDK({token: token, secretKey, keyId, debug});
+        result = await LinkrunnerSDKModule.initializeSDK({token: token, secretKey, keyId, disableIdfa, debug});
       }
       
       if (__DEV__) {
