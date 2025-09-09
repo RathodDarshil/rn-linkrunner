@@ -1,7 +1,6 @@
 import { NativeModules, Platform } from 'react-native';
 import type { AttributionData, IntegrationData, UserData } from './types';
 import packageJson from '../package.json';
-import DeviceInfo from 'react-native-device-info';
 
 const LINKING_ERROR =
   `The package 'rn-linkrunner' doesn't seem to be linked. Make sure: \n\n` +
@@ -16,17 +15,12 @@ if (!LinkrunnerSDKModule) {
 }
 
 const package_version = packageJson.version;
-const app_version: string = DeviceInfo.getVersion();
 
 class Linkrunner {
   private token: string | null;
 
   constructor() {
     this.token = null;
-  }
-
-  getAppVersion() {
-    return app_version;
   }
 
   getPackageVersion() {
