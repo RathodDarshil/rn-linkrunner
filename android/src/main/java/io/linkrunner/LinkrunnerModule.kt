@@ -38,6 +38,8 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
 
+            val packageVersion = options?.getString("packageVersion") ?: "2.4.1" // React Native package version
+
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
                 return
@@ -45,6 +47,15 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
 
             moduleScope.launch {
                 try {
+                    // Configure SDK with client platform and version prior to init
+                    try {
+                        val platform = "REACT_NATIVE"
+                        val packageVersion = packageVersion // React Native package version
+                        LinkRunner.configureSDK(platform, packageVersion)
+                    } catch (e: Exception) {
+                        Log.w(TAG, "configureSDK failed: ${e.message}")
+                    }
+                    
                     val result = linkrunnerSDK.init(
                         context = reactContext,
                         token = token,

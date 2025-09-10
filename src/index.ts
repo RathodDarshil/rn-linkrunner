@@ -14,7 +14,7 @@ if (!LinkrunnerSDKModule) {
   throw new Error(LINKING_ERROR);
 }
 
-const package_version = packageJson.version;
+const packageVersion = packageJson.version;
 
 class Linkrunner {
   private token: string | null;
@@ -24,7 +24,7 @@ class Linkrunner {
   }
 
   getPackageVersion() {
-    return package_version;
+    return packageVersion;
   }
 
   async init(token: string, secretKey?: string, keyId?: string, disableIdfa?: boolean, debug: boolean=false) {
@@ -39,7 +39,7 @@ class Linkrunner {
 
       let result;
       if (Platform.OS === 'android') {
-        result = await LinkrunnerSDKModule.init(token, {secretKey, keyId, debug});
+        result = await LinkrunnerSDKModule.init(token, {secretKey, keyId, debug, packageVersion});
       } else {
         // iOS init maintains backwards compatibility
         result = await LinkrunnerSDKModule.initializeSDK({token: token, secretKey, keyId, disableIdfa, debug});

@@ -117,7 +117,7 @@ dependencies {
     implementation 'com.facebook.react:react-android:0.80.0'
 
     // Linkrunner SDK 
-    implementation "io.linkrunner:android-sdk:3.0.1"
+    implementation "io.linkrunner:android-sdk:3.1.1"
 
     // Kotlin standard libraries - use stable versions
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
