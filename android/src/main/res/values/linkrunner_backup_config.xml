@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        LinkRunner SDK Backup Configuration Resources
+        
+        This resource file contains backup exclusion patterns that can be referenced
+        in your app's backup configuration files.
+    -->
+    
+    <!-- SharedPreferences file name used by LinkRunner SDK -->
+    <string name="linkrunner_prefs_file_name" translatable="false">io.linkrunner.sdk_prefs</string>
+    
+    <!-- Backup exclusion path for LinkRunner SDK -->
+    <string name="linkrunner_backup_exclusion_path" translatable="false">io.linkrunner.sdk_prefs</string>
+</resources>

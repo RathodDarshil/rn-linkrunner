@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    LinkRunner SDK Backup Rules for Android 12+ (API 31+)
+    
+    To use this in your Flutter app, add this to your app's android/app/src/main/AndroidManifest.xml:
+    <application android:dataExtractionRules="@xml/linkrunner_backup_rules">
+    
+    Or include these rules in your existing backup rules file.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude LinkRunner SDK SharedPreferences from cloud backup -->
+        <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+    </cloud-backup>
+    <device-transfer>
+        <!-- Exclude LinkRunner SDK SharedPreferences from device transfer -->
+        <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+    </device-transfer>
+</data-extraction-rules>
