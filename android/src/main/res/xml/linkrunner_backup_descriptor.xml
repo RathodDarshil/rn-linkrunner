@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    LinkRunner SDK Backup Descriptor for Android 6.0-11 (API 23-30)
+    
+    To use this in your Flutter app, add this to your app's android/app/src/main/AndroidManifest.xml:
+    <application android:fullBackupContent="@xml/linkrunner_backup_descriptor">
+    
+    Or include these rules in your existing backup descriptor file.
+-->
+<full-backup-content>
+    <!-- Exclude LinkRunner SDK SharedPreferences from legacy backup -->
+    <exclude domain="sharedpref" path="io.linkrunner.sdk_prefs"/>
+</full-backup-content>
