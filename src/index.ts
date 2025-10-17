@@ -284,6 +284,23 @@ class Linkrunner {
     }
   }
 
+  async setPushToken(pushToken: string): Promise<void> {
+    if (!pushToken || pushToken.trim().length === 0) {
+      throw new Error('Push token cannot be empty');
+    }
+
+    try {
+      await LinkrunnerSDKModule.setPushToken(pushToken);
+      
+      if (__DEV__) {
+        console.log('Linkrunner: Push token set successfully');
+      }
+    } catch (error) {
+      console.error('Linkrunner: Failed to set push token:', error);
+      throw error;
+    }
+  }
+
 }
 
 const linkrunner = new Linkrunner();

@@ -211,6 +211,14 @@ class LinkrunnerSDK: NSObject {
             }
         }
     }
+    
+    @objc func setPushToken(_ pushToken: NSString, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+        let response: [String: Any] = [
+            "status": "success",
+            "message": "Push token set successfully"
+        ]
+        resolve(response)
+    }
 
 }
 
