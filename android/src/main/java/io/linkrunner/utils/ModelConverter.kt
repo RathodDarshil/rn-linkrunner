@@ -184,6 +184,8 @@ object ModelConverter {
             mixpanelDistinctId = map["mixpanel_distinct_id"] as? String,
             amplitudeDeviceId = map["amplitude_device_id"] as? String,
             posthogDistinctId = map["posthog_distinct_id"] as? String,
+            brazeDeviceId = map["braze_device_id"] as? String,
+            gaAppInstanceId = map["ga_app_instance_id"] as? String,
             userCreatedAt = map["user_created_at"] as? String,
             isFirstTimeUser = map["is_first_time_user"] as? Boolean
         )
