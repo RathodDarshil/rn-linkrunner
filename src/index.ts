@@ -195,7 +195,7 @@ class Linkrunner {
     }
   }
 
-  async trackEvent(eventName: string, eventData?: Record<string, any>) {
+  async trackEvent(eventName: string, eventData?: Record<string, any>, eventId?: string) {
     if (!this.token) {
       console.error('Linkrunner: Track event failed, token not initialized');
       return;
@@ -206,7 +206,7 @@ class Linkrunner {
     }
 
     try {
-      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {});
+      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, eventId || null);
       
       if (__DEV__) {
         console.log('Linkrunner event tracked successfully:', eventName);
