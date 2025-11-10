@@ -198,7 +198,7 @@ class Linkrunner {
   async trackEvent(eventName: string, eventData?: Record<string, any>, eventId?: string | number ) {
     let finalEventId: string | null = null;
     
-    if (eventId) {
+    if (eventId != null) {
       if (typeof eventId === 'string' || typeof eventId === 'number') {
         finalEventId = String(eventId);
       } else {
