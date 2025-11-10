@@ -180,7 +180,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val eventDataMap = if (eventData != null) {
                 MapUtils.readableMapToMap(eventData)
             } else {
-                null
+                emptyMap()
             }
 
             moduleScope.launch {
