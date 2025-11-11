@@ -103,10 +103,12 @@ class LinkrunnerSDK: NSObject {
         }
     }
     
-    @objc func trackEvent(_ eventName: NSString, eventData: NSDictionary?) -> Void {
+    @objc func trackEvent(_ eventName: NSString, eventData: NSDictionary?, eventId: NSString?) -> Void {
         Task {
             do {
-                try await linkrunnerSDK.trackEvent(eventName: eventName as String, eventData: eventData as? [String: Any])
+                let finalEventData = eventData as? [String: Any]
+                let eventIdString = eventId as String?
+                try await linkrunnerSDK.trackEvent(eventName: eventName as String, eventData: finalEventData, eventId: eventIdString)
                 print("Linkrunner: Event tracked successfully")
             } catch {
                 print("Linkrunner: Failed to track event: \(error)")

@@ -170,7 +170,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
     }
 
     @ReactMethod
-    fun trackEvent(eventName: String, eventData: ReadableMap?, promise: Promise) {
+    fun trackEvent(eventName: String, eventData: ReadableMap?, eventId: String?, promise: Promise) {
         if (eventName.isEmpty()) {
             promise.reject("TRACK_EVENT_ERROR", "Event name is required")
             return
@@ -185,7 +185,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
 
             moduleScope.launch {
                 try {
-                    val result = linkrunnerSDK.trackEvent(eventName, eventDataMap)
+                    val result = linkrunnerSDK.trackEvent(eventName, eventDataMap, eventId)
                     
                     withContext(Dispatchers.Main) {
                         if (result.isSuccess) {

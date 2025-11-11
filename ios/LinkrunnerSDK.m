@@ -11,7 +11,7 @@ RCT_EXTERN_METHOD(signup:(NSDictionary *)userData
 
 RCT_EXTERN_METHOD(setUserData:(NSDictionary *)userData)
 
-RCT_EXTERN_METHOD(trackEvent:(NSString *)eventName eventData:(NSDictionary *)eventData)
+RCT_EXTERN_METHOD(trackEvent:(NSString *)eventName eventData:(NSDictionary *)eventData eventId:(NSString *)eventId)
 
 RCT_EXTERN_METHOD(capturePayment:(NSDictionary *)paymentData)
 
