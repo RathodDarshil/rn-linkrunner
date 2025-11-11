@@ -74,6 +74,7 @@ android {
         targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
         versionCode 1
         versionName "1.0"
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {
@@ -117,7 +118,7 @@ dependencies {
     implementation 'com.facebook.react:react-android:0.80.0'
 
     // Linkrunner SDK 
-    implementation "io.linkrunner:android-sdk:3.3.1"
+    implementation "io.linkrunner:android-sdk:3.3.2"
 
     // Kotlin standard libraries - use stable versions
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
