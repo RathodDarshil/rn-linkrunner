@@ -285,6 +285,11 @@ class Linkrunner {
   }
 
   async setPushToken(pushToken: string): Promise<void> {
+    if (!this.token) {
+      console.error('Linkrunner: Setting push token failed, token not initialized');
+      return;
+    }
+    
     if (!pushToken || pushToken.trim().length === 0) {
       throw new Error('Push token cannot be empty');
     }
