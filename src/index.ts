@@ -295,6 +295,79 @@ class Linkrunner {
     }
   }
 
+  /**
+   * Disable or enable Google Advertising ID (AAID/GAID) collection
+   * 
+   * When disabled, the SDK will not collect or send the Google Advertising ID (GAID).
+   * This is useful for apps targeting children or families to comply with Google Play's Family Policy.
+   * 
+   * IMPORTANT: To fully comply and avoid Google Play flags, you must also remove the AD_ID permission
+   * from your app's AndroidManifest.xml. See documentation for details.
+   * 
+   * @param disabled - Set to true to disable AAID collection, false to enable (default: true)
+   * 
+   * @example
+   * // Disable AAID collection (recommended for child-directed apps)
+   * linkrunner.setDisableAaidCollection(true);
+   * 
+   * // Enable AAID collection (default behavior)
+   * linkrunner.setDisableAaidCollection(false);
+   */
+  setDisableAaidCollection(disabled: boolean = true): void {
+    if (Platform.OS !== 'android') {
+      if (__DEV__) {
+        console.warn('Linkrunner: setDisableAaidCollection is only available on Android');
+      }
+      return;
+    }
+
+    try {
+      LinkrunnerSDKModule.setDisableAaidCollection(disabled);
+      
+      if (__DEV__) {
+        console.log(`Linkrunner: AAID collection ${disabled ? 'disabled' : 'enabled'}`);
+      }
+    } catch (error) {
+      console.error(`Linkrunner: Failed to ${disabled ? 'disable' : 'enable'} AAID collection`);
+      console.error('Linkrunner: ', error);
+    }
+  }
+
+  /**
+   * Check if Google Advertising ID (AAID/GAID) collection is currently disabled
+   * 
+   * Returns true if AAID collection is disabled, false if it's enabled.
+   * 
+   * @returns Promise<boolean> - true if AAID collection is disabled, false if enabled
+   * 
+   * @example
+   * // Check current AAID collection status
+   * const isDisabled = await linkrunner.isAaidCollectionDisabled();
+   * console.log(`AAID collection is ${isDisabled ? 'disabled' : 'enabled'}`);
+   */
+  async isAaidCollectionDisabled(): Promise<boolean> {
+    if (Platform.OS !== 'android') {
+      if (__DEV__) {
+        console.warn('Linkrunner: isAaidCollectionDisabled is only available on Android');
+      }
+      return false;
+    }
+
+    try {
+      const isDisabled = await LinkrunnerSDKModule.isAaidCollectionDisabled();
+      
+      if (__DEV__) {
+        console.log(`Linkrunner: AAID collection disabled status: ${isDisabled}`);
+      }
+      
+      return isDisabled;
+    } catch (error) {
+      console.error('Linkrunner: Failed to get AAID collection status');
+      console.error('Linkrunner: ', error);
+      throw error;
+    }
+  }
+
 }
 
 const linkrunner = new Linkrunner();

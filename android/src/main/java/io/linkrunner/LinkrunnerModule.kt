@@ -408,4 +408,34 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             Log.e(TAG, "Failed to ${if (enabled) "enable" else "disable"} PII hashing", e)
         }
     }
+
+    @ReactMethod
+    fun setDisableAaidCollection(disabled: Boolean) {
+        try {
+            // Call the SDK's setDisableAaidCollection method
+            linkrunnerSDK.setDisableAaidCollection(disabled)
+            
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Linkrunner: AAID collection ${if (disabled) "disabled" else "enabled"}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to ${if (disabled) "disable" else "enable"} AAID collection", e)
+        }
+    }
+
+    @ReactMethod
+    fun isAaidCollectionDisabled(promise: Promise) {
+        try {
+            val isDisabled = linkrunnerSDK.isAaidCollectionDisabled()
+            
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Linkrunner: AAID collection disabled status: $isDisabled")
+            }
+            
+            promise.resolve(isDisabled)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get AAID collection status", e)
+            promise.reject("AAID_STATUS_ERROR", "Failed to get AAID collection status: ${e.message}", e)
+        }
+    }
 }
