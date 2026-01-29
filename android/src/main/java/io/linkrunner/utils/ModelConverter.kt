@@ -186,6 +186,7 @@ object ModelConverter {
             posthogDistinctId = map["posthog_distinct_id"] as? String,
             brazeDeviceId = map["braze_device_id"] as? String,
             gaAppInstanceId = map["ga_app_instance_id"] as? String,
+            gaSessionId = map["ga_session_id"] as? String,
             userCreatedAt = map["user_created_at"] as? String,
             isFirstTimeUser = map["is_first_time_user"] as? Boolean
         )

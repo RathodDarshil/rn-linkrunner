@@ -22,6 +22,7 @@ export interface UserData {
   posthog_distinct_id?: string;
   braze_device_id?: string;
   ga_app_instance_id?: string;
+  ga_session_id?: string;
 }
 
 export interface IntegrationData {
