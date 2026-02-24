@@ -5,9 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2026-02-24
+
+### Added
+
+- Added optional event data parameter to payment capture functionality, allowing additional event information to be included with transactions.
+
 ## [2.6.3] - 2026-01-29
 
 ### Added
+
 - **Google Analytics Session ID**: Added support for `ga_session_id` field in user data collection
 
 ## [2.6.2] - 2026-01-02
@@ -29,9 +36,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.5.0] - 2025-11-10
 
 ### Added
+
 - **Third-Party Integration Fields**: Added Braze device ID and Google Analytics app instance ID fields to user data collection
-  
+
 ## [2.4.3] - 2025-10-01
 
 ### Added
+
 - **Android Backup Configuration**: Added backup exclusion config files for LinkRunner SharedPreferences on Android versions 6-11 and 12+
