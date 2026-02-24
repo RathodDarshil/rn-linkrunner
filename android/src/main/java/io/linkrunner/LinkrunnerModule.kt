@@ -38,7 +38,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
 
-            val packageVersion = options?.getString("packageVersion") ?: "2.6.3" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "2.7.0" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
