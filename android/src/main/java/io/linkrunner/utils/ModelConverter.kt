@@ -207,13 +207,17 @@ object ModelConverter {
     fun toCapturePaymentRequest(map: Map<String, Any>): CapturePaymentRequest {
         val typeString = map["type"] as? String ?: "DEFAULT"
         val statusString = map["status"] as? String ?: "PAYMENT_COMPLETED"
-        
+
+        @Suppress("UNCHECKED_CAST")
+        val eventData = map["eventData"] as? Map<String, Any>
+
         return CapturePaymentRequest(
             paymentId = map["paymentId"] as? String ?: "",
             userId = map["userId"] as? String ?: "",
             amount = (map["amount"] as? Number)?.toDouble() ?: 0.0,
             type = PaymentType.valueOf(typeString),
-            status = PaymentStatus.valueOf(statusString)
+            status = PaymentStatus.valueOf(statusString),
+            eventData = eventData
         )
     }
 
