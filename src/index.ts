@@ -152,7 +152,7 @@ class Linkrunner {
         amount,
         type: type || 'DEFAULT',
         status: status || 'PAYMENT_COMPLETED',
-        eventData: eventData || {},
+        eventData: eventData,
       };
 
       const result = await LinkrunnerSDKModule.capturePayment(paymentData);
