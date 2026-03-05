@@ -19,5 +19,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency 'LinkrunnerKit', '3.7.1'
+  s.dependency 'LinkrunnerKit', '3.8.0'
 end

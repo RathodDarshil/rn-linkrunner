@@ -128,11 +128,12 @@ class LinkrunnerSDK: NSObject {
         let paymentId = paymentData["paymentId"] as? String
         let typeString = paymentData["type"] as? String ?? "DEFAULT"
         let statusString = paymentData["status"] as? String ?? "PAYMENT_COMPLETED"
-        
+        let eventData = paymentData["eventData"] as? [String: Any]
+
         // Convert strings to enums
         let paymentType = PaymentType(rawValue: typeString) ?? .default
         let paymentStatus = PaymentStatus(rawValue: statusString) ?? .completed
-        
+
         Task {
             do {
                 try await linkrunnerSDK.capturePayment(
@@ -140,7 +141,8 @@ class LinkrunnerSDK: NSObject {
                     userId: userId,
                     paymentId: paymentId,
                     type: paymentType,
-                    status: paymentStatus
+                    status: paymentStatus,
+                    eventData: eventData
                 )
                 print("Linkrunner: Payment captured successfully")
             } catch {

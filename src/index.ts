@@ -119,6 +119,7 @@ class Linkrunner {
     paymentId,
     type,
     status,
+    eventData,
   }: {
     paymentId?: string;
     userId: string;
@@ -137,6 +138,7 @@ class Linkrunner {
       | 'PAYMENT_COMPLETED'
       | 'PAYMENT_FAILED'
       | 'PAYMENT_CANCELLED';
+    eventData?: Record<string, any>;
   }) {
     if (!this.token) {
       console.error('Linkrunner: Payment capture failed, token not initialized');
@@ -150,6 +152,7 @@ class Linkrunner {
         amount,
         type: type || 'DEFAULT',
         status: status || 'PAYMENT_COMPLETED',
+        eventData: eventData,
       };
 
       const result = await LinkrunnerSDKModule.capturePayment(paymentData);
