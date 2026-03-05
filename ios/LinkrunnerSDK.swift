@@ -184,12 +184,60 @@ class LinkrunnerSDK: NSObject {
     
     @objc func getAttributionData(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
         Task {
-            do {
-                let attributionData = try await linkrunnerSDK.getAttributionData()
-                resolve(attributionData.toDictionary())
-            } catch {
-                reject("ATTRIBUTION_ERROR", "Failed to get attribution data: \(error.localizedDescription)", error)
+            let attributionData = await linkrunnerSDK.getAttributionData()
+
+            var response: [String: Any] = [:]
+
+            if let deeplink = attributionData.deeplink {
+                response["deeplink"] = deeplink
             }
+
+            if let campaignData = attributionData.campaignData {
+                let dateFormatter = ISO8601DateFormatter()
+                dateFormatter.formatOptions = [.withInternetDateTime]
+
+                var campaignDataMap: [String: Any] = [
+                    "id": campaignData.id,
+                    "name": campaignData.name,
+                    "type": campaignData.type.rawValue
+                ]
+
+                if let adNetwork = campaignData.adNetwork {
+                    // camelCase (correct, matches TypeScript type and Android)
+                    campaignDataMap["adNetwork"] = adNetwork.rawValue
+                    // snake_case (deprecated, for backward compatibility)
+                    campaignDataMap["ad_network"] = adNetwork.rawValue
+                }
+                if let groupName = campaignData.groupName {
+                    campaignDataMap["groupName"] = groupName
+                    campaignDataMap["group_name"] = groupName
+                }
+                if let assetGroupName = campaignData.assetGroupName {
+                    campaignDataMap["assetGroupName"] = assetGroupName
+                    campaignDataMap["asset_group_name"] = assetGroupName
+                }
+                if let assetName = campaignData.assetName {
+                    campaignDataMap["assetName"] = assetName
+                    campaignDataMap["asset_name"] = assetName
+                }
+                if let installedAt = campaignData.installedAt {
+                    let dateString = dateFormatter.string(from: installedAt)
+                    campaignDataMap["installedAt"] = dateString
+                    campaignDataMap["installed_at"] = dateString
+                }
+                if let storeClickAt = campaignData.storeClickAt {
+                    let dateString = dateFormatter.string(from: storeClickAt)
+                    campaignDataMap["storeClickAt"] = dateString
+                    campaignDataMap["store_click_at"] = dateString
+                }
+
+                // camelCase (correct, matches TypeScript type and Android)
+                response["campaignData"] = campaignDataMap
+                // snake_case (deprecated, for backward compatibility)
+                response["campaign_data"] = campaignDataMap
+            }
+
+            resolve(response)
         }
     }
     
