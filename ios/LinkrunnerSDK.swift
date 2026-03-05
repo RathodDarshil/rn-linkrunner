@@ -220,11 +220,10 @@ class LinkrunnerSDK: NSObject {
                     campaignDataMap["assetName"] = assetName
                     campaignDataMap["asset_name"] = assetName
                 }
-                if let installedAt = campaignData.installedAt {
-                    let dateString = dateFormatter.string(from: installedAt)
-                    campaignDataMap["installedAt"] = dateString
-                    campaignDataMap["installed_at"] = dateString
-                }
+                let installedAtDate = campaignData.installedAt ?? Date()
+                let installedAtString = dateFormatter.string(from: installedAtDate)
+                campaignDataMap["installedAt"] = installedAtString
+                campaignDataMap["installed_at"] = installedAtString
                 if let storeClickAt = campaignData.storeClickAt {
                     let dateString = dateFormatter.string(from: storeClickAt)
                     campaignDataMap["storeClickAt"] = dateString
