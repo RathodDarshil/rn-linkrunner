@@ -51,7 +51,10 @@ class LinkrunnerSDK: NSObject {
             userCreatedAt: userData["user_created_at"] as? String,
             mixPanelDistinctId: userData["mixpanel_distinct_id"] as? String,
             amplitudeDeviceId: userData["amplitude_device_id"] as? String,
-            posthogDistinctId: userData["posthog_distinct_id"] as? String
+            posthogDistinctId: userData["posthog_distinct_id"] as? String,
+            brazeDeviceId: userData["braze_device_id"] as? String,
+            gaAppInstanceId: userData["ga_app_instance_id"] as? String,
+            gaSessionId: userData["ga_session_id"] as? String
         )
         
         Task {
@@ -86,7 +89,10 @@ class LinkrunnerSDK: NSObject {
             userCreatedAt: userData["user_created_at"] as? String,
             mixPanelDistinctId: userData["mixpanel_distinct_id"] as? String,
             amplitudeDeviceId: userData["amplitude_device_id"] as? String,
-            posthogDistinctId: userData["posthog_distinct_id"] as? String
+            posthogDistinctId: userData["posthog_distinct_id"] as? String,
+            brazeDeviceId: userData["braze_device_id"] as? String,
+            gaAppInstanceId: userData["ga_app_instance_id"] as? String,
+            gaSessionId: userData["ga_session_id"] as? String
         )
         
         Task {
@@ -99,10 +105,12 @@ class LinkrunnerSDK: NSObject {
         }
     }
     
-    @objc func trackEvent(_ eventName: NSString, eventData: NSDictionary?) -> Void {
+    @objc func trackEvent(_ eventName: NSString, eventData: NSDictionary?, eventId: NSString?) -> Void {
         Task {
             do {
-                try await linkrunnerSDK.trackEvent(eventName: eventName as String, eventData: eventData as? [String: Any])
+                let finalEventData = eventData as? [String: Any]
+                let eventIdString = eventId as String?
+                try await linkrunnerSDK.trackEvent(eventName: eventName as String, eventData: finalEventData, eventId: eventIdString)
                 print("Linkrunner: Event tracked successfully")
             } catch {
                 print("Linkrunner: Failed to track event: \(error)")
@@ -120,11 +128,12 @@ class LinkrunnerSDK: NSObject {
         let paymentId = paymentData["paymentId"] as? String
         let typeString = paymentData["type"] as? String ?? "DEFAULT"
         let statusString = paymentData["status"] as? String ?? "PAYMENT_COMPLETED"
-        
+        let eventData = paymentData["eventData"] as? [String: Any]
+
         // Convert strings to enums
         let paymentType = PaymentType(rawValue: typeString) ?? .default
         let paymentStatus = PaymentStatus(rawValue: statusString) ?? .completed
-        
+
         Task {
             do {
                 try await linkrunnerSDK.capturePayment(
@@ -132,7 +141,8 @@ class LinkrunnerSDK: NSObject {
                     userId: userId,
                     paymentId: paymentId,
                     type: paymentType,
-                    status: paymentStatus
+                    status: paymentStatus,
+                    eventData: eventData
                 )
                 print("Linkrunner: Payment captured successfully")
             } catch {
@@ -174,12 +184,59 @@ class LinkrunnerSDK: NSObject {
     
     @objc func getAttributionData(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
         Task {
-            do {
-                let attributionData = try await linkrunnerSDK.getAttributionData()
-                resolve(attributionData.toDictionary())
-            } catch {
-                reject("ATTRIBUTION_ERROR", "Failed to get attribution data: \(error.localizedDescription)", error)
+            let attributionData = await linkrunnerSDK.getAttributionData()
+
+            var response: [String: Any] = [:]
+
+            if let deeplink = attributionData.deeplink {
+                response["deeplink"] = deeplink
             }
+
+            if let campaignData = attributionData.campaignData {
+                let dateFormatter = ISO8601DateFormatter()
+                dateFormatter.formatOptions = [.withInternetDateTime]
+
+                var campaignDataMap: [String: Any] = [
+                    "id": campaignData.id,
+                    "name": campaignData.name,
+                    "type": campaignData.type.rawValue
+                ]
+
+                if let adNetwork = campaignData.adNetwork {
+                    // camelCase (correct, matches TypeScript type and Android)
+                    campaignDataMap["adNetwork"] = adNetwork.rawValue
+                    // snake_case (deprecated, for backward compatibility)
+                    campaignDataMap["ad_network"] = adNetwork.rawValue
+                }
+                if let groupName = campaignData.groupName {
+                    campaignDataMap["groupName"] = groupName
+                    campaignDataMap["group_name"] = groupName
+                }
+                if let assetGroupName = campaignData.assetGroupName {
+                    campaignDataMap["assetGroupName"] = assetGroupName
+                    campaignDataMap["asset_group_name"] = assetGroupName
+                }
+                if let assetName = campaignData.assetName {
+                    campaignDataMap["assetName"] = assetName
+                    campaignDataMap["asset_name"] = assetName
+                }
+                let installedAtDate = campaignData.installedAt ?? Date()
+                let installedAtString = dateFormatter.string(from: installedAtDate)
+                campaignDataMap["installedAt"] = installedAtString
+                campaignDataMap["installed_at"] = installedAtString
+                if let storeClickAt = campaignData.storeClickAt {
+                    let dateString = dateFormatter.string(from: storeClickAt)
+                    campaignDataMap["storeClickAt"] = dateString
+                    campaignDataMap["store_click_at"] = dateString
+                }
+
+                // camelCase (correct, matches TypeScript type and Android)
+                response["campaignData"] = campaignDataMap
+                // snake_case (deprecated, for backward compatibility)
+                response["campaign_data"] = campaignDataMap
+            }
+
+            resolve(response)
         }
     }
     

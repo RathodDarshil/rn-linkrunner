@@ -119,6 +119,7 @@ class Linkrunner {
     paymentId,
     type,
     status,
+    eventData,
   }: {
     paymentId?: string;
     userId: string;
@@ -137,6 +138,7 @@ class Linkrunner {
       | 'PAYMENT_COMPLETED'
       | 'PAYMENT_FAILED'
       | 'PAYMENT_CANCELLED';
+    eventData?: Record<string, any>;
   }) {
     if (!this.token) {
       console.error('Linkrunner: Payment capture failed, token not initialized');
@@ -150,6 +152,7 @@ class Linkrunner {
         amount,
         type: type || 'DEFAULT',
         status: status || 'PAYMENT_COMPLETED',
+        eventData: eventData,
       };
 
       const result = await LinkrunnerSDKModule.capturePayment(paymentData);
@@ -195,7 +198,18 @@ class Linkrunner {
     }
   }
 
-  async trackEvent(eventName: string, eventData?: Record<string, any>) {
+  async trackEvent(eventName: string, eventData?: Record<string, any>, eventId?: string | number ) {
+    let finalEventId: string | null = null;
+    
+    if (eventId != null) {
+      if (typeof eventId === 'string' || typeof eventId === 'number') {
+        finalEventId = String(eventId);
+      } else {
+        console.warn('Linkrunner: eventId must be a string or number. Received:', typeof eventId, '. Ignoring eventId.');
+        finalEventId = null;
+      }
+    }
+    
     if (!this.token) {
       console.error('Linkrunner: Track event failed, token not initialized');
       return;
@@ -206,7 +220,7 @@ class Linkrunner {
     }
 
     try {
-      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {});
+      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, finalEventId);
       
       if (__DEV__) {
         console.log('Linkrunner event tracked successfully:', eventName);

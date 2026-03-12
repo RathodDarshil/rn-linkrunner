@@ -38,7 +38,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
 
-            val packageVersion = options?.getString("packageVersion") ?: "2.4.1" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "2.7.1" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -170,7 +170,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
     }
 
     @ReactMethod
-    fun trackEvent(eventName: String, eventData: ReadableMap?, promise: Promise) {
+    fun trackEvent(eventName: String, eventData: ReadableMap?, eventId: String?, promise: Promise) {
         if (eventName.isEmpty()) {
             promise.reject("TRACK_EVENT_ERROR", "Event name is required")
             return
@@ -185,7 +185,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
 
             moduleScope.launch {
                 try {
-                    val result = linkrunnerSDK.trackEvent(eventName, eventDataMap)
+                    val result = linkrunnerSDK.trackEvent(eventName, eventDataMap, eventId)
                     
                     withContext(Dispatchers.Main) {
                         if (result.isSuccess) {
