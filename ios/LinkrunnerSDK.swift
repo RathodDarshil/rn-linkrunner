@@ -213,9 +213,9 @@ class LinkrunnerSDK: NSObject {
     }
     
     @objc func setPushToken(_ pushToken: NSString, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
-        let tokenString = pushToken as String
+        let tokenString = (pushToken as String).trimmingCharacters(in: .whitespacesAndNewlines)
         
-        if tokenString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        if tokenString.isEmpty {
             reject("SET_PUSH_TOKEN_ERROR", "Push token cannot be empty", NSError(domain: "LinkrunnerSDK", code: 1, userInfo: nil))
             return
         }
