@@ -28,4 +28,8 @@ RCT_EXTERN_METHOD(setAdditionalData:(NSDictionary *)integrationDataDict
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 
+RCT_EXTERN_METHOD(setPushToken:(NSString *)pushToken
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+
 @end
