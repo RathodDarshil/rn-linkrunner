@@ -38,7 +38,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
 
-            val packageVersion = options?.getString("packageVersion") ?: "2.7.1" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "2.8.0" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -406,6 +406,43 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to ${if (enabled) "enable" else "disable"} PII hashing", e)
+        }
+    }
+
+    @ReactMethod
+    fun setPushToken(pushToken: String, promise: Promise) {
+        if (pushToken.isBlank()) {
+            promise.reject("SET_PUSH_TOKEN_ERROR", "Push token cannot be empty")
+            return
+        }
+
+        try {
+            moduleScope.launch {
+                try {
+                    val result = linkrunnerSDK.setPushToken(pushToken)
+                    
+                    withContext(Dispatchers.Main) {
+                        if (result.isSuccess) {
+                            val response = Arguments.createMap()
+                            response.putString("status", "success")
+                            response.putString("message", "Push token set successfully")
+                            promise.resolve(response)
+                        } else {
+                            promise.reject(
+                                "SET_PUSH_TOKEN_ERROR", 
+                                "Failed to set push token: ${result.exceptionOrNull()?.message}",
+                                result.exceptionOrNull()
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        promise.reject("SET_PUSH_TOKEN_ERROR", "Exception setting push token: ${e.message}", e)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            promise.reject("SET_PUSH_TOKEN_ERROR", "Failed to set push token: ${e.message}", e)
         }
     }
 }

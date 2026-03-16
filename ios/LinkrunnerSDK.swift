@@ -268,6 +268,32 @@ class LinkrunnerSDK: NSObject {
             }
         }
     }
+    
+    @objc func setPushToken(_ pushToken: NSString, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+        let tokenString = (pushToken as String).trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if tokenString.isEmpty {
+            reject("SET_PUSH_TOKEN_ERROR", "Push token cannot be empty", NSError(domain: "LinkrunnerSDK", code: 1, userInfo: nil))
+            return
+        }
+        
+        Task {
+            do {
+                if #available(iOS 15.0, *) {
+                    try await linkrunnerSDK.setPushToken(tokenString)
+                    let response: [String: Any] = [
+                        "status": "success",
+                        "message": "Push token set successfully"
+                    ]
+                    resolve(response)
+                } else {
+                    reject("UNSUPPORTED_VERSION", "iOS 15.0 or later is required", NSError(domain: "LinkrunnerSDK", code: 2, userInfo: nil))
+                }
+            } catch {
+                reject("SET_PUSH_TOKEN_ERROR", "Failed to set push token: \(error.localizedDescription)", error)
+            }
+        }
+    }
 
 }
 
