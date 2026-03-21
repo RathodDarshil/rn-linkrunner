@@ -23,6 +23,7 @@ export interface UserData {
   braze_device_id?: string;
   ga_app_instance_id?: string;
   ga_session_id?: string;
+  netcore_device_guid?: string;
 }
 
 export interface IntegrationData {

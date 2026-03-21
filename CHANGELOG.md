@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.81.0] - 2026-03-21
+
+### Added
+
+- **Netcore Integration**: Added `netcore_device_guid` field to user data for Netcore device tracking integration
+
+### Changed
+
+- Upgraded native Android SDK to 3.61.0
+- Upgraded native iOS SDK to 3.81.0
+
 ## [2.8.0] - 2026-03-12
 
 ### Added
