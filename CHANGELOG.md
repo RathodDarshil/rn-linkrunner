@@ -13,8 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Upgraded native Android SDK to 3.61.0
-- Upgraded native iOS SDK to 3.81.0
+- Upgraded native Android SDK to 3.7.0
+- Upgraded native iOS SDK to 3.9.0
 
 ## [2.8.0] - 2026-03-12
 
