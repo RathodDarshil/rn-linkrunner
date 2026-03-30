@@ -188,7 +188,8 @@ object ModelConverter {
             gaAppInstanceId = map["ga_app_instance_id"] as? String,
             gaSessionId = map["ga_session_id"] as? String,
             userCreatedAt = map["user_created_at"] as? String,
-            isFirstTimeUser = map["is_first_time_user"] as? Boolean
+            isFirstTimeUser = map["is_first_time_user"] as? Boolean,
+            netcoreDeviceGuid = map["netcore_device_guid"] as? String
         )
     }
 

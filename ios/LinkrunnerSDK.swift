@@ -54,7 +54,8 @@ class LinkrunnerSDK: NSObject {
             posthogDistinctId: userData["posthog_distinct_id"] as? String,
             brazeDeviceId: userData["braze_device_id"] as? String,
             gaAppInstanceId: userData["ga_app_instance_id"] as? String,
-            gaSessionId: userData["ga_session_id"] as? String
+            gaSessionId: userData["ga_session_id"] as? String,
+            netcoreDeviceGuid: userData["netcore_device_guid"] as? String
         )
         
         Task {
@@ -92,7 +93,8 @@ class LinkrunnerSDK: NSObject {
             posthogDistinctId: userData["posthog_distinct_id"] as? String,
             brazeDeviceId: userData["braze_device_id"] as? String,
             gaAppInstanceId: userData["ga_app_instance_id"] as? String,
-            gaSessionId: userData["ga_session_id"] as? String
+            gaSessionId: userData["ga_session_id"] as? String,
+            netcoreDeviceGuid: userData["netcore_device_guid"] as? String
         )
         
         Task {
