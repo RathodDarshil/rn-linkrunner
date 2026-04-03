@@ -320,6 +320,31 @@ class Linkrunner {
     }
   }
 
+  async handleDeeplink(deeplinkUrl: string | null): Promise<void> {
+    if (!deeplinkUrl || deeplinkUrl.trim().length === 0) {
+      if (__DEV__) {
+        console.log('Linkrunner: handleDeeplink called with null or empty URL, ignoring');
+      }
+      return;
+    }
+
+    if (!this.token) {
+      console.error('Linkrunner: handleDeeplink failed, token not initialized');
+      return;
+    }
+
+    try {
+      await LinkrunnerSDKModule.handleDeeplink(deeplinkUrl);
+      
+      if (__DEV__) {
+        console.log('Linkrunner: handleDeeplink successful for URL:', deeplinkUrl);
+      }
+    } catch (error) {
+      console.error('Linkrunner: handleDeeplink failed:', error);
+      throw error;
+    }
+  }
+
 }
 
 const linkrunner = new Linkrunner();

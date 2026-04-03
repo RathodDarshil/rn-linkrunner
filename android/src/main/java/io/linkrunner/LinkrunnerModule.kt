@@ -38,7 +38,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
 
-            val packageVersion = options?.getString("packageVersion") ?: "2.9.1" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "2.10.0" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -443,6 +443,47 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             }
         } catch (e: Exception) {
             promise.reject("SET_PUSH_TOKEN_ERROR", "Failed to set push token: ${e.message}", e)
+        }
+    }
+
+    @ReactMethod
+    fun handleDeeplink(deeplinkUrl: String, promise: Promise) {
+        if (deeplinkUrl.isBlank()) {
+            // Silently succeed for empty URLs (matches SDK behavior)
+            val response = Arguments.createMap()
+            response.putString("status", "success")
+            response.putString("message", "Empty deeplink URL, ignoring")
+            promise.resolve(response)
+            return
+        }
+
+        try {
+            moduleScope.launch {
+                try {
+                    val result = linkrunnerSDK.handleDeeplink(deeplinkUrl)
+                    
+                    withContext(Dispatchers.Main) {
+                        if (result.isSuccess) {
+                            val response = Arguments.createMap()
+                            response.putString("status", "success")
+                            response.putString("message", "Deeplink handled successfully")
+                            promise.resolve(response)
+                        } else {
+                            promise.reject(
+                                "HANDLE_DEEPLINK_ERROR", 
+                                "Failed to handle deeplink: ${result.exceptionOrNull()?.message}",
+                                result.exceptionOrNull()
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        promise.reject("HANDLE_DEEPLINK_ERROR", "Exception handling deeplink: ${e.message}", e)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            promise.reject("HANDLE_DEEPLINK_ERROR", "Failed to handle deeplink: ${e.message}", e)
         }
     }
 }
