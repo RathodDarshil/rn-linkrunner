@@ -451,8 +451,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
         if (deeplinkUrl.isBlank()) {
             // Silently succeed for empty URLs (matches SDK behavior)
             val response = Arguments.createMap()
-            response.putString("status", "success")
-            response.putString("message", "Empty deeplink URL, ignoring")
+            response.putBoolean("isLinkrunner", false)
             promise.resolve(response)
             return
         }
@@ -461,16 +460,26 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             moduleScope.launch {
                 try {
                     val result = linkrunnerSDK.handleDeeplink(deeplinkUrl)
-                    
+
                     withContext(Dispatchers.Main) {
                         if (result.isSuccess) {
+                            val deeplinkData = result.getOrNull()
                             val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Deeplink handled successfully")
+
+                            if (deeplinkData != null) {
+                                deeplinkData.deeplink?.let { deeplink ->
+                                    response.putString("deeplink", deeplink)
+                                }
+                                response.putBoolean("isLinkrunner", deeplinkData.isLinkrunner)
+                                deeplinkData.processing?.let { processing ->
+                                    response.putBoolean("processing", processing)
+                                }
+                            }
+
                             promise.resolve(response)
                         } else {
                             promise.reject(
-                                "HANDLE_DEEPLINK_ERROR", 
+                                "HANDLE_DEEPLINK_ERROR",
                                 "Failed to handle deeplink: ${result.exceptionOrNull()?.message}",
                                 result.exceptionOrNull()
                             )

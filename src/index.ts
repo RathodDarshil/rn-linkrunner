@@ -1,5 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
-import type { AttributionData, IntegrationData, UserData } from './types';
+import type { AttributionData, DeeplinkData, IntegrationData, UserData } from './types';
 import packageJson from '../package.json';
 
 const LINKING_ERROR =
@@ -320,7 +320,7 @@ class Linkrunner {
     }
   }
 
-  async handleDeeplink(deeplinkUrl: string | null): Promise<void> {
+  async handleDeeplink(deeplinkUrl: string | null): Promise<DeeplinkData | void> {
     if (!deeplinkUrl || deeplinkUrl.trim().length === 0) {
       if (__DEV__) {
         console.log('Linkrunner: handleDeeplink called with null or empty URL, ignoring');
@@ -334,11 +334,14 @@ class Linkrunner {
     }
 
     try {
-      await LinkrunnerSDKModule.handleDeeplink(deeplinkUrl);
-      
+      const result = await LinkrunnerSDKModule.handleDeeplink(deeplinkUrl);
+
       if (__DEV__) {
         console.log('Linkrunner: handleDeeplink successful for URL:', deeplinkUrl);
+        console.log('handleDeeplink response > ', result);
       }
+
+      return result as DeeplinkData;
     } catch (error) {
       console.error('Linkrunner: handleDeeplink failed:', error);
       throw error;
