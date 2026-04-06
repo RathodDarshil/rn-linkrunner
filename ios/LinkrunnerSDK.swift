@@ -296,6 +296,41 @@ class LinkrunnerSDK: NSObject {
             }
         }
     }
+    
+    @objc func handleDeeplink(_ deeplinkUrl: NSString, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+        let urlString = (deeplinkUrl as String).trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if urlString.isEmpty {
+            // Silently succeed for empty URLs (matches SDK behavior)
+            let response: [String: Any] = [
+                "isLinkrunner": false
+            ]
+            resolve(response)
+            return
+        }
+
+        Task {
+            if #available(iOS 15.0, *) {
+                let deeplinkResponse = await linkrunnerSDK.handleDeeplink(url: urlString)
+
+                var response: [String: Any] = [
+                    "isLinkrunner": deeplinkResponse.isLinkrunner
+                ]
+
+                if let deeplink = deeplinkResponse.deeplink {
+                    response["deeplink"] = deeplink
+                }
+
+                if let processing = deeplinkResponse.processing {
+                    response["processing"] = processing
+                }
+
+                resolve(response)
+            } else {
+                reject("UNSUPPORTED_VERSION", "iOS 15.0 or later is required", NSError(domain: "LinkrunnerSDK", code: 2, userInfo: nil))
+            }
+        }
+    }
 
 }
 

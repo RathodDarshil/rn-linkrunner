@@ -47,3 +47,9 @@ export interface AttributionData {
   deeplink?: string;
   campaignData?: CampaignData;
 }
+
+export interface DeeplinkData {
+  deeplink?: string;
+  isLinkrunner: boolean;
+  processing?: boolean;
+}
