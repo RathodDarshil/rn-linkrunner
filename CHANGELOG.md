@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.1] - 2026-05-07
+
+### Changed
+
+- Bumped native Android SDK to `io.linkrunner:android-sdk:3.8.1` — token, signature key id, and signature secret key are now encrypted at rest in SharedPreferences using AES-256-GCM with a hardware-backed AndroidKeyStore key (StrongBox when available); legacy plaintext keys from prior versions are wiped atomically on the first `init()` after upgrade
+
 ## [2.10.0] - 2026-04-03
 
 ### Added
