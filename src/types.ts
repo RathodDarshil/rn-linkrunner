@@ -40,6 +40,11 @@ export interface CampaignData {
   groupName?: string;
   assetName?: string;
   assetGroupName?: string;
+  adNetworkCampaignId?: string | null;
+  adSetId?: string | null;
+  adSetName?: string | null;
+  adCreativeId?: string | null;
+  adCreativeName?: string | null;
 }
 
 export interface AttributionData {
