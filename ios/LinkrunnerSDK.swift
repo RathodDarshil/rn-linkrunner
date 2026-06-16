@@ -121,11 +121,12 @@ class LinkrunnerSDK: NSObject {
     }
     
     @objc func capturePayment(_ paymentData: NSDictionary) -> Void {
-        guard let userId = paymentData["userId"] as? String,
-              let amount = paymentData["amount"] as? Double else {
-            print("Linkrunner: userId and amount are required for payment capture")
+        guard let amount = paymentData["amount"] as? Double else {
+            print("Linkrunner: amount is required for payment capture")
             return
         }
+
+        let userId = paymentData["userId"] as? String ?? ""
         
         let paymentId = paymentData["paymentId"] as? String
         let typeString = paymentData["type"] as? String ?? "DEFAULT"
