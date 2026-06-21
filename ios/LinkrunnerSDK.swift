@@ -121,11 +121,12 @@ class LinkrunnerSDK: NSObject {
     }
     
     @objc func capturePayment(_ paymentData: NSDictionary) -> Void {
-        guard let userId = paymentData["userId"] as? String,
-              let amount = paymentData["amount"] as? Double else {
-            print("Linkrunner: userId and amount are required for payment capture")
+        guard let amount = paymentData["amount"] as? Double else {
+            print("Linkrunner: amount is required for payment capture")
             return
         }
+
+        let userId = paymentData["userId"] as? String ?? ""
         
         let paymentId = paymentData["paymentId"] as? String
         let typeString = paymentData["type"] as? String ?? "DEFAULT"
@@ -296,7 +297,33 @@ class LinkrunnerSDK: NSObject {
             }
         }
     }
-    
+
+    @objc func setCustomerUserId(_ userId: NSString, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+        let userIdString = (userId as String).trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if userIdString.isEmpty {
+            reject("SET_CUSTOMER_USER_ID_ERROR", "Customer user ID cannot be empty", NSError(domain: "LinkrunnerSDK", code: 1, userInfo: nil))
+            return
+        }
+
+        Task {
+            do {
+                if #available(iOS 15.0, *) {
+                    try await linkrunnerSDK.setCustomerUserId(userIdString)
+                    let response: [String: Any] = [
+                        "status": "success",
+                        "message": "Customer user ID set successfully"
+                    ]
+                    resolve(response)
+                } else {
+                    reject("UNSUPPORTED_VERSION", "iOS 15.0 or later is required", NSError(domain: "LinkrunnerSDK", code: 2, userInfo: nil))
+                }
+            } catch {
+                reject("SET_CUSTOMER_USER_ID_ERROR", "Failed to set customer user ID: \(error.localizedDescription)", error)
+            }
+        }
+    }
+
     @objc func handleDeeplink(_ deeplinkUrl: NSString, resolver resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
         let urlString = (deeplinkUrl as String).trimmingCharacters(in: .whitespacesAndNewlines)
 
