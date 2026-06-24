@@ -452,6 +452,43 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
     }
 
     @ReactMethod
+    fun setCustomerUserId(userId: String, promise: Promise) {
+        if (userId.isBlank()) {
+            promise.reject("SET_CUSTOMER_USER_ID_ERROR", "Customer user ID cannot be empty")
+            return
+        }
+
+        try {
+            moduleScope.launch {
+                try {
+                    val result = linkrunnerSDK.setCustomerUserId(userId)
+
+                    withContext(Dispatchers.Main) {
+                        if (result.isSuccess) {
+                            val response = Arguments.createMap()
+                            response.putString("status", "success")
+                            response.putString("message", "Customer user ID set successfully")
+                            promise.resolve(response)
+                        } else {
+                            promise.reject(
+                                "SET_CUSTOMER_USER_ID_ERROR",
+                                "Failed to set customer user ID: ${result.exceptionOrNull()?.message}",
+                                result.exceptionOrNull()
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        promise.reject("SET_CUSTOMER_USER_ID_ERROR", "Exception setting customer user ID: ${e.message}", e)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            promise.reject("SET_CUSTOMER_USER_ID_ERROR", "Failed to set customer user ID: ${e.message}", e)
+        }
+    }
+
+    @ReactMethod
     fun handleDeeplink(deeplinkUrl: String, promise: Promise) {
         if (deeplinkUrl.isBlank()) {
             // Silently succeed for empty URLs (matches SDK behavior)
