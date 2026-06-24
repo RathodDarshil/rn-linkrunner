@@ -219,6 +219,26 @@ class LinkrunnerSDK: NSObject {
                     campaignDataMap["assetGroupName"] = assetGroupName
                     campaignDataMap["asset_group_name"] = assetGroupName
                 }
+                if let adNetworkCampaignId = campaignData.adNetworkCampaignId {
+                    campaignDataMap["adNetworkCampaignId"] = adNetworkCampaignId
+                    campaignDataMap["ad_network_campaign_id"] = adNetworkCampaignId
+                }
+                if let adSetId = campaignData.adSetId {
+                    campaignDataMap["adSetId"] = adSetId
+                    campaignDataMap["ad_set_id"] = adSetId
+                }
+                if let adSetName = campaignData.adSetName {
+                    campaignDataMap["adSetName"] = adSetName
+                    campaignDataMap["ad_set_name"] = adSetName
+                }
+                if let adCreativeId = campaignData.adCreativeId {
+                    campaignDataMap["adCreativeId"] = adCreativeId
+                    campaignDataMap["ad_creative_id"] = adCreativeId
+                }
+                if let adCreativeName = campaignData.adCreativeName {
+                    campaignDataMap["adCreativeName"] = adCreativeName
+                    campaignDataMap["ad_creative_name"] = adCreativeName
+                }
                 if let assetName = campaignData.assetName {
                     campaignDataMap["assetName"] = assetName
                     campaignDataMap["asset_name"] = assetName
