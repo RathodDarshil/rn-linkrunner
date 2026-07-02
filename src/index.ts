@@ -326,6 +326,28 @@ class Linkrunner {
     }
   }
 
+  async setCustomerUserId(userId: string): Promise<void> {
+    if (!this.token) {
+      console.error('Linkrunner: Setting customer user ID failed, token not initialized');
+      return;
+    }
+
+    if (!userId || userId.trim().length === 0) {
+      throw new Error('Customer user ID cannot be empty');
+    }
+
+    try {
+      await LinkrunnerSDKModule.setCustomerUserId(userId);
+
+      if (__DEV__) {
+        console.log('Linkrunner: Customer user ID set successfully');
+      }
+    } catch (error) {
+      console.error('Linkrunner: Failed to set customer user ID:', error);
+      throw error;
+    }
+  }
+
   async handleDeeplink(deeplinkUrl: string | null): Promise<DeeplinkData | void> {
     if (!deeplinkUrl || deeplinkUrl.trim().length === 0) {
       if (__DEV__) {
