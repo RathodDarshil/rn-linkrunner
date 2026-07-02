@@ -145,7 +145,7 @@ class Linkrunner {
       return;
     }
 
-    if (!paymentId) {
+    if (!paymentId || paymentId.trim().length === 0) {
       const error = new Error('Linkrunner: paymentId is required to capture a payment');
       console.error(error.message);
       throw error;
