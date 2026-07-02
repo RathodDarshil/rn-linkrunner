@@ -121,7 +121,7 @@ class Linkrunner {
     status,
     eventData,
   }: {
-    paymentId?: string;
+    paymentId: string;
     userId: string;
     amount: number;
     type?:
@@ -145,9 +145,15 @@ class Linkrunner {
       return;
     }
 
+    if (!paymentId || paymentId.trim().length === 0) {
+      const error = new Error('Linkrunner: paymentId is required to capture a payment');
+      console.error(error.message);
+      throw error;
+    }
+
     try {
       const paymentData = {
-        paymentId: paymentId || '',
+        paymentId,
         userId,
         amount,
         type: type || 'DEFAULT',
