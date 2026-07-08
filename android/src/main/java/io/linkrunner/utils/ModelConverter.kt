@@ -74,7 +74,27 @@ object ModelConverter {
         data.assetGroupName?.let { assetGroupName ->
             map.putString("assetGroupName", assetGroupName)
         }
-        
+
+        data.adNetworkCampaignId?.let { adNetworkCampaignId ->
+            map.putString("adNetworkCampaignId", adNetworkCampaignId)
+        }
+
+        data.adSetId?.let { adSetId ->
+            map.putString("adSetId", adSetId)
+        }
+
+        data.adSetName?.let { adSetName ->
+            map.putString("adSetName", adSetName)
+        }
+
+        data.adCreativeId?.let { adCreativeId ->
+            map.putString("adCreativeId", adCreativeId)
+        }
+
+        data.adCreativeName?.let { adCreativeName ->
+            map.putString("adCreativeName", adCreativeName)
+        }
+
         data.assetName?.let { assetName ->
             map.putString("assetName", assetName)
         }
@@ -164,7 +184,12 @@ object ModelConverter {
                 campaignDataMap.putString("groupName", campaignData.groupName)
                 campaignDataMap.putString("assetName", campaignData.assetName)
                 campaignDataMap.putString("assetGroupName", campaignData.assetGroupName)
-                
+                campaignDataMap.putString("adNetworkCampaignId", campaignData.adNetworkCampaignId)
+                campaignDataMap.putString("adSetId", campaignData.adSetId)
+                campaignDataMap.putString("adSetName", campaignData.adSetName)
+                campaignDataMap.putString("adCreativeId", campaignData.adCreativeId)
+                campaignDataMap.putString("adCreativeName", campaignData.adCreativeName)
+
                 map.putMap("campaignData", campaignDataMap)
             }
         }

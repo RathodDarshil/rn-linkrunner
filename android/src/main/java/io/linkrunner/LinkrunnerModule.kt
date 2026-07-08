@@ -329,7 +329,12 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                                 campaignDataMap.putString("groupName", campaignData.groupName)
                                 campaignDataMap.putString("assetName", campaignData.assetName)
                                 campaignDataMap.putString("assetGroupName", campaignData.assetGroupName)
-                                
+                                campaignDataMap.putString("adNetworkCampaignId", campaignData.adNetworkCampaignId)
+                                campaignDataMap.putString("adSetId", campaignData.adSetId)
+                                campaignDataMap.putString("adSetName", campaignData.adSetName)
+                                campaignDataMap.putString("adCreativeId", campaignData.adCreativeId)
+                                campaignDataMap.putString("adCreativeName", campaignData.adCreativeName)
+
                                 response.putMap("campaignData", campaignDataMap)
                             }
                         }
