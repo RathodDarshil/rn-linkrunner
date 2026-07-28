@@ -1,0 +1,299 @@
+{
+  "sdk": "REACT_NATIVE",
+  "package": "rn-linkrunner",
+  "latest_version": "3.0.1",
+  "total_versions": 57,
+  "source": "version and description from Postgres public.\"SDKVersion\"; pushed_date from the package registry publish date, falling back to CHANGELOG.md, git tags, then manifest history",
+  "version_source": {
+    "file": "package.json",
+    "type": "package_json"
+  },
+  "version_mirrors": [],
+  "sdk_versions": [
+    {
+      "version": "3.0.1",
+      "pushed_date": "2026-07-09",
+      "description": "Expanded attribution responses with ad-network campaign, ad set, and creative IDs and names for campaign-level reporting."
+    },
+    {
+      "version": "3.0.0",
+      "pushed_date": "2026-06-30",
+      "description": "Breaking change: payment capture now requires a non-empty paymentId so every payment can be uniquely identified."
+    },
+    {
+      "version": "2.11.0",
+      "pushed_date": "2026-06-22",
+      "description": "Added setCustomerUserId, which persists the application user ID and automatically includes it with subsequent tracked events."
+    },
+    {
+      "version": "2.10.1",
+      "pushed_date": "2026-05-07",
+      "description": "Updated the Android SDK to encrypt SDK credentials at rest with AndroidKeyStore."
+    },
+    {
+      "version": "2.10.0",
+      "pushed_date": "2026-04-06",
+      "description": "Added the handleDeeplink API for processing incoming deep links and resolving re-engagement attribution."
+    },
+    {
+      "version": "2.9.1",
+      "pushed_date": "2026-04-02",
+      "description": "Aligned the native iOS SDK dependency with the Netcore-compatible release."
+    },
+    {
+      "version": "2.9.0",
+      "pushed_date": "2026-03-30",
+      "description": "Added the Netcore device GUID to user data so Linkrunner users can be matched with Netcore profiles."
+    },
+    {
+      "version": "2.8.0",
+      "pushed_date": "2026-03-16",
+      "description": "Implemented iOS push-token forwarding for uninstall tracking."
+    },
+    {
+      "version": "2.7.2",
+      "pushed_date": "2026-03-05",
+      "description": "Internal package maintenance release; no public API or runtime behavior changes were documented."
+    },
+    {
+      "version": "2.7.1",
+      "pushed_date": "2026-03-05",
+      "description": "Normalized iOS attribution response keys to JavaScript-style camelCase."
+    },
+    {
+      "version": "2.7.0",
+      "pushed_date": "2026-03-05",
+      "description": "Added optional event data to payment capture for Meta Commerce Event Manager."
+    },
+    {
+      "version": "2.6.3",
+      "pushed_date": "2026-02-02",
+      "description": "Added Google Analytics session ID collection so Linkrunner events can be correlated with analytics sessions."
+    },
+    {
+      "version": "2.6.2",
+      "pushed_date": "2026-01-05",
+      "description": "Added Meta view-through attribution so eligible conversions can be attributed to ad impressions without a click."
+    },
+    {
+      "version": "2.6.1",
+      "pushed_date": "2025-12-30",
+      "description": "Removed trailing Swift commas for compatibility with older Swift versions."
+    },
+    {
+      "version": "2.6.0",
+      "pushed_date": "2025-12-16",
+      "description": "Updated LinkrunnerKit to support Apple Search Ads attribution."
+    },
+    {
+      "version": "2.5.2",
+      "pushed_date": "2025-12-11",
+      "description": "Removed the deprecated JCenter repository from the Android build."
+    },
+    {
+      "version": "2.5.1",
+      "pushed_date": "2025-11-11",
+      "description": "Added event IDs to trackEvent requests so individual custom events can be identified and deduplicated."
+    },
+    {
+      "version": "2.5.0",
+      "pushed_date": "2025-11-11",
+      "description": "Added Braze device ID and Google Analytics app instance ID fields."
+    },
+    {
+      "version": "2.4.3",
+      "pushed_date": "2025-10-01",
+      "description": "Added Android backup exclusions for Linkrunner SharedPreferences on Android 6 through 12 and later."
+    },
+    {
+      "version": "2.4.2",
+      "pushed_date": "2025-09-10",
+      "description": "Updated the iOS bridge with SECOND_PAYMENT so follow-up payments are classified consistently across platforms."
+    },
+    {
+      "version": "2.4.1",
+      "pushed_date": "2025-09-10",
+      "description": "Updated the Android bridge with SECOND_PAYMENT support."
+    },
+    {
+      "version": "2.4.0",
+      "pushed_date": "2025-09-09",
+      "description": "Removed unused native dependencies and updated the Android SDK retry implementation."
+    },
+    {
+      "version": "2.3.0",
+      "pushed_date": "2025-09-04",
+      "description": "Updated LinkrunnerKit to add SKAdNetwork attribution support."
+    },
+    {
+      "version": "2.2.0",
+      "pushed_date": "2025-07-29",
+      "description": "Updated the Android SDK and removed the unused Koin dependency."
+    },
+    {
+      "version": "2.1.1",
+      "pushed_date": "2025-07-28",
+      "description": "Added an iOS initialization option to disable IDFA collection when advertising identifiers are not required."
+    },
+    {
+      "version": "2.1.0",
+      "pushed_date": "2025-07-05",
+      "description": "Updated native SDK dependencies and added a default value for the debug option."
+    },
+    {
+      "version": "2.0.1",
+      "pushed_date": "2025-06-27",
+      "description": "Added the initialization debug option and corrected the user-data bridge structure."
+    },
+    {
+      "version": "2.0.0",
+      "pushed_date": "2025-06-27",
+      "description": "Reworked native SDK integration and added attribution-source data to attribution responses."
+    },
+    {
+      "version": "1.1.2",
+      "pushed_date": "2025-03-22",
+      "description": "Improved device-data collection with safe getters and error handling."
+    },
+    {
+      "version": "1.1.1",
+      "pushed_date": "2025-03-20",
+      "description": "Fixed deeplink handling so a URL is stored only when available."
+    },
+    {
+      "version": "1.1.0",
+      "pushed_date": "2025-03-18",
+      "description": "Added optional payment type and payment status fields so payment events can include lifecycle and outcome information."
+    },
+    {
+      "version": "1.0.4",
+      "pushed_date": "2025-03-15",
+      "description": "Added Google Analytics attribution processing so campaign data can be included in Linkrunner attribution results."
+    },
+    {
+      "version": "1.0.3",
+      "pushed_date": "2025-03-13",
+      "description": "Updated TypeScript output settings and added TSX compilation support."
+    },
+    {
+      "version": "1.0.2",
+      "pushed_date": "2025-03-13",
+      "description": "Added direct links to function reference documentation."
+    },
+    {
+      "version": "1.0.1",
+      "pushed_date": "2025-03-12",
+      "description": "Corrected and expanded documentation for the public React Native APIs introduced in version 1.0.0."
+    },
+    {
+      "version": "1.0.0",
+      "pushed_date": "2025-03-12",
+      "description": "Added trackEvent, signup, setUserData, and triggerDeeplink and deprecated the legacy trigger API."
+    },
+    {
+      "version": "0.9.1",
+      "pushed_date": "2025-03-11",
+      "description": "Read the SDK package version dynamically from package.json."
+    },
+    {
+      "version": "0.9.0",
+      "pushed_date": "2025-03-11",
+      "description": "Added Expo development-build integration documentation."
+    },
+    {
+      "version": "0.8.1",
+      "pushed_date": "2025-02-27",
+      "description": "Clarified the meaning and usage of the attribution metrics introduced in version 0.8.0."
+    },
+    {
+      "version": "0.8.0",
+      "pushed_date": "2025-02-27",
+      "description": "Expanded attribution results with additional performance metrics and documented the new response fields."
+    },
+    {
+      "version": "0.7.1",
+      "pushed_date": "2025-01-22",
+      "description": "Fixed iOS install-referrer availability checks to avoid calling APIs that are unavailable on the running OS version."
+    },
+    {
+      "version": "0.7.0",
+      "pushed_date": "2025-01-21",
+      "description": "Expanded attribution results with campaign-level data for downstream reporting and routing."
+    },
+    {
+      "version": "0.6.2",
+      "pushed_date": "2024-09-08",
+      "description": "Updated install instance ID documentation and examples."
+    },
+    {
+      "version": "0.6.1",
+      "pushed_date": "2024-09-08",
+      "description": "Added install instance ID support for consistently identifying an application installation."
+    },
+    {
+      "version": "0.6.0",
+      "pushed_date": "2024-09-04",
+      "description": "Added payment capture APIs for sending revenue and transaction details to Linkrunner."
+    },
+    {
+      "version": "0.5.2",
+      "pushed_date": "2024-05-14",
+      "description": "Updated API examples and usage guidance to match the current React Native method signatures."
+    },
+    {
+      "version": "0.5.1",
+      "pushed_date": "2024-05-14",
+      "description": "Expanded SDK method results with additional response data for use by JavaScript callers."
+    },
+    {
+      "version": "0.5.0",
+      "pushed_date": "2024-05-06",
+      "description": "Removed the encrypted-storage dependency and simplified token handling."
+    },
+    {
+      "version": "0.4.3",
+      "pushed_date": "2024-05-06",
+      "description": "Added the originating mobile platform to API requests so backend processing can distinguish Android and iOS traffic."
+    },
+    {
+      "version": "0.4.2",
+      "pushed_date": "2024-04-29",
+      "description": "Corrected package documentation and release metadata so installation instructions and published package details stay consistent."
+    },
+    {
+      "version": "0.4.1",
+      "pushed_date": "2024-04-29",
+      "description": "Updated token-link handling and corrected the user-data schema."
+    },
+    {
+      "version": "0.4.0",
+      "pushed_date": "2024-04-25",
+      "description": "Added deep-link opening support so resolved destinations can be launched from the application."
+    },
+    {
+      "version": "0.3.0",
+      "pushed_date": "2024-03-03",
+      "description": "Expanded installation, initialization, and usage guidance to make the first React Native integration easier to complete."
+    },
+    {
+      "version": "0.2.2",
+      "pushed_date": "2024-02-24",
+      "description": "Added encrypted storage for SDK tokens to protect persisted credentials on the device."
+    },
+    {
+      "version": "0.2.1",
+      "pushed_date": "2024-02-24",
+      "description": "Added the trigger API for starting Linkrunner attribution and deep-link processing from JavaScript."
+    },
+    {
+      "version": "0.2.0",
+      "pushed_date": "2024-02-06",
+      "description": "Added the initialization API for configuring Linkrunner from React Native applications."
+    },
+    {
+      "version": "0.1.0",
+      "pushed_date": "2023-12-21",
+      "description": "Initial React Native package release establishing the JavaScript API and native Android and iOS bridge structure."
+    }
+  ]
+}

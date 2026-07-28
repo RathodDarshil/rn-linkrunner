@@ -1,0 +1,29 @@
+name: SDK version check
+
+# Blocks a PR whose code declares an SDK version that is not recorded as the
+# latest entry in config-sdk-version.json. PRs that do not change the SDK
+# version are unaffected.
+#
+# NOTE: for this to actually prevent a merge, add "SDK version check" as a
+# required status check in the branch protection rules for main.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sdk-version:
+    name: SDK version check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify the SDK version is recorded in config-sdk-version.json
+        run: python3 scripts/check-sdk-version.py
