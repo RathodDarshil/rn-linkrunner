@@ -10,15 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for Google Integrated Conversion Measurement (ICM). On iOS the native SDK fetches Google's On-Device Measurement value automatically during initialization and forwards it to Linkrunner; no JavaScript API change is required to adopt it.
+- `setConsent(consent)` for Google Ads consent. Takes `isEEA`, `hasConsentForDataUsage` and `hasConsentForAdsPersonalization`, each `'granted' | 'denied' | 'unknown'`. Call it before `init` and again whenever your CMP state changes. Omitted signals default to `'unknown'` and are dropped from the payload rather than sent as a denial, so a signal you never set is never reported as granted.
+- `enableTCFConsentCollection(enabled)` to derive consent from an IAB TCF v2.2/v2.3 Consent Management Platform instead. Anything set explicitly with `setConsent` still wins, per signal.
+- Exported `LinkrunnerConsent` and `ConsentStatus` types.
+
+Both consent methods are iOS only and no-op on Android, which has no On-Device Measurement SDK.
 
 ### Changed
 
 - Bumped native iOS SDK to `LinkrunnerKit 4.1.0` and native Android SDK to `io.linkrunner:android-sdk:4.1.0`.
-- iOS apps now pull `GoogleAdsOnDeviceConversion` transitively and require `-ObjC` and `-lc++` in Other Linker Flags. CocoaPods applies these automatically. If your app also uses Firebase Analytics, check the version compatibility table in the LinkrunnerKit README.
+- To use ICM, add `pod 'GoogleAdsOnDeviceConversion'` to your app's Podfile. rn-linkrunner does not bundle it, so apps that skip ICM carry none of its weight. CocoaPods adds the required linker flags automatically, so no build settings are needed.
 
-### Note
+### Fixed
 
-Setting Google Ads consent (`isEEA`, `adUserData`, `adPersonalization`) is not yet exposed through the JavaScript bridge. Until it is, consent is reported as unknown, which Google treats as "not known" rather than as granted.
+- `capturePayment` failed to compile against LinkrunnerKit 4.x, which has required a non-optional `paymentId` since 4.0.0. The call now returns early with a clear message when `paymentId` is missing, matching the native SDK's behaviour.
 
 ## [3.0.1] - 2026-07-09
 

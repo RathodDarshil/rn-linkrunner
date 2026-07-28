@@ -1,5 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
-import type { AttributionData, DeeplinkData, IntegrationData, UserData } from './types';
+import type { AttributionData, DeeplinkData, IntegrationData, LinkrunnerConsent, UserData } from './types';
 import packageJson from '../package.json';
 
 const LINKING_ERROR =
@@ -304,6 +304,81 @@ class Linkrunner {
     }
   }
 
+  /**
+   * Set the Google Ads consent state.
+   *
+   * Call it before `init` so the first payload carries the correct state, and call it
+   * again whenever your CMP state changes. The values replace the previous ones and are
+   * persisted, so a returning user keeps their state without you re-supplying it.
+   *
+   * Anything omitted or left 'unknown' is reported as unknown rather than assumed
+   * granted, and is dropped from the payload entirely.
+   *
+   * Required only if you run Google App Campaigns and have users in the EEA, the UK,
+   * or Switzerland. iOS only; on Android this is a no-op for now.
+   *
+   * @example
+   * linkrunner.setConsent({
+   *   isEEA: 'granted',
+   *   hasConsentForDataUsage: 'granted',
+   *   hasConsentForAdsPersonalization: 'denied',
+   * });
+   */
+  setConsent(consent: LinkrunnerConsent): void {
+    try {
+      if (Platform.OS !== 'ios') {
+        return;
+      }
+
+      LinkrunnerSDKModule.setConsent({
+        isEEA: consent.isEEA ?? 'unknown',
+        hasConsentForDataUsage: consent.hasConsentForDataUsage ?? 'unknown',
+        hasConsentForAdsPersonalization:
+          consent.hasConsentForAdsPersonalization ?? 'unknown',
+      });
+
+      if (__DEV__) {
+        console.log('Linkrunner: Consent set', consent);
+      }
+    } catch (error) {
+      console.error('Linkrunner: Failed to set consent');
+      console.error('Linkrunner: ', error);
+    }
+  }
+
+  /**
+   * Collect Google Ads consent automatically from an IAB TCF v2.2/v2.3 Consent
+   * Management Platform.
+   *
+   * When enabled, the SDK reads the CMP's standard `IABTCF_*` keys. Anything set
+   * explicitly through `setConsent` still wins, per signal.
+   *
+   * Opt in rather than automatic, because interpreting a TC string on your behalf is a
+   * legal judgement. Only enable it if you use a TCF-compliant CMP: custom consent
+   * screens and Firebase Consent Mode do not write those keys. Not persisted, so call
+   * it on every launch before `init`. iOS only.
+   */
+  enableTCFConsentCollection(enabled: boolean = true): void {
+    try {
+      if (Platform.OS !== 'ios') {
+        return;
+      }
+
+      LinkrunnerSDKModule.enableTCFConsentCollection(enabled);
+
+      if (__DEV__) {
+        console.log(
+          `Linkrunner: TCF consent collection ${enabled ? 'enabled' : 'disabled'}`
+        );
+      }
+    } catch (error) {
+      console.error(
+        `Linkrunner: Failed to ${enabled ? 'enable' : 'disable'} TCF consent collection`
+      );
+      console.error('Linkrunner: ', error);
+    }
+  }
+
   async setPushToken(pushToken: string): Promise<void> {
     if (!this.token) {
       console.error('Linkrunner: Setting push token failed, token not initialized');
@@ -379,5 +454,15 @@ class Linkrunner {
 }
 
 const linkrunner = new Linkrunner();
+
+export type {
+  AttributionData,
+  CampaignData,
+  ConsentStatus,
+  DeeplinkData,
+  IntegrationData,
+  LinkrunnerConsent,
+  UserData,
+} from './types';
 
 export default linkrunner;

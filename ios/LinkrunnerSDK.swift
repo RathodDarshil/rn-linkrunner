@@ -127,8 +127,15 @@ class LinkrunnerSDK: NSObject {
         }
 
         let userId = paymentData["userId"] as? String ?? ""
-        
-        let paymentId = paymentData["paymentId"] as? String
+
+        // Required since LinkrunnerKit 4.0.0, which stopped dispatching the event
+        // without it. Bail out here rather than passing an empty string, so the
+        // caller sees the same behaviour the native SDK documents.
+        guard let paymentId = paymentData["paymentId"] as? String, !paymentId.isEmpty else {
+            print("Linkrunner: paymentId is required for payment capture")
+            return
+        }
+
         let typeString = paymentData["type"] as? String ?? "DEFAULT"
         let statusString = paymentData["status"] as? String ?? "PAYMENT_COMPLETED"
         let eventData = paymentData["eventData"] as? [String: Any]
@@ -183,6 +190,33 @@ class LinkrunnerSDK: NSObject {
         linkrunnerSDK.requestTrackingAuthorization { status in
             print("Linkrunner: Tracking authorization status: \(status.rawValue)")
         }
+    }
+
+    /// Maps a JS consent value to `ConsentStatus`.
+    ///
+    /// Anything absent or unrecognised becomes `.unknown`, which the native SDK omits
+    /// from the payload rather than sending as a denial. JS booleans cannot express
+    /// "not known", so the bridge takes strings: "granted", "denied" or "unknown".
+    private func consentStatus(from value: Any?) -> ConsentStatus {
+        guard let raw = value as? String else { return .unknown }
+        return ConsentStatus(rawValue: raw.lowercased()) ?? .unknown
+    }
+
+    @objc func setConsent(_ consentData: NSDictionary) -> Void {
+        let consent = LinkrunnerConsent(
+            isEEA: consentStatus(from: consentData["isEEA"]),
+            hasConsentForDataUsage: consentStatus(from: consentData["hasConsentForDataUsage"]),
+            hasConsentForAdsPersonalization: consentStatus(from: consentData["hasConsentForAdsPersonalization"])
+        )
+        linkrunnerSDK.setConsent(consent)
+        print("Linkrunner: Consent set — isEEA: \(consent.isEEA.rawValue), "
+              + "adUserData: \(consent.hasConsentForDataUsage.rawValue), "
+              + "adPersonalization: \(consent.hasConsentForAdsPersonalization.rawValue)")
+    }
+
+    @objc func enableTCFConsentCollection(_ enabled: Bool) -> Void {
+        linkrunnerSDK.enableTCFConsentCollection(enabled)
+        print("Linkrunner: TCF consent collection \(enabled ? "enabled" : "disabled")")
     }
     
     @objc func getAttributionData(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {

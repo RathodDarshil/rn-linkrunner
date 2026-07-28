@@ -58,3 +58,25 @@ export interface DeeplinkData {
   isLinkrunner: boolean;
   processing?: boolean;
 }
+
+/**
+ * Tri-state consent signal for Google Ads.
+ *
+ * A string rather than a boolean because 'unknown' is a distinct state: it is omitted
+ * from the payload rather than sent as a denial, so the backend can tell "we were never
+ * told" apart from "the user said no". Never map 'unknown' to 'granted'.
+ */
+export type ConsentStatus = 'granted' | 'denied' | 'unknown';
+
+/**
+ * Google Ads consent state, normally sourced from your Consent Management Platform.
+ * Anything omitted defaults to 'unknown'.
+ */
+export interface LinkrunnerConsent {
+  /** Whether European regulations apply to this user (the EEA, the UK, or Switzerland). Sent as `is_eea`. */
+  isEEA?: ConsentStatus;
+  /** Whether the user consented to their data being sent to Google for advertising purposes. Sent as `ad_user_data`. */
+  hasConsentForDataUsage?: ConsentStatus;
+  /** Whether the user consented to their data being used to personalize ads. Sent as `ad_personalization`. */
+  hasConsentForAdsPersonalization?: ConsentStatus;
+}
