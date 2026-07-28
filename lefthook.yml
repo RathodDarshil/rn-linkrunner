@@ -1,6 +1,11 @@
 pre-commit:
   parallel: true
   commands:
+    # Fails the commit when package.json declares an SDK version that is not
+    # the top entry of config-sdk-version.json. Not glob-scoped: a version bump
+    # must be caught whichever files the commit happens to touch.
+    check-version:
+      run: npm run check:version
     # lint:
     #   glob: "*.{js,ts,jsx,tsx}"
     #   run: npx eslint {staged_files}
