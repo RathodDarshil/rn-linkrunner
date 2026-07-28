@@ -31,7 +31,9 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli lib",
     "prepare": "bob build",
-    "release": "release-it"
+    "release": "release-it",
+    "check:version": "node scripts/check-sdk-version.js",
+    "prepublishOnly": "npm run check:version"
   },
   "keywords": [
     "react-native",
