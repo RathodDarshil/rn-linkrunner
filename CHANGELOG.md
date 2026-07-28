@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-07-27
+
+### Added
+
+- Support for Google Integrated Conversion Measurement (ICM). On iOS the native SDK fetches Google's On-Device Measurement value automatically during initialization and forwards it to Linkrunner; no JavaScript API change is required to adopt it.
+
+### Changed
+
+- Bumped native iOS SDK to `LinkrunnerKit 4.1.0` and native Android SDK to `io.linkrunner:android-sdk:4.1.0`.
+- iOS apps now pull `GoogleAdsOnDeviceConversion` transitively and require `-ObjC` and `-lc++` in Other Linker Flags. CocoaPods applies these automatically. If your app also uses Firebase Analytics, check the version compatibility table in the LinkrunnerKit README.
+
+### Note
+
+Setting Google Ads consent (`isEEA`, `adUserData`, `adPersonalization`) is not yet exposed through the JavaScript bridge. Until it is, consent is reported as unknown, which Google treats as "not known" rather than as granted.
+
 ## [3.0.1] - 2026-07-09
 
 ### Added
