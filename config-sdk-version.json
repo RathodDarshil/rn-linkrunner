@@ -1,8 +1,8 @@
 {
   "sdk": "REACT_NATIVE",
   "package": "rn-linkrunner",
-  "latest_version": "3.0.1",
-  "total_versions": 57,
+  "latest_version": "3.0.2",
+  "total_versions": 58,
   "source": "version and description from Postgres public.\"SDKVersion\"; pushed_date from the package registry publish date, falling back to CHANGELOG.md, git tags, then manifest history",
   "version_source": {
     "file": "package.json",
@@ -10,6 +10,11 @@
   },
   "version_mirrors": [],
   "sdk_versions": [
+    {
+      "version": "3.0.2",
+      "pushed_date": "2026-07-28",
+      "description": "Updated the native Android SDK to 4.0.2 so signup no longer sends an empty install instance ID when it runs concurrently with initialization."
+    },
     {
       "version": "3.0.1",
       "pushed_date": "2026-07-09",
