@@ -315,7 +315,7 @@ class Linkrunner {
    * granted, and is dropped from the payload entirely.
    *
    * Required only if you run Google App Campaigns and have users in the EEA, the UK,
-   * or Switzerland. iOS only; on Android this is a no-op for now.
+   * or Switzerland. Supported on iOS and Android.
    *
    * @example
    * linkrunner.setConsent({
@@ -326,7 +326,7 @@ class Linkrunner {
    */
   setConsent(consent: LinkrunnerConsent): void {
     try {
-      if (Platform.OS !== 'ios') {
+      if (Platform.OS !== 'ios' && Platform.OS !== 'android') {
         return;
       }
 
