@@ -425,13 +425,13 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
     @ReactMethod
     fun setConsent(consent: ReadableMap) {
         try {
-            // JS field names/casing follow the shared LinkrunnerConsent type; map them
-            // onto the native SDK's isEEA/adUserData/adPersonalization + enum names.
+            // Field names match the JS/iOS LinkrunnerConsent type one-to-one; only the
+            // enum casing differs ('granted' in JS vs GRANTED in Kotlin).
             linkrunnerSDK.setConsent(
                 LinkrunnerConsent(
                     isEEA = toConsentStatus(consent.getString("isEEA")),
-                    adUserData = toConsentStatus(consent.getString("hasConsentForDataUsage")),
-                    adPersonalization = toConsentStatus(consent.getString("hasConsentForAdsPersonalization"))
+                    hasConsentForDataUsage = toConsentStatus(consent.getString("hasConsentForDataUsage")),
+                    hasConsentForAdsPersonalization = toConsentStatus(consent.getString("hasConsentForAdsPersonalization"))
                 )
             )
 
