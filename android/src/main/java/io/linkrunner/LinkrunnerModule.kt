@@ -10,6 +10,8 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
 import io.linkrunner.sdk.BuildConfig
 import io.linkrunner.sdk.LinkRunner
+import io.linkrunner.sdk.models.ConsentStatus
+import io.linkrunner.sdk.models.LinkrunnerConsent
 import io.linkrunner.sdk.models.request.UserDataRequest
 import io.linkrunner.sdk.models.IntegrationData
 import io.linkrunner.utils.MapUtils
@@ -411,6 +413,33 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to ${if (enabled) "enable" else "disable"} PII hashing", e)
+        }
+    }
+
+    private fun toConsentStatus(value: String?): ConsentStatus = when (value) {
+        "granted" -> ConsentStatus.GRANTED
+        "denied" -> ConsentStatus.DENIED
+        else -> ConsentStatus.UNKNOWN
+    }
+
+    @ReactMethod
+    fun setConsent(consent: ReadableMap) {
+        try {
+            // Field names match the JS/iOS LinkrunnerConsent type one-to-one; only the
+            // enum casing differs ('granted' in JS vs GRANTED in Kotlin).
+            linkrunnerSDK.setConsent(
+                LinkrunnerConsent(
+                    isEEA = toConsentStatus(consent.getString("isEEA")),
+                    hasConsentForDataUsage = toConsentStatus(consent.getString("hasConsentForDataUsage")),
+                    hasConsentForAdsPersonalization = toConsentStatus(consent.getString("hasConsentForAdsPersonalization"))
+                )
+            )
+
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Linkrunner: Consent set")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to set consent", e)
         }
     }
 

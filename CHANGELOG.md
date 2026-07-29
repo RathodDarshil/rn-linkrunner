@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-07-29
+
+### Added
+
+- Support for Google Integrated Conversion Measurement (ICM). On iOS the native SDK fetches Google's On-Device Measurement value automatically during initialization and forwards it to Linkrunner; no JavaScript API change is required to adopt it.
+- `setConsent(consent)` for Google Ads consent. Takes `isEEA`, `hasConsentForDataUsage` and `hasConsentForAdsPersonalization`, each `'granted' | 'denied' | 'unknown'`. Call it before `init` and again whenever your CMP state changes. Omitted signals default to `'unknown'` and are dropped from the payload rather than sent as a denial, so a signal you never set is never reported as granted. Supported on iOS and Android.
+- `enableTCFConsentCollection(enabled)` to derive consent from an IAB TCF v2.2/v2.3 Consent Management Platform instead. Anything set explicitly with `setConsent` still wins, per signal. iOS only.
+- Exported `LinkrunnerConsent` and `ConsentStatus` types.
+
+Android has no On-Device Measurement SDK, so it gains no benefit from `enableTCFConsentCollection`, but `setConsent` still matters there: Android's ICM benefit comes through Google's App Conversion API on the backend, which needs the same consent, EEA and country signals to be truthful. The Android native SDK reports them once `setConsent` is called.
+
+### Changed
+
+- Bumped native iOS SDK to `LinkrunnerKit 4.1.0` and native Android SDK to `io.linkrunner:android-sdk:4.1.0`.
+- To use ICM, add `pod 'GoogleAdsOnDeviceConversion'` to your app's Podfile. rn-linkrunner does not bundle it, so apps that skip ICM carry none of its weight. CocoaPods adds the required linker flags automatically, so no build settings are needed.
+
+### Fixed
+
+- `capturePayment` failed to compile against LinkrunnerKit 4.x, which has required a non-optional `paymentId` since 4.0.0. The call now returns early with a clear message when `paymentId` is missing, matching the native SDK's behaviour.
+
 ## [3.0.2] - 2026-07-23
 
 ### Fixed

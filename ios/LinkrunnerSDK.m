@@ -19,6 +19,10 @@ RCT_EXTERN_METHOD(removePayment:(NSDictionary *)paymentData)
 
 RCT_EXTERN_METHOD(enablePIIHashing:(BOOL)enabled)
 
+RCT_EXTERN_METHOD(setConsent:(NSDictionary *)consentData)
+
+RCT_EXTERN_METHOD(enableTCFConsentCollection:(BOOL)enabled)
+
 RCT_EXTERN_METHOD(requestTrackingAuthorization)
 
 RCT_EXTERN_METHOD(getAttributionData:(RCTPromiseResolveBlock)resolve
