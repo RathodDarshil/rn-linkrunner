@@ -25,6 +25,12 @@ Android has no On-Device Measurement SDK, so it gains no benefit from `enableTCF
 
 - `capturePayment` failed to compile against LinkrunnerKit 4.x, which has required a non-optional `paymentId` since 4.0.0. The call now returns early with a clear message when `paymentId` is missing, matching the native SDK's behaviour.
 
+## [3.0.2] - 2026-07-23
+
+### Fixed
+
+- Bumped the native Android SDK to `io.linkrunner:android-sdk:4.0.2` to prevent signup from sending an empty install instance ID when it runs concurrently with initialization.
+
 ## [3.0.1] - 2026-07-09
 
 ### Added
