@@ -356,11 +356,11 @@ class Linkrunner {
    * Opt in rather than automatic, because interpreting a TC string on your behalf is a
    * legal judgement. Only enable it if you use a TCF-compliant CMP: custom consent
    * screens and Firebase Consent Mode do not write those keys. Not persisted, so call
-   * it on every launch before `init`. iOS only.
+   * it on every launch before `init`. Supported on iOS and Android.
    */
   enableTCFConsentCollection(enabled: boolean = true): void {
     try {
-      if (Platform.OS !== 'ios') {
+      if (Platform.OS !== 'ios' && Platform.OS !== 'android') {
         return;
       }
 

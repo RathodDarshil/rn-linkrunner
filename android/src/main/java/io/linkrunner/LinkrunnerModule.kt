@@ -444,6 +444,19 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
     }
 
     @ReactMethod
+    fun enableTCFConsentCollection(enabled: Boolean) {
+        try {
+            linkrunnerSDK.enableTCFConsentCollection(enabled)
+
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Linkrunner: TCF consent collection ${if (enabled) "enabled" else "disabled"}")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to ${if (enabled) "enable" else "disable"} TCF consent collection", e)
+        }
+    }
+
+    @ReactMethod
     fun setPushToken(pushToken: String, promise: Promise) {
         if (pushToken.isBlank()) {
             promise.reject("SET_PUSH_TOKEN_ERROR", "Push token cannot be empty")
