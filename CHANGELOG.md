@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-07-30
+
+### Added
+
+- `enableTCFConsentCollection(enabled)` now works on Android too, matching iOS. The native Android SDK reads the CMP's standard `IABTCF_*` keys from the default SharedPreferences and applies the same Google TCF purpose mapping; anything set explicitly with `setConsent` still wins, per signal.
+
+### Changed
+
+- Bumped native Android SDK to `io.linkrunner:android-sdk:4.2.0` (TCF consent collection).
+
 ## [3.1.0] - 2026-07-29
 
 ### Added
