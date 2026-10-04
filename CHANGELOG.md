@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.1] - 2026-10-04
+
+### Fixed
+
+- `enablePIIHashing(true)` now hashes `name`, `email` and `phone` on Android. Before, the native Android SDK stored the flag but never applied it, so `signup` and `setUserData` sent those fields in plain text while iOS sent SHA-256 hashes. Android now sends the same lowercase SHA-256 hex as iOS, so the same input gives the same hash on both platforms. Nothing changes when hashing is off.
+- Calling `enablePIIHashing()` before `init()` no longer fails on Android. The native SDK used to throw `Context not set`, which the bridge only logged, and `init()` then reset the flag to off.
+
+### Changed
+
+- Bumped native Android SDK to `io.linkrunner:android-sdk:4.1.1`.
+
 ## [3.1.0] - 2026-07-29
 
 ### Added
