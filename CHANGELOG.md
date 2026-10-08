@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-10-08
+
+### Added
+
+- `getAttributionData()` now returns `gaid` and `idfa`, the advertising identifiers Linkrunner recorded the install with. Use them to join Linkrunner attribution with your own data instead of reading the identifier again on the device. `gaid` is set on Android and `idfa` on iOS; each is absent when unavailable (limit ad tracking, App Tracking Transparency not authorized, or the other platform).
+
+### Changed
+
+- Requires the native Android SDK 4.2.0 (`io.linkrunner:android-sdk:4.2.0`) and iOS SDK 4.2.0 (`LinkrunnerKit 4.2.0`).
+
 ## [3.1.1] - 2026-10-04
 
 ### Fixed
