@@ -40,7 +40,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
 
-            val packageVersion = options?.getString("packageVersion") ?: "3.2.0" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "3.2.1" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -302,45 +302,8 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                     if (result.isSuccess) {
                         val attributionData = result.getOrNull()
                         
-                        // Convert the attribution data to a WritableMap
-                        val response = Arguments.createMap()
-                        
-                        if (attributionData != null) {
-                            // Add the deeplink if it exists
-                            attributionData.deeplink?.let { deeplink ->
-                                response.putString("deeplink", deeplink)
-                            }
-                            
-                            // Convert campaign data to a WritableMap if it exists
-                            attributionData.campaignData?.let { campaignData ->
-                                val campaignDataMap = Arguments.createMap()
-                                campaignDataMap.putString("id", campaignData.id)
-                                campaignDataMap.putString("name", campaignData.name)
-                                
-                                campaignData.adNetwork?.let { adNetwork ->
-                                    campaignDataMap.putString("adNetwork", adNetwork)
-                                }
-                                
-                                campaignDataMap.putString("type", campaignData.type)
-                                campaignDataMap.putString("installedAt", campaignData.installedAt)
-                                
-                                campaignData.storeClickAt?.let { storeClickAt ->
-                                    campaignDataMap.putString("storeClickAt", storeClickAt)
-                                }
-                                
-                                campaignDataMap.putString("groupName", campaignData.groupName)
-                                campaignDataMap.putString("assetName", campaignData.assetName)
-                                campaignDataMap.putString("assetGroupName", campaignData.assetGroupName)
-                                campaignDataMap.putString("adNetworkCampaignId", campaignData.adNetworkCampaignId)
-                                campaignDataMap.putString("adSetId", campaignData.adSetId)
-                                campaignDataMap.putString("adSetName", campaignData.adSetName)
-                                campaignDataMap.putString("adCreativeId", campaignData.adCreativeId)
-                                campaignDataMap.putString("adCreativeName", campaignData.adCreativeName)
+                        val response = ModelConverter.fromAttributionData(attributionData)
 
-                                response.putMap("campaignData", campaignDataMap)
-                            }
-                        }
-                        
                         response.putString("status", "success")
                         response.putString("message", "Attribution data retrieved successfully")
                         
