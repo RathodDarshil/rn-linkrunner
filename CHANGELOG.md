@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.1] - 2026-10-10
+
+### Fixed
+
+- `getAttributionData()` now returns `gaid` and `idfa` on Android. In 3.2.0 the Android bridge built its response without them, so both were `undefined` even when Linkrunner had the GAID. Both keys are now always present on Android and iOS, and are `null` when the identifier is unavailable.
+
 ## [3.2.0] - 2026-10-08
 
 ### Added
