@@ -229,6 +229,13 @@ class LinkrunnerSDK: NSObject {
                 response["deeplink"] = deeplink
             }
 
+            if let gaid = attributionData.gaid {
+                response["gaid"] = gaid
+            }
+            if let idfa = attributionData.idfa {
+                response["idfa"] = idfa
+            }
+
             if let campaignData = attributionData.campaignData {
                 let dateFormatter = ISO8601DateFormatter()
                 dateFormatter.formatOptions = [.withInternetDateTime]

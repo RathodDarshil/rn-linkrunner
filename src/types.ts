@@ -51,6 +51,10 @@ export interface AttributionData {
   // Direct fields
   deeplink?: string;
   campaignData?: CampaignData;
+  /** Android only. */
+  gaid?: string | null;
+  /** iOS only, null when ATT is not authorized. */
+  idfa?: string | null;
 }
 
 export interface DeeplinkData {

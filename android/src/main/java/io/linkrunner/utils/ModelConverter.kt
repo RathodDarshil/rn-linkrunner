@@ -163,6 +163,9 @@ object ModelConverter {
             data.deeplink?.let { deeplink ->
                 map.putString("deeplink", deeplink)
             }
+
+            data.gaid?.let { map.putString("gaid", it) }
+            data.idfa?.let { map.putString("idfa", it) }
             
             // Convert campaign data to a WritableMap if it exists
             data.campaignData?.let { campaignData ->
