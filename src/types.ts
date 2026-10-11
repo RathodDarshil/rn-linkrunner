@@ -95,9 +95,7 @@ export const PaymentStatus = {
 
 export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 
-/**
- * Revenue attached to a tracked event. The event name becomes the payment type.
- */
+/** Revenue attached to a tracked event; the event name becomes the payment type. */
 export interface EventPayment {
   /** Finite and not negative. */
   amount: number;

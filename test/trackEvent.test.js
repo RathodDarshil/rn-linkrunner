@@ -4,7 +4,6 @@ const fs = require('node:fs');
 const Module = require('node:module');
 const ts = require('typescript');
 
-// Load src/*.ts in Node by transpiling to CommonJS and swapping react-native for a stub.
 require.extensions['.ts'] = (module, filename) => {
   const { outputText } = ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
     compilerOptions: {

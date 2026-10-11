@@ -389,7 +389,6 @@ class LinkrunnerSDK: NSObject {
 typealias RCTPromiseResolveBlock = (Any?) -> Void
 typealias RCTPromiseRejectBlock = (String, String?, Error?) -> Void
 
-// JS always sends userId; a missing one means the payload did not come from the wrapper.
 private enum BridgePaymentError: Error {
     case missingUserId
 }

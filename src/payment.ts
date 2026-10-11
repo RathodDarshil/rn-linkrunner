@@ -5,11 +5,7 @@ const PAYMENT_STATUSES: readonly PaymentStatus[] = Object.values(PaymentStatus);
 
 const CURRENCY_PATTERN = /^[A-Za-z]{3}$/;
 
-/**
- * Validates a payment with the same rules as the native SDKs and returns the
- * normalized payload for the bridge (currency trimmed and uppercased, status
- * defaulted to PAYMENT_COMPLETED).
- */
+// Validates like the native SDKs; trims and uppercases currency and defaults status to PAYMENT_COMPLETED.
 export function normalizeEventPayment(payment: EventPayment): EventPayment {
   if (payment == null || typeof payment !== 'object') {
     throw new Error('Linkrunner: payment must be an object');
