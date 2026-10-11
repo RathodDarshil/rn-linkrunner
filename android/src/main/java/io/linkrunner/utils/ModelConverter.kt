@@ -238,8 +238,11 @@ object ModelConverter {
             ?: throw IllegalArgumentException("payment.paymentId is required")
         val currency = map["currency"] as? String
             ?: throw IllegalArgumentException("payment.currency is required")
+        val userId = map["userId"] as? String
+            ?: throw IllegalArgumentException("payment.userId is required")
         val status = (map["status"] as? String)?.let { PaymentStatus.valueOf(it) }
+            ?: PaymentStatus.PAYMENT_COMPLETED
 
-        return EventPayment(amount, paymentId, currency, status)
+        return EventPayment(amount, paymentId, currency, userId, status)
     }
 }

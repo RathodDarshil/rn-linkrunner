@@ -101,5 +101,14 @@ export interface EventPayment {
   paymentId: string;
   /** ISO 4217 code, three letters (for example 'USD' or 'INR'). */
   currency: string;
+  /** Your user id. An empty string falls back to the user saved by signup or setUserData. */
+  userId: string;
+  /** Defaults to PAYMENT_COMPLETED. */
   status?: PaymentStatus;
+}
+
+export interface TrackPaymentParams extends EventPayment {
+  /** Becomes the payment type in reports and dashboard mappings. */
+  eventName: string;
+  eventData?: Record<string, any>;
 }

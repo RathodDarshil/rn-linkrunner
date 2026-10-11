@@ -1,5 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
-import type { AttributionData, DeeplinkData, EventPayment, IntegrationData, LinkrunnerConsent, UserData } from './types';
+import type { AttributionData, DeeplinkData, EventPayment, IntegrationData, LinkrunnerConsent, TrackPaymentParams, UserData } from './types';
 import { normalizeEventPayment } from './payment';
 import packageJson from '../package.json';
 
@@ -122,6 +122,7 @@ class Linkrunner {
    *   amount: 499,
    *   paymentId: 'order_123',
    *   currency: 'INR',
+   *   userId: 'user_123',
    * });
    */
   async trackEvent(
@@ -175,6 +176,59 @@ class Linkrunner {
     }
   }
 
+
+  /**
+   * Record a payment. The event name becomes the payment type; status defaults to PAYMENT_COMPLETED.
+   *
+   * @example
+   * linkrunner.trackPayment({
+   *   eventName: 'first_payment',
+   *   paymentId: 'order_456',
+   *   userId: 'user_123',
+   *   amount: 499,
+   *   currency: 'INR',
+   *   eventData: { plan: 'pro' },
+   * });
+   */
+  async trackPayment({
+    eventName,
+    paymentId,
+    userId,
+    amount,
+    currency,
+    status,
+    eventData,
+  }: TrackPaymentParams) {
+    if (!this.token) {
+      console.error('Linkrunner: Track payment failed, token not initialized');
+      return;
+    }
+
+    let nativePayment: EventPayment;
+    try {
+      if (typeof eventName !== 'string' || eventName.trim().length === 0) {
+        throw new Error('Linkrunner: eventName is required to track a payment');
+      }
+      nativePayment = normalizeEventPayment({ amount, paymentId, currency, userId, status });
+    } catch (error) {
+      console.error((error as Error).message);
+      throw error;
+    }
+
+    try {
+      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, null, nativePayment);
+
+      if (__DEV__) {
+        console.log('Linkrunner payment tracked successfully:', eventName);
+        console.log('track payment response > ', result);
+      }
+
+      return result?.data;
+    } catch (error) {
+      console.error('Error tracking payment via native module', error);
+      throw error;
+    }
+  }
 
   async setAdditionalData(integrationData: IntegrationData): Promise<void | any> {
     if (!this.token) {
@@ -399,6 +453,7 @@ export type {
   IntegrationData,
   LinkrunnerConsent,
   PaymentStatus,
+  TrackPaymentParams,
   UserData,
 } from './types';
 

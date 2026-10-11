@@ -63,7 +63,8 @@ test('trackEvent passes payment fields through and normalizes currency', async (
     amount: 499.5,
     paymentId: 'ord_1',
     currency: ' inr ',
-    status: 'PAYMENT_COMPLETED',
+    userId: 'user_1',
+    status: 'PAYMENT_FAILED',
   });
   assert.deepEqual(calls, [
     [
@@ -74,21 +75,28 @@ test('trackEvent passes payment fields through and normalizes currency', async (
         amount: 499.5,
         paymentId: 'ord_1',
         currency: 'INR',
-        status: 'PAYMENT_COMPLETED',
+        userId: 'user_1',
+        status: 'PAYMENT_FAILED',
       },
     ],
   ]);
 });
 
-test('payment status is optional and left out when not set', async () => {
+test('payment status defaults to PAYMENT_COMPLETED and a blank userId is passed through', async () => {
   await linkrunner.trackEvent('purchase', undefined, undefined, {
     amount: 0,
     paymentId: 'ord_2',
     currency: 'USD',
+    userId: '',
   });
   assert.equal(calls.length, 1);
-  assert.deepEqual(calls[0][3], { amount: 0, paymentId: 'ord_2', currency: 'USD' });
-  assert.equal('status' in calls[0][3], false);
+  assert.deepEqual(calls[0][3], {
+    amount: 0,
+    paymentId: 'ord_2',
+    currency: 'USD',
+    userId: '',
+    status: 'PAYMENT_COMPLETED',
+  });
 });
 
 test('invalid payments are rejected before reaching native', async () => {
@@ -96,17 +104,20 @@ test('invalid payments are rejected before reaching native', async () => {
   console.error = () => {};
   try {
     const bad = [
-      { amount: -1, paymentId: 'p', currency: 'USD' },
-      { amount: NaN, paymentId: 'p', currency: 'USD' },
-      { amount: Infinity, paymentId: 'p', currency: 'USD' },
-      { amount: '10', paymentId: 'p', currency: 'USD' },
-      { amount: 1, paymentId: '', currency: 'USD' },
-      { amount: 1, paymentId: '   ', currency: 'USD' },
-      { amount: 1, paymentId: 'p', currency: '' },
-      { amount: 1, paymentId: 'p', currency: 'US' },
-      { amount: 1, paymentId: 'p', currency: 'USDT' },
-      { amount: 1, paymentId: 'p', currency: 'U5D' },
-      { amount: 1, paymentId: 'p', currency: 'USD', status: 'REFUNDED' },
+      { amount: -1, paymentId: 'p', currency: 'USD', userId: 'u' },
+      { amount: NaN, paymentId: 'p', currency: 'USD', userId: 'u' },
+      { amount: Infinity, paymentId: 'p', currency: 'USD', userId: 'u' },
+      { amount: '10', paymentId: 'p', currency: 'USD', userId: 'u' },
+      { amount: 1, paymentId: '', currency: 'USD', userId: 'u' },
+      { amount: 1, paymentId: '   ', currency: 'USD', userId: 'u' },
+      { amount: 1, paymentId: 'p', currency: '', userId: 'u' },
+      { amount: 1, paymentId: 'p', currency: 'US', userId: 'u' },
+      { amount: 1, paymentId: 'p', currency: 'USDT', userId: 'u' },
+      { amount: 1, paymentId: 'p', currency: 'U5D', userId: 'u' },
+      { amount: 1, paymentId: 'p', currency: 'USD', userId: 'u', status: 'REFUNDED' },
+      { amount: 1, paymentId: 'p', currency: 'USD' },
+      { amount: 1, paymentId: 'p', currency: 'USD', userId: null },
+      { amount: 1, paymentId: 'p', currency: 'USD', userId: 42 },
     ];
     for (const payment of bad) {
       await assert.rejects(
@@ -114,6 +125,87 @@ test('invalid payments are rejected before reaching native', async () => {
         /Linkrunner: payment\./,
         JSON.stringify(payment)
       );
+    }
+  } finally {
+    console.error = originalError;
+  }
+  assert.equal(calls.length, 0);
+});
+
+test('trackPayment sends the payment through native trackEvent', async () => {
+  await linkrunner.trackPayment({
+    eventName: 'first_payment',
+    paymentId: 'ord_3',
+    userId: 'user_9',
+    amount: 499,
+    currency: 'inr',
+    status: 'PAYMENT_INITIATED',
+    eventData: { plan: 'pro' },
+  });
+  assert.deepEqual(calls, [
+    [
+      'first_payment',
+      { plan: 'pro' },
+      null,
+      {
+        amount: 499,
+        paymentId: 'ord_3',
+        currency: 'INR',
+        userId: 'user_9',
+        status: 'PAYMENT_INITIATED',
+      },
+    ],
+  ]);
+});
+
+test('trackPayment defaults status to PAYMENT_COMPLETED and eventData to empty', async () => {
+  await linkrunner.trackPayment({
+    eventName: 'purchase',
+    paymentId: 'ord_4',
+    userId: '',
+    amount: 0,
+    currency: 'USD',
+  });
+  assert.deepEqual(calls, [
+    [
+      'purchase',
+      {},
+      null,
+      {
+        amount: 0,
+        paymentId: 'ord_4',
+        currency: 'USD',
+        userId: '',
+        status: 'PAYMENT_COMPLETED',
+      },
+    ],
+  ]);
+});
+
+test('trackPayment rejects invalid input before reaching native', async () => {
+  const originalError = console.error;
+  console.error = () => {};
+  const valid = {
+    eventName: 'purchase',
+    paymentId: 'p',
+    userId: 'u',
+    amount: 1,
+    currency: 'USD',
+  };
+  try {
+    const cases = [
+      [{ ...valid, eventName: '' }, /eventName is required/],
+      [{ ...valid, eventName: undefined }, /eventName is required/],
+      [{ ...valid, userId: undefined }, /payment\.userId is required/],
+      [{ ...valid, userId: null }, /payment\.userId is required/],
+      [{ ...valid, paymentId: ' ' }, /payment\.paymentId is required/],
+      [{ ...valid, amount: -5 }, /payment\.amount/],
+      [{ ...valid, currency: 'RUPEE' }, /payment\.currency/],
+      [{ ...valid, currency: undefined }, /payment\.currency/],
+      [{ ...valid, status: 'REFUNDED' }, /payment\.status/],
+    ];
+    for (const [params, pattern] of cases) {
+      await assert.rejects(linkrunner.trackPayment(params), pattern, JSON.stringify(params));
     }
   } finally {
     console.error = originalError;

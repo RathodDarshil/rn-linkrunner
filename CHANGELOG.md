@@ -9,13 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `trackEvent` takes an optional fourth argument, `payment`, to record revenue on the event: `{ amount, paymentId, currency, status? }`. The event name becomes the payment type, so `trackEvent('subscription_renewed', ...)` records a `subscription_renewed` payment. `currency` is a 3 letter ISO 4217 code and is required. `status` is optional.
-- `payment` is validated before it reaches the native SDK. `trackEvent` throws when `amount` is not a finite number of 0 or more, `paymentId` is blank, `currency` is not 3 letters, or `status` is not a known value.
-- Exported `EventPayment` and `PaymentStatus` types.
+- `trackPayment({ eventName, paymentId, userId, amount, currency, status?, eventData? })` records a payment. It replaces `capturePayment` and takes the same fields, except `type` is now `eventName` and `currency` is new. The event name becomes the payment type, so `eventName: 'subscription_renewed'` records a `subscription_renewed` payment. `currency` is a 3 letter ISO 4217 code. `status` defaults to `PAYMENT_COMPLETED`. Pass `userId: ''` to use the user saved by `signup` or `setUserData`.
+- `trackEvent` also takes an optional fourth argument, `payment`, for revenue on a regular event: `{ amount, paymentId, currency, userId, status? }`, with the same rules as `trackPayment`.
+- Payments are validated before they reach the native SDK. `trackPayment` and `trackEvent` throw when `eventName` is blank (`trackPayment`), `amount` is not a finite number of 0 or more, `paymentId` is blank, `currency` is not 3 letters, `userId` is not a string, or `status` is not a known value.
+- Exported `EventPayment`, `PaymentStatus` and `TrackPaymentParams` types.
 
 ### Removed
 
-- **Breaking:** `capturePayment` and `removePayment`. Send payments through `trackEvent` with `payment` instead. The `type` values (`FIRST_PAYMENT`, `WALLET_TOPUP` and the rest) are gone; the event name is the payment type now.
+- **Breaking:** `capturePayment` and `removePayment`. Use `trackPayment` instead. The `type` values (`FIRST_PAYMENT`, `WALLET_TOPUP` and the rest) are gone; the event name is the payment type now. There is no replacement for `removePayment`.
 
 ### Changed
 
@@ -39,15 +40,18 @@ await linkrunner.capturePayment({
 After:
 
 ```ts
-await linkrunner.trackEvent('first_payment', { plan: 'pro' }, 'order_456', {
-  amount: 499,
+await linkrunner.trackPayment({
+  eventName: 'first_payment',
+  userId: 'user_123',
   paymentId: 'order_456',
+  amount: 499,
   currency: 'INR',
   status: 'PAYMENT_COMPLETED',
+  eventData: { plan: 'pro' },
 });
 ```
 
-`userId` is no longer passed per call. There is no replacement for `removePayment`.
+`type` becomes `eventName` and `currency` is required. Everything else, including `userId`, stays the same.
 
 ### Payment names and dashboard mappings
 

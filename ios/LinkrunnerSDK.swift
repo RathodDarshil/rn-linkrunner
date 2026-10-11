@@ -139,8 +139,11 @@ class LinkrunnerSDK: NSObject {
         guard let currency = payment["currency"] as? String else {
             throw EventPaymentError.invalidCurrency
         }
-        let status = (payment["status"] as? String).flatMap { PaymentStatus(rawValue: $0) }
-        return try EventPayment(amount: amount, paymentId: paymentId, currency: currency, status: status)
+        guard let userId = payment["userId"] as? String else {
+            throw BridgePaymentError.missingUserId
+        }
+        let status = (payment["status"] as? String).flatMap { PaymentStatus(rawValue: $0) } ?? .completed
+        return try EventPayment(amount: amount, paymentId: paymentId, currency: currency, userId: userId, status: status)
     }
 
     @objc func enablePIIHashing(_ enabled: Bool) -> Void {
@@ -385,3 +388,8 @@ class LinkrunnerSDK: NSObject {
 // Type definition needed for RCTPromiseResolveBlock
 typealias RCTPromiseResolveBlock = (Any?) -> Void
 typealias RCTPromiseRejectBlock = (String, String?, Error?) -> Void
+
+// JS always sends userId; a missing one means the payload did not come from the wrapper.
+private enum BridgePaymentError: Error {
+    case missingUserId
+}
