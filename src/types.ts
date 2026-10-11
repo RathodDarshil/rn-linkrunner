@@ -84,3 +84,33 @@ export interface LinkrunnerConsent {
   /** Whether the user consented to their data being used to personalize ads. Sent as `ad_personalization`. */
   hasConsentForAdsPersonalization?: ConsentStatus;
 }
+
+/** Payment statuses; only PAYMENT_COMPLETED payments count as revenue and reach ad networks. */
+export const PaymentStatus = {
+  PAYMENT_INITIATED: 'PAYMENT_INITIATED',
+  PAYMENT_COMPLETED: 'PAYMENT_COMPLETED',
+  PAYMENT_FAILED: 'PAYMENT_FAILED',
+  PAYMENT_CANCELLED: 'PAYMENT_CANCELLED',
+} as const;
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+
+/** Revenue attached to a tracked event; the event name becomes the payment type. */
+export interface EventPayment {
+  /** Finite and not negative. */
+  amount: number;
+  /** Unique per payment; used to deduplicate. */
+  paymentId: string;
+  /** ISO 4217 code, three letters (for example 'USD' or 'INR'). */
+  currency: string;
+  /** Your user id. An empty string falls back to the user saved by signup or setUserData. */
+  userId: string;
+  /** Defaults to PAYMENT_COMPLETED. */
+  status?: PaymentStatus;
+}
+
+export interface TrackPaymentParams extends EventPayment {
+  /** Becomes the payment type in reports and dashboard mappings. */
+  eventName: string;
+  eventData?: Record<string, any>;
+}

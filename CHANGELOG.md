@@ -5,6 +5,59 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - Unreleased
+
+### Added
+
+- `trackPayment({ eventName, paymentId, userId, amount, currency, status?, eventData? })` records a payment. It replaces `capturePayment` and takes the same fields, except `type` is now `eventName` and `currency` is new. The event name becomes the payment type, so `eventName: 'subscription_renewed'` records a `subscription_renewed` payment. `currency` is a 3 letter ISO 4217 code. `status` defaults to `PAYMENT_COMPLETED`. Pass `userId: ''` to use the user saved by `signup` or `setUserData`.
+- `trackEvent` also takes an optional fourth argument, `payment`, for revenue on a regular event: `{ amount, paymentId, currency, userId, status? }`, with the same rules as `trackPayment`.
+- Payments are validated before they reach the native SDK. `trackPayment` and `trackEvent` throw when `eventName` is blank (`trackPayment`), `amount` is not a finite number of 0 or more, `paymentId` is blank, `currency` is not 3 letters, `userId` is not a string, or `status` is not a known value.
+- Exported `EventPayment`, `PaymentStatus` and `TrackPaymentParams` types.
+- `PaymentStatus` is exported as a runtime object, so you can write `PaymentStatus.PAYMENT_COMPLETED` (`import { PaymentStatus } from 'rn-linkrunner'`). Plain strings such as `'PAYMENT_COMPLETED'` still work.
+
+### Removed
+
+- **Breaking:** `capturePayment` and `removePayment`. Use `trackPayment` instead. The `type` values (`FIRST_PAYMENT`, `WALLET_TOPUP` and the rest) are gone; the event name is the payment type now. There is no replacement for `removePayment`.
+
+### Changed
+
+- Requires the native Android SDK 5.0.0 (`io.linkrunner:android-sdk:5.0.0`) and iOS SDK 5.0.0 (`LinkrunnerKit 5.0.0`).
+
+### Migration
+
+Before:
+
+```ts
+await linkrunner.capturePayment({
+  userId: 'user_123',
+  paymentId: 'order_456',
+  amount: 499,
+  type: 'FIRST_PAYMENT',
+  status: 'PAYMENT_COMPLETED',
+  eventData: { plan: 'pro' },
+});
+```
+
+After:
+
+```ts
+await linkrunner.trackPayment({
+  eventName: 'first_payment',
+  userId: 'user_123',
+  paymentId: 'order_456',
+  amount: 499,
+  currency: 'INR',
+  status: 'PAYMENT_COMPLETED',
+  eventData: { plan: 'pro' },
+});
+```
+
+`type` becomes `eventName` and `currency` is required. Everything else, including `userId`, stays the same.
+
+### Payment names and dashboard mappings
+
+The event name you pass becomes the payment type in reports and in your dashboard event mappings, and mappings match it exactly. If you used one of the old payment types, pass the same name (in any case, for example `first_payment` or `DEFAULT`). Linkrunner stores it as the uppercase type, so your existing mappings, reports and partner templates keep working with no change. If you pick a new name such as `purchase`, add a mapping for it in the dashboard before you release, or those payments are not sent to ad networks. `capturePayment` without a type was stored as `DEFAULT`.
+
 ## [3.2.1] - 2026-10-10
 
 ### Fixed

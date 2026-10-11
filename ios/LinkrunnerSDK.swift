@@ -107,78 +107,45 @@ class LinkrunnerSDK: NSObject {
         }
     }
     
-    @objc func trackEvent(_ eventName: NSString, eventData: NSDictionary?, eventId: NSString?) -> Void {
-        Task {
-            do {
-                let finalEventData = eventData as? [String: Any]
-                let eventIdString = eventId as String?
-                try await linkrunnerSDK.trackEvent(eventName: eventName as String, eventData: finalEventData, eventId: eventIdString)
-                print("Linkrunner: Event tracked successfully")
-            } catch {
-                print("Linkrunner: Failed to track event: \(error)")
-            }
-        }
-    }
-    
-    @objc func capturePayment(_ paymentData: NSDictionary) -> Void {
-        guard let amount = paymentData["amount"] as? Double else {
-            print("Linkrunner: amount is required for payment capture")
+    @objc func trackEvent(_ eventName: NSString, eventData: NSDictionary?, eventId: NSString?, payment: NSDictionary?) -> Void {
+        let eventPayment: EventPayment?
+        do {
+            eventPayment = try payment.map(makeEventPayment)
+        } catch {
+            print("Linkrunner: Failed to track event, invalid payment: \(error)")
             return
         }
 
-        let userId = paymentData["userId"] as? String ?? ""
-
-        // Required since LinkrunnerKit 4.0.0, which stopped dispatching the event
-        // without it. Bail out here rather than passing an empty string, so the
-        // caller sees the same behaviour the native SDK documents.
-        guard let paymentId = paymentData["paymentId"] as? String, !paymentId.isEmpty else {
-            print("Linkrunner: paymentId is required for payment capture")
-            return
-        }
-
-        let typeString = paymentData["type"] as? String ?? "DEFAULT"
-        let statusString = paymentData["status"] as? String ?? "PAYMENT_COMPLETED"
-        let eventData = paymentData["eventData"] as? [String: Any]
-
-        // Convert strings to enums
-        let paymentType = PaymentType(rawValue: typeString) ?? .default
-        let paymentStatus = PaymentStatus(rawValue: statusString) ?? .completed
-
         Task {
-            do {
-                try await linkrunnerSDK.capturePayment(
-                    amount: amount,
-                    userId: userId,
-                    paymentId: paymentId,
-                    type: paymentType,
-                    status: paymentStatus,
-                    eventData: eventData
-                )
-                print("Linkrunner: Payment captured successfully")
-            } catch {
-                print("Linkrunner: Failed to capture payment: \(error)")
-            }
+            let finalEventData = eventData as? [String: Any]
+            let eventIdString = eventId as String?
+            await linkrunnerSDK.trackEvent(
+                eventName: eventName as String,
+                eventData: finalEventData,
+                eventId: eventIdString,
+                payment: eventPayment
+            )
+            print("Linkrunner: Event tracked successfully")
         }
     }
-    
-    @objc func removePayment(_ paymentData: NSDictionary) -> Void {
-        guard let userId = paymentData["userId"] as? String else {
-            print("Linkrunner: userId is required for payment removal")
-            return
+
+    private func makeEventPayment(_ payment: NSDictionary) throws -> EventPayment {
+        guard let amount = (payment["amount"] as? NSNumber)?.doubleValue else {
+            throw EventPaymentError.invalidAmount
         }
-        
-        let paymentId = paymentData["paymentId"] as? String
-        
-        Task {
-            do {
-                try await linkrunnerSDK.removePayment(userId: userId, paymentId: paymentId)
-                print("Linkrunner: Payment removed successfully")
-            } catch {
-                print("Linkrunner: Failed to remove payment: \(error)")
-            }
+        guard let paymentId = payment["paymentId"] as? String else {
+            throw EventPaymentError.invalidPaymentId
         }
+        guard let currency = payment["currency"] as? String else {
+            throw EventPaymentError.invalidCurrency
+        }
+        guard let userId = payment["userId"] as? String else {
+            throw BridgePaymentError.missingUserId
+        }
+        let status = (payment["status"] as? String).flatMap { PaymentStatus(rawValue: $0) } ?? .completed
+        return try EventPayment(amount: amount, paymentId: paymentId, currency: currency, userId: userId, status: status)
     }
-    
+
     @objc func enablePIIHashing(_ enabled: Bool) -> Void {
         Task {
             await linkrunnerSDK.enablePIIHashing(enabled)
@@ -421,3 +388,7 @@ class LinkrunnerSDK: NSObject {
 // Type definition needed for RCTPromiseResolveBlock
 typealias RCTPromiseResolveBlock = (Any?) -> Void
 typealias RCTPromiseRejectBlock = (String, String?, Error?) -> Void
+
+private enum BridgePaymentError: Error {
+    case missingUserId
+}
