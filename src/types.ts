@@ -84,3 +84,22 @@ export interface LinkrunnerConsent {
   /** Whether the user consented to their data being used to personalize ads. Sent as `ad_personalization`. */
   hasConsentForAdsPersonalization?: ConsentStatus;
 }
+
+export type PaymentStatus =
+  | 'PAYMENT_INITIATED'
+  | 'PAYMENT_COMPLETED'
+  | 'PAYMENT_FAILED'
+  | 'PAYMENT_CANCELLED';
+
+/**
+ * Revenue attached to a tracked event. The event name becomes the payment type.
+ */
+export interface EventPayment {
+  /** Finite and not negative. */
+  amount: number;
+  /** Unique per payment; used to deduplicate. */
+  paymentId: string;
+  /** ISO 4217 code, three letters (for example 'USD' or 'INR'). */
+  currency: string;
+  status?: PaymentStatus;
+}

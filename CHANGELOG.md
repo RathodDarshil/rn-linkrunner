@@ -5,6 +5,50 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - Unreleased
+
+### Added
+
+- `trackEvent` takes an optional fourth argument, `payment`, to record revenue on the event: `{ amount, paymentId, currency, status? }`. The event name becomes the payment type, so `trackEvent('subscription_renewed', ...)` records a `subscription_renewed` payment. `currency` is a 3 letter ISO 4217 code and is required. `status` is optional.
+- `payment` is validated before it reaches the native SDK. `trackEvent` throws when `amount` is not a finite number of 0 or more, `paymentId` is blank, `currency` is not 3 letters, or `status` is not a known value.
+- Exported `EventPayment` and `PaymentStatus` types.
+
+### Removed
+
+- **Breaking:** `capturePayment` and `removePayment`. Send payments through `trackEvent` with `payment` instead. The `type` values (`FIRST_PAYMENT`, `WALLET_TOPUP` and the rest) are gone; the event name is the payment type now.
+
+### Changed
+
+- Requires the native Android SDK 5.0.0 (`io.linkrunner:android-sdk:5.0.0`) and iOS SDK 5.0.0 (`LinkrunnerKit 5.0.0`).
+
+### Migration
+
+Before:
+
+```ts
+await linkrunner.capturePayment({
+  userId: 'user_123',
+  paymentId: 'order_456',
+  amount: 499,
+  type: 'FIRST_PAYMENT',
+  status: 'PAYMENT_COMPLETED',
+  eventData: { plan: 'pro' },
+});
+```
+
+After:
+
+```ts
+await linkrunner.trackEvent('first_payment', { plan: 'pro' }, 'order_456', {
+  amount: 499,
+  paymentId: 'order_456',
+  currency: 'INR',
+  status: 'PAYMENT_COMPLETED',
+});
+```
+
+`userId` is no longer passed per call. There is no replacement for `removePayment`.
+
 ## [3.2.1] - 2026-10-10
 
 ### Fixed

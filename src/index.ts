@@ -1,5 +1,6 @@
 import { NativeModules, Platform } from 'react-native';
-import type { AttributionData, DeeplinkData, IntegrationData, LinkrunnerConsent, UserData } from './types';
+import type { AttributionData, DeeplinkData, EventPayment, IntegrationData, LinkrunnerConsent, UserData } from './types';
+import { normalizeEventPayment } from './payment';
 import packageJson from '../package.json';
 
 const LINKING_ERROR =
@@ -113,98 +114,22 @@ class Linkrunner {
     }
   }
 
-  async capturePayment({
-    amount,
-    userId,
-    paymentId,
-    type,
-    status,
-    eventData,
-  }: {
-    paymentId: string;
-    userId: string;
-    amount: number;
-    type?:
-      | 'FIRST_PAYMENT'
-      | 'WALLET_TOPUP'
-      | 'FUNDS_WITHDRAWAL'
-      | 'SUBSCRIPTION_CREATED'
-      | 'SUBSCRIPTION_RENEWED'
-      | 'DEFAULT'
-      | 'ONE_TIME'
-      | 'RECURRING';
-    status?:
-      | 'PAYMENT_INITIATED'
-      | 'PAYMENT_COMPLETED'
-      | 'PAYMENT_FAILED'
-      | 'PAYMENT_CANCELLED';
-    eventData?: Record<string, any>;
-  }) {
-    if (!this.token) {
-      console.error('Linkrunner: Payment capture failed, token not initialized');
-      return;
-    }
-
-    if (!paymentId || paymentId.trim().length === 0) {
-      const error = new Error('Linkrunner: paymentId is required to capture a payment');
-      console.error(error.message);
-      throw error;
-    }
-
-    try {
-      const paymentData = {
-        paymentId,
-        userId,
-        amount,
-        type: type || 'DEFAULT',
-        status: status || 'PAYMENT_COMPLETED',
-        eventData: eventData,
-      };
-
-      const result = await LinkrunnerSDKModule.capturePayment(paymentData);
-      
-      if (__DEV__) {
-        console.log('Linkrunner payment captured successfully');
-        console.log('capture payment response > ', result);
-      }
-
-    } catch (error) {
-      console.error('Error capturing payment via native module', error);
-      throw error;
-    }
-  }
-
-  async removePayment({
-    userId,
-    paymentId,
-  }: {
-    paymentId?: string;
-    userId: string;
-  }) {
-    if (!this.token) {
-      console.error('Linkrunner: Payment removal failed, token not initialized');
-      return;
-    }
-
-    try {
-      const paymentData = {
-        paymentId: paymentId || '',
-        userId,
-      };
-
-      const result = await LinkrunnerSDKModule.removePayment(paymentData);
-      
-      if (__DEV__) {
-        console.log('Linkrunner payment removed successfully');
-        console.log('remove payment response > ', result);
-      }
-    } catch (error) {
-      console.error('Error removing payment via native module', error);
-      throw error;
-    }
-  }
-
-  async trackEvent(eventName: string, eventData?: Record<string, any>, eventId?: string | number ) {
+  /**
+   * Track a custom event. Pass `payment` to record revenue; the event name becomes the payment type.
+   *
+   * @example
+   * linkrunner.trackEvent('purchase', { plan: 'pro' }, 'order_123', {
+   *   amount: 499,
+   *   paymentId: 'order_123',
+   *   currency: 'INR',
+   * });
+   */
+  async trackEvent(
+    eventName: string,
+    eventData?: Record<string, any>,
+    eventId?: string | number,
+    payment?: EventPayment
+  ) {
     let finalEventId: string | null = null;
     
     if (eventId != null) {
@@ -225,8 +150,18 @@ class Linkrunner {
       return console.error('Linkrunner: Event name is required');
     }
 
+    let nativePayment: EventPayment | null = null;
+    if (payment != null) {
+      try {
+        nativePayment = normalizeEventPayment(payment);
+      } catch (error) {
+        console.error((error as Error).message);
+        throw error;
+      }
+    }
+
     try {
-      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, finalEventId);
+      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, finalEventId, nativePayment);
       
       if (__DEV__) {
         console.log('Linkrunner event tracked successfully:', eventName);
@@ -460,8 +395,10 @@ export type {
   CampaignData,
   ConsentStatus,
   DeeplinkData,
+  EventPayment,
   IntegrationData,
   LinkrunnerConsent,
+  PaymentStatus,
   UserData,
 } from './types';
 
