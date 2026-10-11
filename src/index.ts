@@ -452,9 +452,10 @@ export type {
   EventPayment,
   IntegrationData,
   LinkrunnerConsent,
-  PaymentStatus,
   TrackPaymentParams,
   UserData,
 } from './types';
+
+export { PaymentStatus } from './types';
 
 export default linkrunner;

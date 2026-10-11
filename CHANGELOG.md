@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `trackEvent` also takes an optional fourth argument, `payment`, for revenue on a regular event: `{ amount, paymentId, currency, userId, status? }`, with the same rules as `trackPayment`.
 - Payments are validated before they reach the native SDK. `trackPayment` and `trackEvent` throw when `eventName` is blank (`trackPayment`), `amount` is not a finite number of 0 or more, `paymentId` is blank, `currency` is not 3 letters, `userId` is not a string, or `status` is not a known value.
 - Exported `EventPayment`, `PaymentStatus` and `TrackPaymentParams` types.
+- `PaymentStatus` is exported as a runtime object, so you can write `PaymentStatus.PAYMENT_COMPLETED` (`import { PaymentStatus } from 'rn-linkrunner'`). Plain strings such as `'PAYMENT_COMPLETED'` still work.
 
 ### Removed
 

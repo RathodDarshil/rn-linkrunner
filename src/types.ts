@@ -85,11 +85,15 @@ export interface LinkrunnerConsent {
   hasConsentForAdsPersonalization?: ConsentStatus;
 }
 
-export type PaymentStatus =
-  | 'PAYMENT_INITIATED'
-  | 'PAYMENT_COMPLETED'
-  | 'PAYMENT_FAILED'
-  | 'PAYMENT_CANCELLED';
+/** Payment statuses; only PAYMENT_COMPLETED payments count as revenue and reach ad networks. */
+export const PaymentStatus = {
+  PAYMENT_INITIATED: 'PAYMENT_INITIATED',
+  PAYMENT_COMPLETED: 'PAYMENT_COMPLETED',
+  PAYMENT_FAILED: 'PAYMENT_FAILED',
+  PAYMENT_CANCELLED: 'PAYMENT_CANCELLED',
+} as const;
+
+export type PaymentStatus = (typeof PaymentStatus)[keyof typeof PaymentStatus];
 
 /**
  * Revenue attached to a tracked event. The event name becomes the payment type.

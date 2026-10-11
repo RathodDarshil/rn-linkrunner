@@ -1,11 +1,7 @@
-import type { EventPayment, PaymentStatus } from './types';
+import { PaymentStatus } from './types';
+import type { EventPayment } from './types';
 
-const PAYMENT_STATUSES: readonly PaymentStatus[] = [
-  'PAYMENT_INITIATED',
-  'PAYMENT_COMPLETED',
-  'PAYMENT_FAILED',
-  'PAYMENT_CANCELLED',
-];
+const PAYMENT_STATUSES: readonly PaymentStatus[] = Object.values(PaymentStatus);
 
 const CURRENCY_PATTERN = /^[A-Za-z]{3}$/;
 
@@ -53,6 +49,6 @@ export function normalizeEventPayment(payment: EventPayment): EventPayment {
     paymentId,
     currency: code.toUpperCase(),
     userId,
-    status: status ?? 'PAYMENT_COMPLETED',
+    status: status ?? PaymentStatus.PAYMENT_COMPLETED,
   };
 }

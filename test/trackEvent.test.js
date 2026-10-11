@@ -38,7 +38,9 @@ Module._load = function (request, ...rest) {
 };
 
 global.__DEV__ = false;
-const linkrunner = require('../src/index.ts').default;
+const sdk = require('../src/index.ts');
+const linkrunner = sdk.default;
+const { PaymentStatus } = sdk;
 
 test.before(async () => {
   await linkrunner.init('token');
@@ -216,4 +218,23 @@ test('trackPayment rejects invalid input before reaching native', async () => {
 test('capturePayment and removePayment are gone', () => {
   assert.equal(linkrunner.capturePayment, undefined);
   assert.equal(linkrunner.removePayment, undefined);
+});
+
+test('PaymentStatus enum exposes the four statuses and works with trackPayment', async () => {
+  assert.deepEqual(Object.values(PaymentStatus), [
+    'PAYMENT_INITIATED',
+    'PAYMENT_COMPLETED',
+    'PAYMENT_FAILED',
+    'PAYMENT_CANCELLED',
+  ]);
+  calls.length = 0;
+  await linkrunner.trackPayment({
+    eventName: 'purchase',
+    paymentId: 'order_enum',
+    userId: 'user_1',
+    amount: 10,
+    currency: 'INR',
+    status: PaymentStatus.PAYMENT_FAILED,
+  });
+  assert.equal(calls.at(-1)[3].status, 'PAYMENT_FAILED');
 });
