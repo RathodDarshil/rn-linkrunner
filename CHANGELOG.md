@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2026-10-12
+
+### Changed
+
+- `setUserData` no longer needs a customer user id, so it can be called right after `init`. `UserData.id` is now optional: pass only the analytics ids you have (for example `mixpanel_distinct_id`, `amplitude_device_id`, `posthog_distinct_id`) and add `id` later, once your app knows the user. Linkrunner sets its attribution properties (`lr_campaign`, `lr_ad_network`) on the profiles of the analytics tools you identified, when that integration is configured for your project. `signup` still requires `id`.
+- On Android, a `setUserData` call without `id` no longer clears the stored customer user id (the bridge used to send `""`), so custom events keep their `user_id`.
+- Requires native SDKs Android `4.3.0` and iOS `LinkrunnerKit 4.3.0`.
+
+### Added
+
+- `UserData.moengage_user_id`, so MoEngage profiles receive Linkrunner attribution.
+
 ## [3.2.1] - 2026-10-10
 
 ### Fixed
