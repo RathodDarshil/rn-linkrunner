@@ -55,7 +55,8 @@ class LinkrunnerSDK: NSObject {
             brazeDeviceId: userData["braze_device_id"] as? String,
             gaAppInstanceId: userData["ga_app_instance_id"] as? String,
             gaSessionId: userData["ga_session_id"] as? String,
-            netcoreDeviceGuid: userData["netcore_device_guid"] as? String
+            netcoreDeviceGuid: userData["netcore_device_guid"] as? String,
+            moengageUserId: userData["moengage_user_id"] as? String
         )
         
         Task {
@@ -76,13 +77,9 @@ class LinkrunnerSDK: NSObject {
     }
     
     @objc func setUserData(_ userData: NSDictionary) -> Void {
-        guard let id = userData["id"] as? String else {
-            print("Linkrunner: User ID is required")
-            return
-        }
-        
+        // id is optional here (LIN-3534): setUserData can run right after init.
         let userDataObj = UserData(
-            id: id,
+            id: userData["id"] as? String,
             name: userData["name"] as? String,
             phone: userData["phone"] as? String,
             email: userData["email"] as? String,
@@ -94,7 +91,8 @@ class LinkrunnerSDK: NSObject {
             brazeDeviceId: userData["braze_device_id"] as? String,
             gaAppInstanceId: userData["ga_app_instance_id"] as? String,
             gaSessionId: userData["ga_session_id"] as? String,
-            netcoreDeviceGuid: userData["netcore_device_guid"] as? String
+            netcoreDeviceGuid: userData["netcore_device_guid"] as? String,
+            moengageUserId: userData["moengage_user_id"] as? String
         )
         
         Task {
