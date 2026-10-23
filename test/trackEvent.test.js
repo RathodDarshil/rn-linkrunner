@@ -135,7 +135,7 @@ test('invalid payments are rejected before reaching native', async () => {
 
 test('trackPayment sends the payment through native trackEvent', async () => {
   await linkrunner.trackPayment({
-    eventName: 'first_payment',
+    eventName: 'FIRST_PAYMENT',
     paymentId: 'ord_3',
     userId: 'user_9',
     amount: 499,
@@ -145,7 +145,7 @@ test('trackPayment sends the payment through native trackEvent', async () => {
   });
   assert.deepEqual(calls, [
     [
-      'first_payment',
+      'FIRST_PAYMENT',
       { plan: 'pro' },
       null,
       {

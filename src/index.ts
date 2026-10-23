@@ -188,7 +188,7 @@ class Linkrunner {
    *
    * @example
    * linkrunner.trackPayment({
-   *   eventName: 'first_payment',
+   *   eventName: 'FIRST_PAYMENT',
    *   paymentId: 'order_456',
    *   userId: 'user_123',
    *   amount: 499,
