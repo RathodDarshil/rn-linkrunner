@@ -203,7 +203,8 @@ object ModelConverter {
      */
     fun toUserDataRequest(map: Map<String, Any>): UserDataRequest {
         return UserDataRequest(
-            id = map["id"] as? String ?: "",
+            // Missing id stays null: setUserData accepts it, the native signup rejects it.
+            id = map["id"] as? String,
             name = map["name"] as? String,
             phone = map["phone"] as? String,
             email = map["email"] as? String,
@@ -215,7 +216,8 @@ object ModelConverter {
             gaSessionId = map["ga_session_id"] as? String,
             userCreatedAt = map["user_created_at"] as? String,
             isFirstTimeUser = map["is_first_time_user"] as? Boolean,
-            netcoreDeviceGuid = map["netcore_device_guid"] as? String
+            netcoreDeviceGuid = map["netcore_device_guid"] as? String,
+            moengageUserId = map["moengage_user_id"] as? String
         )
     }
 

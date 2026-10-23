@@ -64,7 +64,7 @@ class Linkrunner {
     user_data,
   }: {
     data?: { [key: string]: any };
-    user_data: UserData;
+    user_data: UserData & { id: string };
   }) {
     if (!this.token) {
       console.error('Linkrunner: Signup failed, token not initialized');
@@ -93,6 +93,12 @@ class Linkrunner {
     }
   }
 
+  /**
+   * Sets user data for this install. Can be called right after `init`: `id` is
+   * optional, so you can pass only analytics ids (Mixpanel, Amplitude, PostHog, ...)
+   * before your app knows the user. Linkrunner then sets its attribution properties
+   * on those tools' profiles.
+   */
   async setUserData(user_data: UserData) {
     if (!this.token) {
       console.error('Linkrunner: Set user data failed, token not initialized');

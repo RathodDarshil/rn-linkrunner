@@ -11,7 +11,11 @@ export interface LRIPLocationData {
 }
 
 export interface UserData {
-  id: string;
+  /**
+   * Your customer user id. Required for `signup`; optional for `setUserData`, so
+   * `setUserData` can be called right after `init` with only analytics ids.
+   */
+  id?: string;
   name?: string;
   phone?: string;
   email?: string;
@@ -24,6 +28,7 @@ export interface UserData {
   ga_app_instance_id?: string;
   ga_session_id?: string;
   netcore_device_guid?: string;
+  moengage_user_id?: string;
 }
 
 export interface IntegrationData {
