@@ -40,7 +40,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
 
-            val packageVersion = options?.getString("packageVersion") ?: "3.3.2" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "4.0.0" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -211,84 +211,6 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             }
         } catch (e: Exception) {
             promise.reject("TRACK_EVENT_ERROR", "Failed to track event: ${e.message}", e)
-        }
-    }
-
-    @ReactMethod
-    fun capturePayment(paymentData: ReadableMap, promise: Promise) {
-        if (paymentData == null) {
-            promise.reject("PAYMENT_ERROR", "Payment data is required")
-            return
-        }
-
-        try {
-            val paymentDataMap = MapUtils.readableMapToMap(paymentData)
-            
-            moduleScope.launch {
-                try {
-                    val result = linkrunnerSDK.capturePayment(ModelConverter.toCapturePaymentRequest(paymentDataMap))
-                    
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Payment captured successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "PAYMENT_ERROR", 
-                                "Failed to capture payment: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("PAYMENT_ERROR", "Exception capturing payment: ${e.message}", e)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            promise.reject("PAYMENT_ERROR", "Failed to capture payment: ${e.message}", e)
-        }
-    }
-
-    @ReactMethod
-    fun removePayment(paymentData: ReadableMap, promise: Promise) {
-        if (paymentData == null) {
-            promise.reject("REMOVE_PAYMENT_ERROR", "Payment data is required")
-            return
-        }
-
-        try {
-            val paymentDataMap = MapUtils.readableMapToMap(paymentData)
-            
-            moduleScope.launch {
-                try {
-                    val result = linkrunnerSDK.removePayment(ModelConverter.toRemovePaymentRequest(paymentDataMap))
-                    
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Payment removed successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "REMOVE_PAYMENT_ERROR", 
-                                "Failed to remove payment: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("REMOVE_PAYMENT_ERROR", "Exception removing payment: ${e.message}", e)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            promise.reject("REMOVE_PAYMENT_ERROR", "Failed to remove payment: ${e.message}", e)
         }
     }
 

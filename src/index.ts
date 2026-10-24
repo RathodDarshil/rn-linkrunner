@@ -119,97 +119,7 @@ class Linkrunner {
     }
   }
 
-  async capturePayment({
-    amount,
-    userId,
-    paymentId,
-    type,
-    status,
-    eventData,
-  }: {
-    paymentId: string;
-    userId: string;
-    amount: number;
-    type?:
-      | 'FIRST_PAYMENT'
-      | 'WALLET_TOPUP'
-      | 'FUNDS_WITHDRAWAL'
-      | 'SUBSCRIPTION_CREATED'
-      | 'SUBSCRIPTION_RENEWED'
-      | 'DEFAULT'
-      | 'ONE_TIME'
-      | 'RECURRING';
-    status?:
-      | 'PAYMENT_INITIATED'
-      | 'PAYMENT_COMPLETED'
-      | 'PAYMENT_FAILED'
-      | 'PAYMENT_CANCELLED';
-    eventData?: Record<string, any>;
-  }) {
-    if (!this.token) {
-      console.error('Linkrunner: Payment capture failed, token not initialized');
-      return;
-    }
-
-    if (!paymentId || paymentId.trim().length === 0) {
-      const error = new Error('Linkrunner: paymentId is required to capture a payment');
-      console.error(error.message);
-      throw error;
-    }
-
-    try {
-      const paymentData = {
-        paymentId,
-        userId,
-        amount,
-        type: type || 'DEFAULT',
-        status: status || 'PAYMENT_COMPLETED',
-        eventData: eventData,
-      };
-
-      const result = await LinkrunnerSDKModule.capturePayment(paymentData);
-      
-      if (__DEV__) {
-        console.log('Linkrunner payment captured successfully');
-        console.log('capture payment response > ', result);
-      }
-
-    } catch (error) {
-      console.error('Error capturing payment via native module', error);
-      throw error;
-    }
-  }
-
-  async removePayment({
-    userId,
-    paymentId,
-  }: {
-    paymentId?: string;
-    userId: string;
-  }) {
-    if (!this.token) {
-      console.error('Linkrunner: Payment removal failed, token not initialized');
-      return;
-    }
-
-    try {
-      const paymentData = {
-        paymentId: paymentId || '',
-        userId,
-      };
-
-      const result = await LinkrunnerSDKModule.removePayment(paymentData);
-      
-      if (__DEV__) {
-        console.log('Linkrunner payment removed successfully');
-        console.log('remove payment response > ', result);
-      }
-    } catch (error) {
-      console.error('Error removing payment via native module', error);
-      throw error;
-    }
-  }
-
+  /** Track an in-app event; it is a payment when eventData has amount, paymentId and currency (plus userId and optional status). */
   async trackEvent(eventName: string, eventData?: Record<string, any>, eventId?: string | number ) {
     let finalEventId: string | null = null;
     
@@ -245,8 +155,6 @@ class Linkrunner {
       throw error;
     }
   }
-
-
   async setAdditionalData(integrationData: IntegrationData): Promise<void | any> {
     if (!this.token) {
       console.error('Linkrunner: Setting integration data failed, token not initialized');
@@ -470,5 +378,7 @@ export type {
   LinkrunnerConsent,
   UserData,
 } from './types';
+
+export { PaymentStatus } from './types';
 
 export default linkrunner;

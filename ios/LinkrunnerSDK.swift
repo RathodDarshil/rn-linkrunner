@@ -118,65 +118,6 @@ class LinkrunnerSDK: NSObject {
         }
     }
     
-    @objc func capturePayment(_ paymentData: NSDictionary) -> Void {
-        guard let amount = paymentData["amount"] as? Double else {
-            print("Linkrunner: amount is required for payment capture")
-            return
-        }
-
-        let userId = paymentData["userId"] as? String ?? ""
-
-        // Required since LinkrunnerKit 4.0.0, which stopped dispatching the event
-        // without it. Bail out here rather than passing an empty string, so the
-        // caller sees the same behaviour the native SDK documents.
-        guard let paymentId = paymentData["paymentId"] as? String, !paymentId.isEmpty else {
-            print("Linkrunner: paymentId is required for payment capture")
-            return
-        }
-
-        let typeString = paymentData["type"] as? String ?? "DEFAULT"
-        let statusString = paymentData["status"] as? String ?? "PAYMENT_COMPLETED"
-        let eventData = paymentData["eventData"] as? [String: Any]
-
-        // Convert strings to enums
-        let paymentType = PaymentType(rawValue: typeString) ?? .default
-        let paymentStatus = PaymentStatus(rawValue: statusString) ?? .completed
-
-        Task {
-            do {
-                try await linkrunnerSDK.capturePayment(
-                    amount: amount,
-                    userId: userId,
-                    paymentId: paymentId,
-                    type: paymentType,
-                    status: paymentStatus,
-                    eventData: eventData
-                )
-                print("Linkrunner: Payment captured successfully")
-            } catch {
-                print("Linkrunner: Failed to capture payment: \(error)")
-            }
-        }
-    }
-    
-    @objc func removePayment(_ paymentData: NSDictionary) -> Void {
-        guard let userId = paymentData["userId"] as? String else {
-            print("Linkrunner: userId is required for payment removal")
-            return
-        }
-        
-        let paymentId = paymentData["paymentId"] as? String
-        
-        Task {
-            do {
-                try await linkrunnerSDK.removePayment(userId: userId, paymentId: paymentId)
-                print("Linkrunner: Payment removed successfully")
-            } catch {
-                print("Linkrunner: Failed to remove payment: \(error)")
-            }
-        }
-    }
-    
     @objc func enablePIIHashing(_ enabled: Bool) -> Void {
         Task {
             await linkrunnerSDK.enablePIIHashing(enabled)

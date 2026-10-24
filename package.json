@@ -1,6 +1,6 @@
 {
   "name": "rn-linkrunner",
-  "version": "3.3.2",
+  "version": "4.0.0",
   "description": "React Native Package for linkrunner",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -28,6 +28,7 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "test": "node --test test/trackEvent.test.js",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli lib",
     "prepare": "bob build",
