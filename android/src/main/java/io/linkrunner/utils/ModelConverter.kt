@@ -3,8 +3,6 @@ package io.linkrunner.utils
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
-import io.linkrunner.sdk.models.EventPayment
-import io.linkrunner.sdk.models.PaymentStatus
 import io.linkrunner.sdk.models.request.UserDataRequest
 import io.linkrunner.sdk.models.IntegrationData
 import io.linkrunner.sdk.models.response.AttributionData
@@ -228,23 +226,5 @@ object ModelConverter {
         return IntegrationData(
             clevertapId = map["clevertapId"] as? String
         )
-    }
-
-    /**
-     * Convert a Map to EventPayment; throws IllegalArgumentException on invalid fields
-     */
-    fun toEventPayment(map: Map<String, Any>): EventPayment {
-        val amount = (map["amount"] as? Number)?.toDouble()
-            ?: throw IllegalArgumentException("payment.amount must be a number")
-        val paymentId = map["paymentId"] as? String
-            ?: throw IllegalArgumentException("payment.paymentId is required")
-        val currency = map["currency"] as? String
-            ?: throw IllegalArgumentException("payment.currency is required")
-        val userId = map["userId"] as? String
-            ?: throw IllegalArgumentException("payment.userId is required")
-        val status = (map["status"] as? String)?.let { PaymentStatus.valueOf(it) }
-            ?: PaymentStatus.PAYMENT_COMPLETED
-
-        return EventPayment(amount, paymentId, currency, userId, status)
     }
 }

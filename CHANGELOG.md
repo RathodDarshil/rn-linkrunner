@@ -7,21 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.0.0] - Unreleased
 
-### Added
+### Changed
 
-- `trackPayment({ eventName, paymentId, userId, amount, currency, status?, eventData? })` records a payment. It replaces `capturePayment` and takes the same fields, except `type` is now `eventName` and `currency` is new. The event name becomes the payment type, so `eventName: 'SUBSCRIPTION_RENEWED'` records a `SUBSCRIPTION_RENEWED` payment. `currency` is a 3 letter ISO 4217 code. `status` defaults to `PAYMENT_COMPLETED`. Pass `userId: ''` to use the user saved by `signup` or `setUserData`.
-- `trackEvent` also takes an optional fourth argument, `payment`, for revenue on a regular event: `{ amount, paymentId, currency, userId, status? }`, with the same rules as `trackPayment`.
-- Payments are validated before they reach the native SDK. `trackPayment` and `trackEvent` throw when `eventName` is blank (`trackPayment`), `amount` is not a finite number of 0 or more, `paymentId` is blank, `currency` is not 3 letters, `userId` is not a string, or `status` is not a known value.
-- Exported `EventPayment`, `PaymentStatus` and `TrackPaymentParams` types.
-- `PaymentStatus` is exported as a runtime object, so you can write `PaymentStatus.PAYMENT_COMPLETED` (`import { PaymentStatus } from 'rn-linkrunner'`). Plain strings such as `'PAYMENT_COMPLETED'` still work.
+- `trackEvent(eventName, eventData?, eventId?)` keeps its signature and now also sends payments. When `eventData` has `amount`, `paymentId` and `currency`, the event is sent as a payment named `eventName`. Put `userId` (required; `''` uses the user saved by `signup` or `setUserData`) and an optional `status` in `eventData` too. Every other key stays as event data.
+- `status` defaults to `PAYMENT_COMPLETED`. Refund a payment by sending the same `paymentId` with `PaymentStatus.PAYMENT_CANCELLED`.
+- The native SDK checks the payment and rejects the call before anything is sent when `paymentId` comes without `amount` or `currency`, `amount` is not a number of 0 or more, `paymentId` is blank, `currency` is not 3 letters, `userId` is missing or `status` is not valid. On iOS the error is logged instead.
+- `amount` or `currency` without `paymentId` is a normal custom event, exactly as before.
+- `PaymentStatus` is exported as a runtime object (`import { PaymentStatus } from 'rn-linkrunner'`). Plain strings such as `'PAYMENT_COMPLETED'` work too.
+- Requires the native Android SDK 5.0.0 (`io.linkrunner:android-sdk:5.0.0`) and iOS SDK 5.0.0 (`LinkrunnerKit 5.0.0`).
 
 ### Removed
 
-- **Breaking:** `capturePayment` and `removePayment`. Use `trackPayment` instead. The `type` values (`FIRST_PAYMENT`, `WALLET_TOPUP` and the rest) are gone; the event name is the payment type now. There is no replacement for `removePayment`.
-
-### Changed
-
-- Requires the native Android SDK 5.0.0 (`io.linkrunner:android-sdk:5.0.0`) and iOS SDK 5.0.0 (`LinkrunnerKit 5.0.0`).
+- **Breaking:** `capturePayment` and `removePayment`. Use `trackEvent` instead. The `type` values (`FIRST_PAYMENT`, `WALLET_TOPUP` and the rest) are gone as a separate option; the event name is the payment type now. There is no replacement for `removePayment`.
 
 ### Migration
 
@@ -41,18 +38,17 @@ await linkrunner.capturePayment({
 After:
 
 ```ts
-await linkrunner.trackPayment({
-  eventName: 'FIRST_PAYMENT',
+await linkrunner.trackEvent('FIRST_PAYMENT', {
   userId: 'user_123',
   paymentId: 'order_456',
   amount: 499,
   currency: 'INR',
-  status: 'PAYMENT_COMPLETED',
-  eventData: { plan: 'pro' },
+  status: PaymentStatus.PAYMENT_COMPLETED,
+  plan: 'pro',
 });
 ```
 
-`type` becomes `eventName` and `currency` is required. Everything else, including `userId`, stays the same.
+Rename `capturePayment` to `trackEvent`, pass the old `type` as the first argument with the exact same spelling, and move the fields into `eventData`. `currency` is new and required.
 
 ### Payment names and dashboard mappings
 

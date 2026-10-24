@@ -1,6 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
-import type { AttributionData, DeeplinkData, EventPayment, IntegrationData, LinkrunnerConsent, TrackPaymentParams, UserData } from './types';
-import { normalizeEventPayment } from './payment';
+import type { AttributionData, DeeplinkData, IntegrationData, LinkrunnerConsent, UserData } from './types';
 import packageJson from '../package.json';
 
 const LINKING_ERROR =
@@ -120,23 +119,8 @@ class Linkrunner {
     }
   }
 
-  /**
-   * Track a custom event. Pass `payment` to record revenue; the event name becomes the payment type.
-   *
-   * @example
-   * linkrunner.trackEvent('purchase', { plan: 'pro' }, 'order_123', {
-   *   amount: 499,
-   *   paymentId: 'order_123',
-   *   currency: 'INR',
-   *   userId: 'user_123',
-   * });
-   */
-  async trackEvent(
-    eventName: string,
-    eventData?: Record<string, any>,
-    eventId?: string | number,
-    payment?: EventPayment
-  ) {
+  /** Track an in-app event; it is a payment when eventData has amount, paymentId and currency (plus userId and optional status). */
+  async trackEvent(eventName: string, eventData?: Record<string, any>, eventId?: string | number ) {
     let finalEventId: string | null = null;
     
     if (eventId != null) {
@@ -157,18 +141,8 @@ class Linkrunner {
       return console.error('Linkrunner: Event name is required');
     }
 
-    let nativePayment: EventPayment | null = null;
-    if (payment != null) {
-      try {
-        nativePayment = normalizeEventPayment(payment);
-      } catch (error) {
-        console.error((error as Error).message);
-        throw error;
-      }
-    }
-
     try {
-      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, finalEventId, nativePayment);
+      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, finalEventId);
       
       if (__DEV__) {
         console.log('Linkrunner event tracked successfully:', eventName);
@@ -181,61 +155,6 @@ class Linkrunner {
       throw error;
     }
   }
-
-
-  /**
-   * Record a payment. The event name becomes the payment type; status defaults to PAYMENT_COMPLETED.
-   *
-   * @example
-   * linkrunner.trackPayment({
-   *   eventName: 'FIRST_PAYMENT',
-   *   paymentId: 'order_456',
-   *   userId: 'user_123',
-   *   amount: 499,
-   *   currency: 'INR',
-   *   eventData: { plan: 'pro' },
-   * });
-   */
-  async trackPayment({
-    eventName,
-    paymentId,
-    userId,
-    amount,
-    currency,
-    status,
-    eventData,
-  }: TrackPaymentParams) {
-    if (!this.token) {
-      console.error('Linkrunner: Track payment failed, token not initialized');
-      return;
-    }
-
-    let nativePayment: EventPayment;
-    try {
-      if (typeof eventName !== 'string' || eventName.trim().length === 0) {
-        throw new Error('Linkrunner: eventName is required to track a payment');
-      }
-      nativePayment = normalizeEventPayment({ amount, paymentId, currency, userId, status });
-    } catch (error) {
-      console.error((error as Error).message);
-      throw error;
-    }
-
-    try {
-      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, null, nativePayment);
-
-      if (__DEV__) {
-        console.log('Linkrunner payment tracked successfully:', eventName);
-        console.log('track payment response > ', result);
-      }
-
-      return result?.data;
-    } catch (error) {
-      console.error('Error tracking payment via native module', error);
-      throw error;
-    }
-  }
-
   async setAdditionalData(integrationData: IntegrationData): Promise<void | any> {
     if (!this.token) {
       console.error('Linkrunner: Setting integration data failed, token not initialized');
@@ -455,10 +374,8 @@ export type {
   CampaignData,
   ConsentStatus,
   DeeplinkData,
-  EventPayment,
   IntegrationData,
   LinkrunnerConsent,
-  TrackPaymentParams,
   UserData,
 } from './types';
 
