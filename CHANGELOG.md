@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.1] - 2026-10-25
+
+### Fixed
+
+- Bumped the native iOS SDK to `LinkrunnerKit 4.3.1`. Fixes an `EXC_BAD_ACCESS (KERN_INVALID_ADDRESS)` crash at app launch on iOS, in frames like `DeviceData`, `getAttributionToken`, `setUserData` and `makeRequestWithRetry`, that could happen when `init`, `setUserData`, `trackEvent` and other calls ran at the same time. LinkrunnerKit 4.1.0 to 4.3.0 shared the cached AdServices token between those calls without a lock, and every piece of shared state is now locked. No API changes. Android is unchanged (`io.linkrunner:android-sdk:4.4.0`).
+
 ## [3.4.0] - 2026-10-23
 
 ### Added
