@@ -16,9 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `PaymentStatus` is exported as a runtime object (`import { PaymentStatus } from 'rn-linkrunner'`). Plain strings such as `'PAYMENT_COMPLETED'` work too.
 - Requires the native Android SDK 5.0.0 (`io.linkrunner:android-sdk:5.0.0`) and iOS SDK 5.0.0 (`LinkrunnerKit 5.0.0`).
 
-### Removed
+### Deprecated
 
-- **Breaking:** `capturePayment` and `removePayment`. Use `trackEvent` instead. The `type` values (`FIRST_PAYMENT`, `WALLET_TOPUP` and the rest) are gone as a separate option; the event name is the payment type now. There is no replacement for `removePayment`.
+- `capturePayment` and `removePayment`. They still work as before on the old endpoint and are marked `@deprecated`, so editors show a warning. They will be removed in a future major version. Use `trackEvent` instead: the event name is the payment type, so pass the old `type` value (for example `FIRST_PAYMENT`) as the event name. Instead of `removePayment`, send the same `paymentId` with `PaymentStatus.PAYMENT_CANCELLED` through `trackEvent`.
 
 ### Migration
 

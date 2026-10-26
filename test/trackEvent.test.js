@@ -23,6 +23,14 @@ const nativeModule = {
     return { status: 'success' };
   },
   init: async () => ({ status: 'success' }),
+  capturePayment: async (data) => {
+    calls.push(['capturePayment', data]);
+    return { status: 'success' };
+  },
+  removePayment: async (data) => {
+    calls.push(['removePayment', data]);
+    return { status: 'success' };
+  },
 };
 
 const originalLoad = Module._load;
@@ -103,10 +111,21 @@ test('native payment errors are rethrown', async () => {
   }
 });
 
-test('trackEvent is the only payment API', () => {
-  for (const name of ['trackPayment', 'capturePayment', 'removePayment']) {
-    assert.equal(typeof linkrunner[name], 'undefined', name);
-  }
+test('trackPayment does not exist', () => {
+  assert.equal(typeof linkrunner.trackPayment, 'undefined');
+});
+
+test('deprecated capturePayment calls native with the old payload', async () => {
+  await linkrunner.capturePayment({ paymentId: 'order_1', userId: 'u_1', amount: 499, type: 'FIRST_PAYMENT' });
+  assert.deepEqual(calls, [[
+    'capturePayment',
+    { paymentId: 'order_1', userId: 'u_1', amount: 499, type: 'FIRST_PAYMENT', status: 'PAYMENT_COMPLETED', eventData: undefined },
+  ]]);
+});
+
+test('deprecated removePayment calls native with the old payload', async () => {
+  await linkrunner.removePayment({ paymentId: 'order_1', userId: 'u_1' });
+  assert.deepEqual(calls, [['removePayment', { paymentId: 'order_1', userId: 'u_1' }]]);
 });
 
 test('PaymentStatus exposes the four statuses as strings', () => {

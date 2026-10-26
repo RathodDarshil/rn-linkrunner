@@ -214,6 +214,86 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
         }
     }
 
+    @Suppress("DEPRECATION")
+    @ReactMethod
+    fun capturePayment(paymentData: ReadableMap, promise: Promise) {
+        if (paymentData == null) {
+            promise.reject("PAYMENT_ERROR", "Payment data is required")
+            return
+        }
+
+        try {
+            val paymentDataMap = MapUtils.readableMapToMap(paymentData)
+            
+            moduleScope.launch {
+                try {
+                    val result = linkrunnerSDK.capturePayment(ModelConverter.toCapturePaymentRequest(paymentDataMap))
+                    
+                    withContext(Dispatchers.Main) {
+                        if (result.isSuccess) {
+                            val response = Arguments.createMap()
+                            response.putString("status", "success")
+                            response.putString("message", "Payment captured successfully")
+                            promise.resolve(response)
+                        } else {
+                            promise.reject(
+                                "PAYMENT_ERROR", 
+                                "Failed to capture payment: ${result.exceptionOrNull()?.message}",
+                                result.exceptionOrNull()
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        promise.reject("PAYMENT_ERROR", "Exception capturing payment: ${e.message}", e)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            promise.reject("PAYMENT_ERROR", "Failed to capture payment: ${e.message}", e)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @ReactMethod
+    fun removePayment(paymentData: ReadableMap, promise: Promise) {
+        if (paymentData == null) {
+            promise.reject("REMOVE_PAYMENT_ERROR", "Payment data is required")
+            return
+        }
+
+        try {
+            val paymentDataMap = MapUtils.readableMapToMap(paymentData)
+            
+            moduleScope.launch {
+                try {
+                    val result = linkrunnerSDK.removePayment(ModelConverter.toRemovePaymentRequest(paymentDataMap))
+                    
+                    withContext(Dispatchers.Main) {
+                        if (result.isSuccess) {
+                            val response = Arguments.createMap()
+                            response.putString("status", "success")
+                            response.putString("message", "Payment removed successfully")
+                            promise.resolve(response)
+                        } else {
+                            promise.reject(
+                                "REMOVE_PAYMENT_ERROR", 
+                                "Failed to remove payment: ${result.exceptionOrNull()?.message}",
+                                result.exceptionOrNull()
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        promise.reject("REMOVE_PAYMENT_ERROR", "Exception removing payment: ${e.message}", e)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            promise.reject("REMOVE_PAYMENT_ERROR", "Failed to remove payment: ${e.message}", e)
+        }
+    }
+
     @ReactMethod
     fun getAttributionData(promise: Promise) {
         moduleScope.launch {

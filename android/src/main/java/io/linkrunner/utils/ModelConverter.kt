@@ -3,6 +3,10 @@ package io.linkrunner.utils
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WritableMap
+import io.linkrunner.sdk.models.PaymentStatus
+import io.linkrunner.sdk.models.PaymentType
+import io.linkrunner.sdk.models.request.CapturePaymentRequest
+import io.linkrunner.sdk.models.request.RemovePaymentRequest
 import io.linkrunner.sdk.models.request.UserDataRequest
 import io.linkrunner.sdk.models.IntegrationData
 import io.linkrunner.sdk.models.response.AttributionData
@@ -225,6 +229,38 @@ object ModelConverter {
     fun toIntegrationData(map: Map<String, Any>): IntegrationData {
         return IntegrationData(
             clevertapId = map["clevertapId"] as? String
+        )
+    }
+
+    /**
+     * Convert a ReadableMap to CapturePaymentRequest
+     */
+    @Suppress("DEPRECATION")
+    fun toCapturePaymentRequest(map: Map<String, Any>): CapturePaymentRequest {
+        val typeString = map["type"] as? String ?: "DEFAULT"
+        val statusString = map["status"] as? String ?: "PAYMENT_COMPLETED"
+
+        @Suppress("UNCHECKED_CAST")
+        val eventData = map["eventData"] as? Map<String, Any>
+
+        return CapturePaymentRequest(
+            paymentId = map["paymentId"] as? String ?: "",
+            userId = map["userId"] as? String ?: "",
+            amount = (map["amount"] as? Number)?.toDouble() ?: 0.0,
+            type = PaymentType.valueOf(typeString),
+            status = PaymentStatus.valueOf(statusString),
+            eventData = eventData
+        )
+    }
+
+    /**
+     * Convert a ReadableMap to RemovePaymentRequest
+     */
+    @Suppress("DEPRECATION")
+    fun toRemovePaymentRequest(map: Map<String, Any>): RemovePaymentRequest {
+        return RemovePaymentRequest(
+            paymentId = map["paymentId"] as? String ?: "",
+            userId = map["userId"] as? String ?: ""
         )
     }
 }
