@@ -53,6 +53,23 @@ Rename `capturePayment` to `trackEvent`, pass the old `type` as the first argume
 ### Payment names and dashboard mappings
 
 The event name you pass becomes the payment type in reports and in your dashboard event mappings, and it is stored exactly as you send it. If you used one of the old payment types, pass it in uppercase exactly as before (for example `FIRST_PAYMENT` or `DEFAULT`), so your existing mappings, reports and partner templates keep working with no change. A different spelling such as `first_payment` is a new payment type. If you pick a new name such as `purchase`, add a mapping for it in the dashboard before you release, or those payments are not sent to ad networks. `capturePayment` without a type was stored as `DEFAULT`.
+## [3.4.2] - 2026-11-02
+
+### Fixed
+
+- Bumped the native iOS SDK to `LinkrunnerKit 4.3.2`. Fixes SKAdNetwork postbacks arriving with no conversion value on iOS 17.4 and above. LinkrunnerKit 4.1.0 to 4.3.1 called only `AdAttributionKit.Postback.updateConversionValue` on those versions, and Apple mirrors SKAdNetwork updates into AdAttributionKit but not the other way round, so installs from SKAdNetwork-signed networks such as Meta and Google got postbacks with no conversion value. 4.3.2 calls both `Postback.updateConversionValue` and `SKAdNetwork.updatePostbackConversionValue`. No API changes. Android is unchanged (`io.linkrunner:android-sdk:4.4.0`).
+
+## [3.4.1] - 2026-10-25
+
+### Fixed
+
+- Bumped the native iOS SDK to `LinkrunnerKit 4.3.1`. Fixes an `EXC_BAD_ACCESS (KERN_INVALID_ADDRESS)` crash at app launch on iOS, in frames like `DeviceData`, `getAttributionToken`, `setUserData` and `makeRequestWithRetry`, that could happen when `init`, `setUserData`, `trackEvent` and other calls ran at the same time. LinkrunnerKit 4.1.0 to 4.3.0 shared the cached AdServices token between those calls without a lock, and every piece of shared state is now locked. No API changes. Android is unchanged (`io.linkrunner:android-sdk:4.4.0`).
+
+## [3.4.0] - 2026-10-23
+
+### Added
+
+- Bumped the native Android SDK to `4.4.0`. Android device data now includes `device_model` (`Build.MODEL`, for example `SM-M315F`), so Device Model is filled for Android users on the dashboard and in ad network postbacks. `device_name` is unchanged. No API changes. iOS is unchanged (`LinkrunnerKit 4.3.0`).
 
 ## [3.3.2] - 2026-10-21
 
