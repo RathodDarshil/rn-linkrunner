@@ -235,6 +235,7 @@ object ModelConverter {
     /**
      * Convert a ReadableMap to CapturePaymentRequest
      */
+    @Suppress("DEPRECATION")
     fun toCapturePaymentRequest(map: Map<String, Any>): CapturePaymentRequest {
         val typeString = map["type"] as? String ?: "DEFAULT"
         val statusString = map["status"] as? String ?: "PAYMENT_COMPLETED"
@@ -255,6 +256,7 @@ object ModelConverter {
     /**
      * Convert a ReadableMap to RemovePaymentRequest
      */
+    @Suppress("DEPRECATION")
     fun toRemovePaymentRequest(map: Map<String, Any>): RemovePaymentRequest {
         return RemovePaymentRequest(
             paymentId = map["paymentId"] as? String ?: "",
