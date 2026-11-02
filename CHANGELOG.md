@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.2] - 2026-11-02
+
+### Fixed
+
+- Bumped the native iOS SDK to `LinkrunnerKit 4.3.2`. Fixes SKAdNetwork postbacks arriving with no conversion value on iOS 17.4 and above. LinkrunnerKit 4.1.0 to 4.3.1 called only `AdAttributionKit.Postback.updateConversionValue` on those versions, and Apple mirrors SKAdNetwork updates into AdAttributionKit but not the other way round, so installs from SKAdNetwork-signed networks such as Meta and Google got postbacks with no conversion value. 4.3.2 calls both `Postback.updateConversionValue` and `SKAdNetwork.updatePostbackConversionValue`. No API changes. Android is unchanged (`io.linkrunner:android-sdk:4.4.0`).
+
 ## [3.4.1] - 2026-10-25
 
 ### Fixed
