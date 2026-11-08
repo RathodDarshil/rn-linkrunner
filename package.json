@@ -1,7 +1,7 @@
 {
   "name": "rn-linkrunner",
   "version": "4.0.0",
-  "description": "React Native Package for linkrunner",
+  "description": "Linkrunner mobile measurement partner (MMP) SDK for React Native: install attribution, deferred deep linking, in-app events, revenue and SKAN.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
@@ -36,8 +36,16 @@
   },
   "keywords": [
     "react-native",
+    "expo",
     "ios",
-    "android"
+    "android",
+    "mmp",
+    "mobile-attribution",
+    "attribution",
+    "deep-linking",
+    "deferred-deep-linking",
+    "skadnetwork",
+    "linkrunner"
   ],
   "repository": {
     "type": "git",
@@ -48,7 +56,7 @@
   "bugs": {
     "url": "https://github.com/RathodDarshil/rn-linkrunner/issues"
   },
-  "homepage": "https://github.com/RathodDarshil/rn-linkrunner#readme",
+  "homepage": "https://www.linkrunner.io",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
