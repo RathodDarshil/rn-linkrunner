@@ -119,6 +119,7 @@ class Linkrunner {
     }
   }
 
+  /** @deprecated Use trackEvent(eventName, { amount, paymentId, currency, userId }) instead. */
   async capturePayment({
     amount,
     userId,
@@ -180,6 +181,7 @@ class Linkrunner {
     }
   }
 
+  /** @deprecated Send the same paymentId with status PAYMENT_CANCELLED through trackEvent instead. */
   async removePayment({
     userId,
     paymentId,
@@ -210,6 +212,7 @@ class Linkrunner {
     }
   }
 
+  /** Track an in-app event; it is a payment when eventData has amount, paymentId and currency (plus userId and optional status). */
   async trackEvent(eventName: string, eventData?: Record<string, any>, eventId?: string | number ) {
     let finalEventId: string | null = null;
     
@@ -245,8 +248,6 @@ class Linkrunner {
       throw error;
     }
   }
-
-
   async setAdditionalData(integrationData: IntegrationData): Promise<void | any> {
     if (!this.token) {
       console.error('Linkrunner: Setting integration data failed, token not initialized');
@@ -470,5 +471,7 @@ export type {
   LinkrunnerConsent,
   UserData,
 } from './types';
+
+export { PaymentStatus } from './types';
 
 export default linkrunner;

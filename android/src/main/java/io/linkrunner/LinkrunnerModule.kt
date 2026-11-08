@@ -40,7 +40,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
 
-            val packageVersion = options?.getString("packageVersion") ?: "3.4.2" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "4.0.0" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -214,6 +214,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
         }
     }
 
+    @Suppress("DEPRECATION")
     @ReactMethod
     fun capturePayment(paymentData: ReadableMap, promise: Promise) {
         if (paymentData == null) {
@@ -253,6 +254,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
         }
     }
 
+    @Suppress("DEPRECATION")
     @ReactMethod
     fun removePayment(paymentData: ReadableMap, promise: Promise) {
         if (paymentData == null) {
