@@ -24,11 +24,12 @@ class LinkrunnerSDK: NSObject {
         let keyId = dict["keyId"] as? String
         let disableIdfa = dict["disableIdfa"] as? Bool ?? false
         let debug = dict["debug"] as? Bool ?? false
-    
-        
+        // Missing or NSNull stays nil (keeps the stored value). Never default to false.
+        let privacyMode = dict["privacyMode"] as? Bool
+
         Task {
             do {
-                try await linkrunnerSDK.initialize(token: token, secretKey: secretKey, keyId: keyId, disableIdfa: disableIdfa, debug: debug)
+                try await linkrunnerSDK.initialize(token: token, secretKey: secretKey, keyId: keyId, disableIdfa: disableIdfa, debug: debug, privacyMode: privacyMode)
                 print("Linkrunner: SDK initialized successfully")
             } catch {
                 print("Linkrunner: Failed to initialize SDK: \(error)")

@@ -1,6 +1,6 @@
 {
   "name": "rn-linkrunner",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "Linkrunner mobile measurement partner (MMP) SDK for React Native: install attribution, deferred deep linking, in-app events, revenue and SKAN.",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -28,7 +28,7 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/trackEvent.test.js",
+    "test": "node --test test/trackEvent.test.js test/init.test.js",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "clean": "del-cli lib",
     "prepare": "bob build",

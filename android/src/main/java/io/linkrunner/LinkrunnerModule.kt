@@ -39,8 +39,15 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             val secretKey = options?.getString("secretKey")
             val keyId = options?.getString("keyId")
             val debug = options?.getBoolean("debug") ?: false
+            // Missing or null must stay null (keeps the stored value). Never default to false.
+            val privacyMode: Boolean? =
+                if (options != null && options.hasKey("privacyMode") && !options.isNull("privacyMode")) {
+                    options.getBoolean("privacyMode")
+                } else {
+                    null
+                }
 
-            val packageVersion = options?.getString("packageVersion") ?: "4.0.0" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "4.1.0" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -63,7 +70,8 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                         token = token,
                         secretKey = secretKey,
                         keyId = keyId,
-                        debug = debug
+                        debug = debug,
+                        privacyMode = privacyMode
                     )
                     
                     withContext(Dispatchers.Main) {
