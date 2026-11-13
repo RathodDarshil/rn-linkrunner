@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0] - 2026-11-13
+
+### Added
+
+- `privacyMode` as the last parameter of `init(token, secretKey?, keyId?, disableIdfa?, debug = false, privacyMode?)`. When `true`, the SDK stops collecting every device-level identifier and only the SDK-generated install instance ID identifies the install. Use it for apps directed at children (COPPA, Apple Kids Category, Google Play Families).
+  - Android: no GAID, no App Set ID, no Android ID, no local IP, no carrier name and no Meta install referrer.
+  - iOS: no IDFA, the ATT prompt is never shown, no IDFV, the device name is replaced by the generic model, no Google ODM and no SKAdNetwork conversion value updates.
+  - Still sent: install instance ID, device metadata (brand, model, OS version, locale, connectivity), the Google Play install referrer (Android) and the Apple AdServices token (iOS). Data your app passes itself (`signup`, `setUserData`, `setPushToken`, `setAdditionalData`) is still sent.
+  - The native SDK stores the value. `true` stays on across launches until you call `init` with `false`. Leaving it out keeps the stored value. Default off.
+  - Trade-off: Google iOS match rate drops because IDFV is Google's fallback ID. Server-side IP matching still works.
+
+### Changed
+
+- Requires the native Android SDK 5.1.0 (`io.linkrunner:android-sdk:5.1.0`) and iOS SDK 5.1.0 (`LinkrunnerKit 5.1.0`).
+
 ## [4.0.0] - 2026-11-08
 
 ### Changed

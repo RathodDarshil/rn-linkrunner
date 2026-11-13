@@ -27,7 +27,23 @@ class Linkrunner {
     return packageVersion;
   }
 
-  async init(token: string, secretKey?: string, keyId?: string, disableIdfa?: boolean, debug: boolean=false) {
+  /**
+   * Initializes the SDK. Call it once on app start.
+   *
+   * @param privacyMode `true` stops collection of every device-level identifier
+   * (GAID, App Set ID, Android ID, IDFA, IDFV and similar) and never shows the ATT
+   * prompt. Use it for apps directed at children. The native SDK stores the value:
+   * `true` stays on across launches until you call `init` with `false`. Leave it
+   * out to keep the stored value. Default off.
+   */
+  async init(
+    token: string,
+    secretKey?: string,
+    keyId?: string,
+    disableIdfa?: boolean,
+    debug: boolean = false,
+    privacyMode?: boolean
+  ) {
     if (!token) {
       console.error('Linkrunner needs your project token to initialize!');
       return;
@@ -35,14 +51,17 @@ class Linkrunner {
 
     this.token = token;
 
+    // Unset must reach native as null, never false: false would turn a stored `true` off.
+    const privacyModeValue = typeof privacyMode === 'boolean' ? privacyMode : null;
+
     try {
 
       let result;
       if (Platform.OS === 'android') {
-        result = await LinkrunnerSDKModule.init(token, {secretKey, keyId, debug, packageVersion});
+        result = await LinkrunnerSDKModule.init(token, {secretKey, keyId, debug, packageVersion, privacyMode: privacyModeValue});
       } else {
         // iOS init maintains backwards compatibility
-        result = await LinkrunnerSDKModule.initializeSDK({token: token, secretKey, keyId, disableIdfa, debug});
+        result = await LinkrunnerSDKModule.initializeSDK({token: token, secretKey, keyId, disableIdfa, debug, privacyMode: privacyModeValue});
       }
       
       if (__DEV__) {
