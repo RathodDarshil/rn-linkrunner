@@ -1,5 +1,11 @@
 import { NativeModules, Platform } from 'react-native';
-import type { AttributionData, DeeplinkData, IntegrationData, LinkrunnerConsent, UserData } from './types';
+import type {
+  AttributionData,
+  DeeplinkData,
+  IntegrationData,
+  LinkrunnerConsent,
+  UserData,
+} from './types';
 import packageJson from '../package.json';
 
 const LINKING_ERROR =
@@ -52,20 +58,33 @@ class Linkrunner {
     this.token = token;
 
     // Unset must reach native as null, never false: false would turn a stored `true` off.
-    const privacyModeValue = typeof privacyMode === 'boolean' ? privacyMode : null;
+    const privacyModeValue =
+      typeof privacyMode === 'boolean' ? privacyMode : null;
 
     try {
-
       let result;
       if (Platform.OS === 'android') {
-        result = await LinkrunnerSDKModule.init(token, {secretKey, keyId, debug, packageVersion, privacyMode: privacyModeValue});
+        result = await LinkrunnerSDKModule.init(token, {
+          secretKey,
+          keyId,
+          debug,
+          packageVersion,
+          privacyMode: privacyModeValue,
+        });
       } else {
         // iOS init maintains backwards compatibility
-        result = await LinkrunnerSDKModule.initializeSDK({token: token, secretKey, keyId, disableIdfa, debug, privacyMode: privacyModeValue});
+        result = await LinkrunnerSDKModule.initializeSDK({
+          token: token,
+          secretKey,
+          keyId,
+          disableIdfa,
+          debug,
+          privacyMode: privacyModeValue,
+        });
       }
-      
+
       if (__DEV__) {
-        console.log("Init successful");
+        console.log('Init successful');
         console.log('Linkrunner initialised successfully');
         console.log('init response > ', result);
       }
@@ -98,7 +117,7 @@ class Linkrunner {
     try {
       // Pass null as data if it's undefined to avoid potential issues
       const result = await LinkrunnerSDKModule.signup(user_data, data || {});
-      
+
       if (__DEV__) {
         console.log('Linkrunner signup successful');
         console.log('signup response > ', result);
@@ -125,7 +144,7 @@ class Linkrunner {
 
     try {
       const result = await LinkrunnerSDKModule.setUserData(user_data);
-      
+
       if (__DEV__) {
         console.log('Linkrunner user data set successfully');
         console.log('set user data response > ', result);
@@ -167,12 +186,16 @@ class Linkrunner {
     eventData?: Record<string, any>;
   }) {
     if (!this.token) {
-      console.error('Linkrunner: Payment capture failed, token not initialized');
+      console.error(
+        'Linkrunner: Payment capture failed, token not initialized'
+      );
       return;
     }
 
     if (!paymentId || paymentId.trim().length === 0) {
-      const error = new Error('Linkrunner: paymentId is required to capture a payment');
+      const error = new Error(
+        'Linkrunner: paymentId is required to capture a payment'
+      );
       console.error(error.message);
       throw error;
     }
@@ -188,12 +211,11 @@ class Linkrunner {
       };
 
       const result = await LinkrunnerSDKModule.capturePayment(paymentData);
-      
+
       if (__DEV__) {
         console.log('Linkrunner payment captured successfully');
         console.log('capture payment response > ', result);
       }
-
     } catch (error) {
       console.error('Error capturing payment via native module', error);
       throw error;
@@ -209,7 +231,9 @@ class Linkrunner {
     userId: string;
   }) {
     if (!this.token) {
-      console.error('Linkrunner: Payment removal failed, token not initialized');
+      console.error(
+        'Linkrunner: Payment removal failed, token not initialized'
+      );
       return;
     }
 
@@ -220,7 +244,7 @@ class Linkrunner {
       };
 
       const result = await LinkrunnerSDKModule.removePayment(paymentData);
-      
+
       if (__DEV__) {
         console.log('Linkrunner payment removed successfully');
         console.log('remove payment response > ', result);
@@ -232,18 +256,26 @@ class Linkrunner {
   }
 
   /** Track an in-app event; it is a payment when eventData has amount, paymentId and currency (plus userId and optional status). */
-  async trackEvent(eventName: string, eventData?: Record<string, any>, eventId?: string | number ) {
+  async trackEvent(
+    eventName: string,
+    eventData?: Record<string, any>,
+    eventId?: string | number
+  ) {
     let finalEventId: string | null = null;
-    
+
     if (eventId != null) {
       if (typeof eventId === 'string' || typeof eventId === 'number') {
         finalEventId = String(eventId);
       } else {
-        console.warn('Linkrunner: eventId must be a string or number. Received:', typeof eventId, '. Ignoring eventId.');
+        console.warn(
+          'Linkrunner: eventId must be a string or number. Received:',
+          typeof eventId,
+          '. Ignoring eventId.'
+        );
         finalEventId = null;
       }
     }
-    
+
     if (!this.token) {
       console.error('Linkrunner: Track event failed, token not initialized');
       return;
@@ -254,8 +286,12 @@ class Linkrunner {
     }
 
     try {
-      const result = await LinkrunnerSDKModule.trackEvent(eventName, eventData || {}, finalEventId);
-      
+      const result = await LinkrunnerSDKModule.trackEvent(
+        eventName,
+        eventData || {},
+        finalEventId
+      );
+
       if (__DEV__) {
         console.log('Linkrunner event tracked successfully:', eventName);
         console.log('track event response > ', result);
@@ -267,9 +303,13 @@ class Linkrunner {
       throw error;
     }
   }
-  async setAdditionalData(integrationData: IntegrationData): Promise<void | any> {
+  async setAdditionalData(
+    integrationData: IntegrationData
+  ): Promise<void | any> {
     if (!this.token) {
-      console.error('Linkrunner: Setting integration data failed, token not initialized');
+      console.error(
+        'Linkrunner: Setting integration data failed, token not initialized'
+      );
       return;
     }
 
@@ -280,10 +320,15 @@ class Linkrunner {
 
     try {
       // Call the native module implementation
-      const result = await LinkrunnerSDKModule.setAdditionalData(integrationData);
-      
+      const result = await LinkrunnerSDKModule.setAdditionalData(
+        integrationData
+      );
+
       if (__DEV__) {
-        console.log('Linkrunner: Integration data set successfully', integrationData);
+        console.log(
+          'Linkrunner: Integration data set successfully',
+          integrationData
+        );
         console.log('set additional data response > ', result);
       }
 
@@ -294,16 +339,18 @@ class Linkrunner {
       throw error;
     }
   }
-  
+
   async getAttributionData(): Promise<AttributionData | void> {
     if (!this.token) {
-      console.error('Linkrunner: Getting attribution data failed, token not initialized');
+      console.error(
+        'Linkrunner: Getting attribution data failed, token not initialized'
+      );
       return;
     }
 
     try {
       const result = await LinkrunnerSDKModule.getAttributionData();
-      
+
       if (__DEV__) {
         console.log('Linkrunner: Attribution data retrieved successfully');
         console.log('get attribution data response > ', result);
@@ -320,12 +367,16 @@ class Linkrunner {
   enablePIIHashing(enabled: boolean = true): void {
     try {
       LinkrunnerSDKModule.enablePIIHashing(enabled);
-      
+
       if (__DEV__) {
-        console.log(`Linkrunner: PII hashing ${enabled ? 'enabled' : 'disabled'}`);
+        console.log(
+          `Linkrunner: PII hashing ${enabled ? 'enabled' : 'disabled'}`
+        );
       }
     } catch (error) {
-      console.error(`Linkrunner: Failed to ${enabled ? 'enable' : 'disable'} PII hashing`);
+      console.error(
+        `Linkrunner: Failed to ${enabled ? 'enable' : 'disable'} PII hashing`
+      );
       console.error('Linkrunner: ', error);
     }
   }
@@ -394,12 +445,16 @@ class Linkrunner {
 
       if (__DEV__) {
         console.log(
-          `Linkrunner: TCF consent collection ${enabled ? 'enabled' : 'disabled'}`
+          `Linkrunner: TCF consent collection ${
+            enabled ? 'enabled' : 'disabled'
+          }`
         );
       }
     } catch (error) {
       console.error(
-        `Linkrunner: Failed to ${enabled ? 'enable' : 'disable'} TCF consent collection`
+        `Linkrunner: Failed to ${
+          enabled ? 'enable' : 'disable'
+        } TCF consent collection`
       );
       console.error('Linkrunner: ', error);
     }
@@ -407,17 +462,19 @@ class Linkrunner {
 
   async setPushToken(pushToken: string): Promise<void> {
     if (!this.token) {
-      console.error('Linkrunner: Setting push token failed, token not initialized');
+      console.error(
+        'Linkrunner: Setting push token failed, token not initialized'
+      );
       return;
     }
-    
+
     if (!pushToken || pushToken.trim().length === 0) {
       throw new Error('Push token cannot be empty');
     }
 
     try {
       await LinkrunnerSDKModule.setPushToken(pushToken);
-      
+
       if (__DEV__) {
         console.log('Linkrunner: Push token set successfully');
       }
@@ -429,7 +486,9 @@ class Linkrunner {
 
   async setCustomerUserId(userId: string): Promise<void> {
     if (!this.token) {
-      console.error('Linkrunner: Setting customer user ID failed, token not initialized');
+      console.error(
+        'Linkrunner: Setting customer user ID failed, token not initialized'
+      );
       return;
     }
 
@@ -449,10 +508,14 @@ class Linkrunner {
     }
   }
 
-  async handleDeeplink(deeplinkUrl: string | null): Promise<DeeplinkData | void> {
+  async handleDeeplink(
+    deeplinkUrl: string | null
+  ): Promise<DeeplinkData | void> {
     if (!deeplinkUrl || deeplinkUrl.trim().length === 0) {
       if (__DEV__) {
-        console.log('Linkrunner: handleDeeplink called with null or empty URL, ignoring');
+        console.log(
+          'Linkrunner: handleDeeplink called with null or empty URL, ignoring'
+        );
       }
       return;
     }
@@ -466,7 +529,10 @@ class Linkrunner {
       const result = await LinkrunnerSDKModule.handleDeeplink(deeplinkUrl);
 
       if (__DEV__) {
-        console.log('Linkrunner: handleDeeplink successful for URL:', deeplinkUrl);
+        console.log(
+          'Linkrunner: handleDeeplink successful for URL:',
+          deeplinkUrl
+        );
         console.log('handleDeeplink response > ', result);
       }
 
@@ -476,7 +542,6 @@ class Linkrunner {
       throw error;
     }
   }
-
 }
 
 const linkrunner = new Linkrunner();

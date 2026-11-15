@@ -68,8 +68,19 @@ test('trackEvent with only an event name defaults the rest', async () => {
 });
 
 test('custom event with amount and currency in eventData is passed unchanged', async () => {
-  await linkrunner.trackEvent('cart_value', { amount: 250, currency: 'INR', status: 'open', userId: 'u_7' });
-  assert.deepEqual(calls, [['cart_value', { amount: 250, currency: 'INR', status: 'open', userId: 'u_7' }, null]]);
+  await linkrunner.trackEvent('cart_value', {
+    amount: 250,
+    currency: 'INR',
+    status: 'open',
+    userId: 'u_7',
+  });
+  assert.deepEqual(calls, [
+    [
+      'cart_value',
+      { amount: 250, currency: 'INR', status: 'open', userId: 'u_7' },
+      null,
+    ],
+  ]);
 });
 
 test('payment fields in eventData reach native unchanged, with numbers kept as numbers', async () => {
@@ -99,7 +110,9 @@ test('payment fields in eventData reach native unchanged, with numbers kept as n
 test('native payment errors are rethrown', async () => {
   const original = nativeModule.trackEvent;
   nativeModule.trackEvent = async () => {
-    throw new Error('Failed to track event: amount, paymentId and currency must be sent together');
+    throw new Error(
+      'Failed to track event: amount, paymentId and currency must be sent together'
+    );
   };
   try {
     await assert.rejects(
@@ -116,16 +129,32 @@ test('trackPayment does not exist', () => {
 });
 
 test('deprecated capturePayment calls native with the old payload', async () => {
-  await linkrunner.capturePayment({ paymentId: 'order_1', userId: 'u_1', amount: 499, type: 'FIRST_PAYMENT' });
-  assert.deepEqual(calls, [[
-    'capturePayment',
-    { paymentId: 'order_1', userId: 'u_1', amount: 499, type: 'FIRST_PAYMENT', status: 'PAYMENT_COMPLETED', eventData: undefined },
-  ]]);
+  await linkrunner.capturePayment({
+    paymentId: 'order_1',
+    userId: 'u_1',
+    amount: 499,
+    type: 'FIRST_PAYMENT',
+  });
+  assert.deepEqual(calls, [
+    [
+      'capturePayment',
+      {
+        paymentId: 'order_1',
+        userId: 'u_1',
+        amount: 499,
+        type: 'FIRST_PAYMENT',
+        status: 'PAYMENT_COMPLETED',
+        eventData: undefined,
+      },
+    ],
+  ]);
 });
 
 test('deprecated removePayment calls native with the old payload', async () => {
   await linkrunner.removePayment({ paymentId: 'order_1', userId: 'u_1' });
-  assert.deepEqual(calls, [['removePayment', { paymentId: 'order_1', userId: 'u_1' }]]);
+  assert.deepEqual(calls, [
+    ['removePayment', { paymentId: 'order_1', userId: 'u_1' }],
+  ]);
 });
 
 test('PaymentStatus exposes the four statuses as strings', () => {
