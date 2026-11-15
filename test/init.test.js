@@ -31,7 +31,10 @@ const platform = { OS: 'android', select: (o) => o.default };
 const originalLoad = Module._load;
 Module._load = function (request, ...rest) {
   if (request === 'react-native') {
-    return { NativeModules: { LinkrunnerSDK: nativeModule }, Platform: platform };
+    return {
+      NativeModules: { LinkrunnerSDK: nativeModule },
+      Platform: platform,
+    };
   }
   return originalLoad.call(this, request, ...rest);
 };
@@ -56,10 +59,24 @@ for (const os of ['android', 'ios']) {
 
   test(`${os}: privacyMode true and false are passed through`, async () => {
     platform.OS = os;
-    await linkrunner.init('token', undefined, undefined, undefined, false, true);
+    await linkrunner.init(
+      'token',
+      undefined,
+      undefined,
+      undefined,
+      false,
+      true
+    );
     assert.equal(options().privacyMode, true);
     calls.length = 0;
-    await linkrunner.init('token', undefined, undefined, undefined, false, false);
+    await linkrunner.init(
+      'token',
+      undefined,
+      undefined,
+      undefined,
+      false,
+      false
+    );
     assert.equal(options().privacyMode, false);
   });
 }
