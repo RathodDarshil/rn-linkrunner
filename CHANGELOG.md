@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0] - 2026-11-14
+
+### Added
+
+- The SDK now reads the Meta (Facebook) SDK's anonymous ID when your app bundles the Meta SDK (for example through `react-native-fbsdk-next`), and sends it with `init`, `signup`, `trackEvent` and `capturePayment`. The backend forwards it to Meta as `anon_id`, so Meta can match the events Linkrunner sends to the device its own SDK already knows. No app code changes and no new dependency: apps without the Meta SDK send exactly what they sent before.
+- The lookup is read only, works in any start-up order, and is skipped while `privacyMode` is on.
+- Opt out at build time: `<meta-data android:name="io.linkrunner.sdk.MetaAnonymousIdCollectionEnabled" android:value="false" />` in `AndroidManifest.xml`, and a `LinkrunnerMetaAnonymousIdCollectionEnabled` Boolean set to `NO` in `Info.plist`.
+
+### Changed
+
+- Bundles native Android SDK `io.linkrunner:android-sdk:5.2.0` and iOS SDK `LinkrunnerKit 5.2.0`. Run a native rebuild after upgrading.
+
 ## [4.1.0] - 2026-11-13
 
 ### Added
