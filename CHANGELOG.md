@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.0] - 2026-11-17
+
+### Changed
+
+- Android: SDK calls from JavaScript now run on a background thread instead of the main thread, and promises are settled from that thread. A burst of `trackEvent` calls no longer queues work on the UI thread.
+- Bundles native Android SDK `io.linkrunner:android-sdk:5.3.0` and iOS SDK `LinkrunnerKit 5.3.0`. Requests are saved to an on-device queue and sent in order while the app runs, so they survive the app being killed or going offline. On Android this replaces one WorkManager job per call, which could start the app in the background and cause ANRs. Run a native rebuild after upgrading.
+
+### Fixed
+
+- Release builds no longer write the project token or user details (name, email, phone) to logcat or the console. The native SDKs log only when `debug` is on, and mask those values even then.
+
 ## [4.2.0] - 2026-11-14
 
 ### Added
