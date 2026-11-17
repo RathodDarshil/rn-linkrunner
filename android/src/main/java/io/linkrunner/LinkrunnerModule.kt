@@ -20,13 +20,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class LinkrunnerModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
     
     private val TAG = "LinkrunnerModule"
     private val linkrunnerSDK = LinkRunner.getInstance()
-    private val moduleScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    // SDK calls stay off the main thread; React Native promises can be settled from any thread.
+    private val moduleScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override fun getName(): String {
         return "LinkrunnerSDK"
@@ -47,7 +47,7 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                     null
                 }
 
-            val packageVersion = options?.getString("packageVersion") ?: "4.2.0" // React Native package version
+            val packageVersion = options?.getString("packageVersion") ?: "4.3.0" // React Native package version
 
             if (token.isEmpty()) {
                 promise.reject("INIT_ERROR", "Token is required")
@@ -74,24 +74,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                         privacyMode = privacyMode
                     )
                     
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Linkrunner SDK initialized successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "INIT_ERROR", 
-                                "Failed to initialize Linkrunner: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "Linkrunner SDK initialized successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "INIT_ERROR", 
+                            "Failed to initialize Linkrunner: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("INIT_ERROR", "Exception calling init: ${e.message}", e)
-                    }
+                    promise.reject("INIT_ERROR", "Exception calling init: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -119,24 +115,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                         additionalData = additionalData
                     )
                     
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "User signed up successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "SIGNUP_ERROR", 
-                                "Failed to signup user: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "User signed up successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "SIGNUP_ERROR", 
+                            "Failed to signup user: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("SIGNUP_ERROR", "Exception during signup: ${e.message}", e)
-                    }
+                    promise.reject("SIGNUP_ERROR", "Exception during signup: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -154,24 +146,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                 try {
                     val result = linkrunnerSDK.setUserData(ModelConverter.toUserDataRequest(userDataMap))
                     
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "User data set successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "SET_USER_DATA_ERROR", 
-                                "Failed to set user data: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "User data set successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "SET_USER_DATA_ERROR", 
+                            "Failed to set user data: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("SET_USER_DATA_ERROR", "Exception setting user data: ${e.message}", e)
-                    }
+                    promise.reject("SET_USER_DATA_ERROR", "Exception setting user data: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -197,24 +185,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                 try {
                     val result = linkrunnerSDK.trackEvent(eventName, eventDataMap, eventId)
                     
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Event tracked successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "TRACK_EVENT_ERROR", 
-                                "Failed to track event: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "Event tracked successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "TRACK_EVENT_ERROR", 
+                            "Failed to track event: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("TRACK_EVENT_ERROR", "Exception tracking event: ${e.message}", e)
-                    }
+                    promise.reject("TRACK_EVENT_ERROR", "Exception tracking event: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -237,24 +221,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                 try {
                     val result = linkrunnerSDK.capturePayment(ModelConverter.toCapturePaymentRequest(paymentDataMap))
                     
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Payment captured successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "PAYMENT_ERROR", 
-                                "Failed to capture payment: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "Payment captured successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "PAYMENT_ERROR", 
+                            "Failed to capture payment: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("PAYMENT_ERROR", "Exception capturing payment: ${e.message}", e)
-                    }
+                    promise.reject("PAYMENT_ERROR", "Exception capturing payment: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -277,24 +257,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                 try {
                     val result = linkrunnerSDK.removePayment(ModelConverter.toRemovePaymentRequest(paymentDataMap))
                     
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Payment removed successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "REMOVE_PAYMENT_ERROR", 
-                                "Failed to remove payment: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "Payment removed successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "REMOVE_PAYMENT_ERROR", 
+                            "Failed to remove payment: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("REMOVE_PAYMENT_ERROR", "Exception removing payment: ${e.message}", e)
-                    }
+                    promise.reject("REMOVE_PAYMENT_ERROR", "Exception removing payment: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -308,28 +284,24 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
             try {
                 val result = linkrunnerSDK.getAttributionData()
                 
-                withContext(Dispatchers.Main) {
-                    if (result.isSuccess) {
-                        val attributionData = result.getOrNull()
-                        
-                        val response = ModelConverter.fromAttributionData(attributionData)
+                if (result.isSuccess) {
+                    val attributionData = result.getOrNull()
+                    
+                    val response = ModelConverter.fromAttributionData(attributionData)
 
-                        response.putString("status", "success")
-                        response.putString("message", "Attribution data retrieved successfully")
-                        
-                        promise.resolve(response)
-                    } else {
-                        promise.reject(
-                            "ATTRIBUTION_DATA_ERROR", 
-                            "Failed to get attribution data: ${result.exceptionOrNull()?.message}",
-                            result.exceptionOrNull()
-                        )
-                    }
+                    response.putString("status", "success")
+                    response.putString("message", "Attribution data retrieved successfully")
+                    
+                    promise.resolve(response)
+                } else {
+                    promise.reject(
+                        "ATTRIBUTION_DATA_ERROR", 
+                        "Failed to get attribution data: ${result.exceptionOrNull()?.message}",
+                        result.exceptionOrNull()
+                    )
                 }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    promise.reject("ATTRIBUTION_DATA_ERROR", "Exception getting attribution data: ${e.message}", e)
-                }
+                promise.reject("ATTRIBUTION_DATA_ERROR", "Exception getting attribution data: ${e.message}", e)
             }
         }
     }
@@ -350,24 +322,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                     val integrationData = ModelConverter.toIntegrationData(additionalData)
                     val result = linkrunnerSDK.setAdditionalData(integrationData)
                     
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Additional data set successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "ADDITIONAL_DATA_ERROR", 
-                                "Failed to set additional data: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "Additional data set successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "ADDITIONAL_DATA_ERROR", 
+                            "Failed to set additional data: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("ADDITIONAL_DATA_ERROR", "Exception setting additional data: ${e.message}", e)
-                    }
+                    promise.reject("ADDITIONAL_DATA_ERROR", "Exception setting additional data: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -428,24 +396,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                 try {
                     val result = linkrunnerSDK.setPushToken(pushToken)
                     
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Push token set successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "SET_PUSH_TOKEN_ERROR", 
-                                "Failed to set push token: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "Push token set successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "SET_PUSH_TOKEN_ERROR", 
+                            "Failed to set push token: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("SET_PUSH_TOKEN_ERROR", "Exception setting push token: ${e.message}", e)
-                    }
+                    promise.reject("SET_PUSH_TOKEN_ERROR", "Exception setting push token: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -465,24 +429,20 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                 try {
                     val result = linkrunnerSDK.setCustomerUserId(userId)
 
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val response = Arguments.createMap()
-                            response.putString("status", "success")
-                            response.putString("message", "Customer user ID set successfully")
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "SET_CUSTOMER_USER_ID_ERROR",
-                                "Failed to set customer user ID: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
-                        }
+                    if (result.isSuccess) {
+                        val response = Arguments.createMap()
+                        response.putString("status", "success")
+                        response.putString("message", "Customer user ID set successfully")
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "SET_CUSTOMER_USER_ID_ERROR",
+                            "Failed to set customer user ID: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("SET_CUSTOMER_USER_ID_ERROR", "Exception setting customer user ID: ${e.message}", e)
-                    }
+                    promise.reject("SET_CUSTOMER_USER_ID_ERROR", "Exception setting customer user ID: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
@@ -505,34 +465,30 @@ class LinkrunnerModule(private val reactContext: ReactApplicationContext) : Reac
                 try {
                     val result = linkrunnerSDK.handleDeeplink(deeplinkUrl)
 
-                    withContext(Dispatchers.Main) {
-                        if (result.isSuccess) {
-                            val deeplinkData = result.getOrNull()
-                            val response = Arguments.createMap()
+                    if (result.isSuccess) {
+                        val deeplinkData = result.getOrNull()
+                        val response = Arguments.createMap()
 
-                            if (deeplinkData != null) {
-                                deeplinkData.deeplink?.let { deeplink ->
-                                    response.putString("deeplink", deeplink)
-                                }
-                                response.putBoolean("isLinkrunner", deeplinkData.isLinkrunner)
-                                deeplinkData.processing?.let { processing ->
-                                    response.putBoolean("processing", processing)
-                                }
+                        if (deeplinkData != null) {
+                            deeplinkData.deeplink?.let { deeplink ->
+                                response.putString("deeplink", deeplink)
                             }
-
-                            promise.resolve(response)
-                        } else {
-                            promise.reject(
-                                "HANDLE_DEEPLINK_ERROR",
-                                "Failed to handle deeplink: ${result.exceptionOrNull()?.message}",
-                                result.exceptionOrNull()
-                            )
+                            response.putBoolean("isLinkrunner", deeplinkData.isLinkrunner)
+                            deeplinkData.processing?.let { processing ->
+                                response.putBoolean("processing", processing)
+                            }
                         }
+
+                        promise.resolve(response)
+                    } else {
+                        promise.reject(
+                            "HANDLE_DEEPLINK_ERROR",
+                            "Failed to handle deeplink: ${result.exceptionOrNull()?.message}",
+                            result.exceptionOrNull()
+                        )
                     }
                 } catch (e: Exception) {
-                    withContext(Dispatchers.Main) {
-                        promise.reject("HANDLE_DEEPLINK_ERROR", "Exception handling deeplink: ${e.message}", e)
-                    }
+                    promise.reject("HANDLE_DEEPLINK_ERROR", "Exception handling deeplink: ${e.message}", e)
                 }
             }
         } catch (e: Exception) {
