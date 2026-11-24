@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.3.1] - 2026-11-24
+
+### Added
+
+- iOS: the bundled `LinkrunnerKit` is now 5.3.1, which ships a privacy manifest (`PrivacyInfo.xcprivacy`). Xcode's privacy report for your app now lists Linkrunner's collected data types and its `UserDefaults` use, so you no longer need to declare them by hand. Run `pod install` after upgrading. Android is unchanged (`io.linkrunner:android-sdk:5.3.0`).
+
 ## [4.3.0] - 2026-11-17
 
 ### Changed
